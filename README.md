@@ -1,7 +1,7 @@
 # 📚 ASP.NET-Core-Arch-Template
-Plug and play template for the creation of mid-scale ASP.NET Web projects. The template provides architecture that utilizes the best architectural practices and coding guidelines in the field, but yet the architecture is easy enough to be understood and extended.
+Plug and play template for the creation of a mid-scale ASP.NET Web projects. The template provides architecture that utilizes the best architectural practices and coding guidelines in the field, but yet the architecture is easy enough to be understood and extended.
 
-This project follows a Multitier architecture designed for scalability, maintainability, and testability. The solution is structured into logical tiers, separating concerns across Web, Services, Data, and Common modules. Each logical tier follows a minified Multilevel architecture, allowing for further seperation of the set of concerns down to the Single Responsibility of a layer, thus improving design efficiency and flexibility. 
+This project follows a Multitier architecture designed for scalability, maintainability, and testability. The solution is structured into logical tiers, separating concerns across Web, Services, Data, Tests and Common modules. Each logical tier follows a minified Multilevel architecture, allowing for further seperation of the set of concerns down to the Single Responsibility of a layer, thus improving design efficiency and flexibility. 
 
 ---
 
@@ -9,12 +9,12 @@ This project follows a Multitier architecture designed for scalability, maintain
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/KrIsKa7a/CSharpWeb-Sept2024.git
+   git clone https://github.com/KrIsKa7a/ASP.NET-Core-Arch-Template.git
    ```
 
 2. Navigate to the project directory:
    ```bash
-   cd CinemaApp
+   cd ASP.NET-Core-Arch-Template
    ```
 
 3. Restore dependencies:
@@ -38,7 +38,7 @@ This project follows a Multitier architecture designed for scalability, maintain
 ## 🛠️ Development Principles
 
 - **Separation of concerns**: Each layer has a single responsibility.
-- **Inversion of Control**: All dependencies are injected for maximum flexibility. This allows the developer to take control over some of the fundamental functionalities, provided by ASP.NET Core Web Framework.
+- **Inversion of Control**: All dependencies are injected for maximum flexibility. This allows the developer to take control over some of the fundamental functionalities, provided by the ASP.NET Core Web Framework.
 - **Modular Design**: New features can be added with minimal impact on existing code.
 - **Testing First**: The template provides seperate layers for performing different types of testing - Blackbox, Whitebox, Sandbox.
 
@@ -70,7 +70,7 @@ The project architecture is divided into five main tiers, each responsible for a
 - Uses the data in the **Shared Tier**
 
 📝 **Notes:**
-- The developer and the future architect is free to extend the architecture with multiple Application/Presentation Tiers, while reusing the functionality of the other tiers. Several Application/Presentation Tiers can be running simultaneously, because of the different naming contexts provided to the other tiers. Such architectural template allows for great scaleability and extendibility. 
+- The developer and the future architect is free to extend the architecture with multiple **Application/Presentation Tiers**, while reusing the functionality of the other **Tiers**. Several **Application/Presentation Tiers** can be running simultaneously, because of the different naming contexts provided to the other tiers. Such architectural template allows for great scaleability and extendibility. 
 
 ---
 
@@ -83,8 +83,8 @@ The project architecture is divided into five main tiers, each responsible for a
 
 🎯 **Purpose:**
 - Contains the core application logic and business rules.
-- Orchestrates workflows between presentation and data layers.
-- Maps domain models to view models and vice versa via AutoMapper.
+- Orchestrates workflows between **Presentation and Data tiers**.
+- Maps entity models to view models and vice versa via AutoMapper.
 - Provides reusable service components and helpers.
 
 🔗 **Dependencies:**
@@ -113,13 +113,13 @@ The project architecture is divided into five main tiers, each responsible for a
 🔗 **Dependencies:**
 - The only dependency of the **Data Tier** lies in the used Database Provider and Database Server.
 - The **Data Tier** is intended to provide high level of abstraction on the used Database Provider and Database Server to the **Service Tier**.
-- Uses the data in the **Shared Tier**
+- Uses the data in the **Shared Tier**.
 
 📝 **Notes:**
 - Usually a single **Data Tier** is used to abstract on a single Database Provider and Database Server used by the application.
 - In some cases, different **Application/Presentation Tiers** or even a single **Application/Presentation Tier** may need to access different Database Providers and Database Servers. In these cases it is up to the future architect of the application to decide between the following concepts:
   * Concept 1 - Usage of multiple DbContexts within a single **Data Tier**. This concept is suitable in the cases when different Database Provider and Database Server needs to be used, but the logic of the abstraction remains unchanged.
-  * Concept 2 - Usage of multiple **Data Tiers**, which represents different Database Provider and Database Server. This concepts allows for customization of the abstraction and common functionality, provided by each of the used **Data Tiers**. However, this concept leads to significant architectural impacts and needs to be analyzed carefully before used.
+  * Concept 2 - Usage of multiple **Data Tiers**, which represent different Database Provider and Database Server. This concepts allows for customization of the abstraction and common functionality, provided by each of the used **Data Tiers**. However, this concept leads to significant architectural impacts and needs to be analyzed carefully before used.
 ---
 
 ## 4. Cross-Cutting Tier
@@ -136,7 +136,7 @@ The project architecture is divided into five main tiers, each responsible for a
 - Promotes reusability and consistent behavior across the application.
 
 📝 **Notes:**
-- This tier is intended to provide shared data and functinality among all of the other **Tiers**.
+- This tier is intended to provide shared data and functionality among all of the other **Tiers**.
 - The **Cross-Cutting Tier** may be referenced by any other **Tier**, even by newly introduced **Tiers** by the future architects and developers.
 - Shared libraries and functionalities may also be stored in the **Cross-Cutting Tier**.
 
@@ -157,7 +157,7 @@ The project architecture is divided into five main tiers, each responsible for a
 
 🔗 **Dependencies:**
 - References each of the **Tiers** that needs to be tested.
-- Relies on the usage of an already implemented Test framework. Currently NUnit is used in the template, but the developer is free to use any Test framework preferred.
+- Relies on the usage of an already implemented Test framework. Currently [**NUnit**](https://nunit.org/) is used in the template, but the developer is free to use any Test framework preferred (e.g. xUnit, MSTest, etc).
 
 ---
 
@@ -178,6 +178,10 @@ The project architecture is divided into five main tiers, each responsible for a
 | `Data.Common`            | Base repositories, specifications, base models, database utilities                 |
 | `Global Common`          | Cross-cutting concerns (e.g., constants, enums, global helpers)        |
 | `Integration Tests`      | End-to-end testing across layers                                       |
+
+The individual layers are represented by individual folder in the file structure of the template. The intention behind this decision is that each of the layers should be added as a submodule of the superproject repository. This allows for smoother execution of the integration process, improves versioning and contributes to the CI/CD of the application. The current architectural template is not splitted into submodules, because it is intended to be used as a reference for building ASP.NET Core Web Apps by C# students. We did not want to add further complications into the template and decided to leave the Git submodules approach as a suggestion to the future user of the template. 
+
+On the other side, the lack of grouping of individual layers into **Tier** folders leads to confusion while developing the application. To deal with this, a Solution Folders are introduced for the different **Tiers** of the architecture.
 
 ---
 ## 📈 UML Diagram
