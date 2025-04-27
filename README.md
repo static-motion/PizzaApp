@@ -176,7 +176,7 @@ The project architecture is divided into five main tiers, each responsible for a
 | `Data`                   | Database access layer (Repositories, DbContext, Seeding, FluentAPI)                      |
 | `Data.Models`            | Code-first description of the Entities                                |
 | `Data.Common`            | Base repositories, specifications, base models, database utilities                 |
-| `Global Common`          | Cross-cutting concerns (e.g., constants, enums, global helpers)        |
+| `GCommon`          | Cross-cutting concerns (e.g., shared constants, enums, global helpers)        |
 | `Integration Tests`      | End-to-end testing across layers                                       |
 
 The individual layers are represented by individual folder in the file structure of the template. The intention behind this decision is that each of the layers should be added as a submodule of the superproject repository. This allows for smoother execution of the integration process, improves versioning and contributes to the CI/CD of the application. The current architectural template is not splitted into submodules, because it is intended to be used as a reference for building ASP.NET Core Web Apps by C# students. We did not want to add further complications into the template and decided to leave the Git submodules approach as a suggestion to the future user of the template. 
