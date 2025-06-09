@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PizzaApp.Data.Models\PizzaApp.Data.Models.csproj" />
+    <ProjectReference Include="..\PizzaApp.Data\PizzaApp.Data.csproj" />
+    <ProjectReference Include="..\PizzaApp.GCommon\PizzaApp.GCommon.csproj" />
+    <ProjectReference Include="..\PizzaApp.Services.AutoMapping\PizzaApp.Services.AutoMapping.csproj" />
+    <ProjectReference Include="..\PizzaApp.Services.Common\PizzaApp.Services.Common.csproj" />
+    <ProjectReference Include="..\PizzaApp.Web.ViewModels\PizzaApp.Web.ViewModels.csproj" />
+  </ItemGroup>
+
+</Project>
