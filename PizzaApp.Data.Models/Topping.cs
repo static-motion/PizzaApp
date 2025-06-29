@@ -3,23 +3,24 @@
     using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data.Models.MappingEntities;
 
+    [Comment("All the toppings offered.")]
     public class Topping
     {
-        [Comment("Unique identifier")]
+        [Comment("Primary Key unique identifier")]
         public int Id { get; set; }
 
-        [Comment("Foreign key to topping types")]
-        public int ToppingTypeId { get; set; }
+        [Comment("Foreign key to topping categories, shows which category the topping belongs to (meats, veggies etc.)")]
+        public int ToppingCategoryId { get; set; }
 
         public ToppingCategory ToppingCategory { get; set; } = null!;
 
-        [Comment("Topping name")]
+        [Comment("Name of the pizza topping")]
         public required string Name { get; set; }
 
-        [Comment("Topping description")]
+        [Comment("A short description of the pizza topping.")]
         public required string Desicription { get; set; }
 
-        [Comment("Topping price")]
+        [Comment("Current price of the pizza topping")]
         public decimal Price { get; set; }
 
         public ICollection<PizzaTopping> PizzasToppings { get; set; }

@@ -2,6 +2,7 @@
 {
     using Microsoft.EntityFrameworkCore;
 
+    [Comment("The topping categories offered by the pizza app (meats, veggies etc.)")]
     public class ToppingCategory
     {
         [Comment("Unique identifier")]
@@ -10,6 +11,7 @@
         [Comment("Topping type name")]
         public required string Name { get; set; }
 
+        // All the topics from a certain category - (meats, vegetables etc.)
         public ICollection<Topping> Toppings { get; set; }
             = new HashSet<Topping>();
     }

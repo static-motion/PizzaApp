@@ -83,7 +83,8 @@ namespace PizzaApp.Data.Migrations
                     table.PrimaryKey("PK_Doughs", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            migrationBuilder.CreateTable
+                (
                 name: "Drinks",
                 columns: table => new
                 {

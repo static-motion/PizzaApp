@@ -1,9 +1,8 @@
 ﻿namespace PizzaApp.Data.Models
 {
     using Microsoft.EntityFrameworkCore;
-    using System.ComponentModel.DataAnnotations.Schema;
 
-    [Table("Doughs")]
+    [Comment("All the dough types used for making pizzas.")]
     public class Dough
     {
         [Comment("Unique identifier")]
