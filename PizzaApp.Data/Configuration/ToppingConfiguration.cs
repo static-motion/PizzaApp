@@ -16,7 +16,7 @@
             entity
                 .HasOne(e => e.ToppingCategory)
                 .WithMany(tt => tt.Toppings)
-                .HasForeignKey(e => e.ToppingTypeId)
+                .HasForeignKey(e => e.ToppingCategoryId)
                 .IsRequired();
 
             entity

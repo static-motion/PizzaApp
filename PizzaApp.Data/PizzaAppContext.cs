@@ -30,6 +30,8 @@
 
         public DbSet<OrderDessert> OrdersDesserts { get; set; }
 
+        public DbSet<PizzaTopping> PizzasToppings { get; set; }
+
         public DbSet<OrderDrink> OrdersDrinks { get; set; }
 
         public DbSet<OrderPizza> OrdersPizzas { get; set; }
