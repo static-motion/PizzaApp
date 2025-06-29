@@ -5,8 +5,6 @@
 
     public class User : IdentityUser<Guid>
     {
-        //public required string Username { get; set; }
-
         public ICollection<Address> Addresses { get; set; }
             = new List<Address>();
 

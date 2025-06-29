@@ -20,6 +20,7 @@
 
         public ICollection<OrderDrink> OrderDrinks { get; set; }
             = new List<OrderDrink>();
+
         public ICollection<OrderPizza> OrderPizzas { get; set; }
             = new List<OrderPizza>();
 

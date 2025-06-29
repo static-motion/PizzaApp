@@ -7,15 +7,12 @@
     [Table("Sauces")]
     public class Sauce
     {
-        [Key]
         [Comment("Unique identifier")]
         public int Id { get; set; }
 
-        [Required]
         [Comment("Sauce type")]
         public required string Type { get; set; }
 
-        [Required]
         [Comment("Sauce description")]
         public required string Description { get; set; }
 
