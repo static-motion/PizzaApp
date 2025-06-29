@@ -22,17 +22,6 @@ namespace PizzaApp.Data.Configurations.MappingEntitiesConfigurations
                 .WithMany(t => t.PizzasToppings)
                 .HasForeignKey(e => e.ToppingId)
                 .IsRequired();
-
-            entity
-                .Property(e => e.Quantity)
-                .IsRequired()
-                .HasSentinel(0);
-
-            entity
-                .Property(e => e.PricePerItemAtPurchase)
-                .HasColumnType("decimal(8,2)")
-                .IsRequired()
-                .HasSentinel(0);
         }
     }
 }
