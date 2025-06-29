@@ -3,6 +3,7 @@ namespace PizzaApp.Web
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data;
+    using PizzaApp.Data.Models;
 
     public class Program
     {
@@ -18,8 +19,9 @@ namespace PizzaApp.Web
                     options.UseSqlServer(connectionString);
                 });
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
             builder.Services
-                .AddDefaultIdentity<IdentityUser>(options =>
+                .AddDefaultIdentity<User>(options =>
                 {
                     options.SignIn.RequireConfirmedAccount = true;
                     options.Password.RequireNonAlphanumeric = false;
@@ -28,7 +30,9 @@ namespace PizzaApp.Web
                     options.Password.RequireUppercase = false;
                     options.Password.RequiredLength = 3;
                 })
+                .AddRoles<IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<PizzaAppContext>();
+
             builder.Services.AddControllersWithViews();
 
             WebApplication? app = builder.Build();

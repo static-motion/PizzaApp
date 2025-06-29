@@ -1,12 +1,13 @@
 ﻿namespace PizzaApp.Data
 {
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
-    using PizzaApp.Data.Models.MappingEntities;
     using PizzaApp.Data.Models;
+    using PizzaApp.Data.Models.MappingEntities;
     using System.Reflection;
 
-    public class PizzaAppContext : IdentityDbContext
+    public class PizzaAppContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
 
         public DbSet<Address> Addresses { get; set; }
