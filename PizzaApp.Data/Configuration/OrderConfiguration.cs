@@ -15,7 +15,7 @@
                 .HasOne(e => e.User)
                 .WithMany(u => u.OrderHistory)
                 .HasForeignKey(e => e.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity
                 .Property(e => e.OrderStatus)
@@ -24,6 +24,10 @@
             entity
                 .Property(e => e.Price)
                 .HasPrecision(8, 2)
+                .IsRequired();
+
+            entity
+                .Property(e => e.CreatedOn)
                 .IsRequired();
 
             entity
