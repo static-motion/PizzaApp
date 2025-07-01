@@ -3,7 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using PizzaApp.Data.Models;
-
+    using PizzaApp.Data.Models.MappingEntities;
     using static PizzaApp.Data.Common.EntityConstraints.Pizza;
 
     class PizzaConfiguration : IEntityTypeConfiguration<Pizza>
@@ -39,6 +39,24 @@
                 .WithMany(u => u.CreatedPizzas)
                 .HasForeignKey(e => e.CreatorUserId)
                 .IsRequired();
+
+            entity
+                .HasData(GeneratePizzaSeed());
+        }
+
+        private static IEnumerable<Pizza> GeneratePizzaSeed()
+        {
+            return
+            [
+                new Pizza
+                {
+                    Id = 1,
+                    Name = "Classic Pepperoni",
+                    CreatorUserId = Guid.Parse("7BC9CF3B-7464-4B4A-EA3B-08DDB8A10943"),
+                    SauceId = 1,
+                    DoughId = 1,
+                }
+            ];
         }
     }
 }

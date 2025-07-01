@@ -22,6 +22,21 @@ namespace PizzaApp.Data.Configurations.MappingEntitiesConfigurations
                 .WithMany(t => t.PizzasToppings)
                 .HasForeignKey(e => e.ToppingId)
                 .IsRequired();
+
+            entity
+                .HasData(
+                    [
+                        new PizzaTopping()
+                        {
+                            PizzaId = 1,
+                            ToppingId = 1
+                        },
+                        new PizzaTopping()
+                        {
+                            PizzaId = 1,
+                            ToppingId = 4
+                        }
+                    ]);
         }
     }
 }
