@@ -13,6 +13,9 @@
         [Comment("Name of the pizza as given by its creator (User)")]
         public required string Name { get; set; }
 
+        [Comment("Short pizza description")]
+        public required string Description { get; set; }
+
         public ICollection<PizzaTopping> Toppings { get; set; }
             = new List<PizzaTopping>();
 

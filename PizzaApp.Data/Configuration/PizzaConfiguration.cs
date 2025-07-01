@@ -3,7 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using PizzaApp.Data.Models;
-    using PizzaApp.Data.Models.MappingEntities;
+
     using static PizzaApp.Data.Common.EntityConstraints.Pizza;
 
     class PizzaConfiguration : IEntityTypeConfiguration<Pizza>
@@ -16,6 +16,11 @@
             entity
                 .Property(e => e.Name)
                 .HasMaxLength(NameMaxLength)
+                .IsRequired();
+
+            entity
+                .Property(e => e.Description)
+                .HasMaxLength(DescriptionMaxLength)
                 .IsRequired();
 
             entity
@@ -52,9 +57,11 @@
                 {
                     Id = 1,
                     Name = "Classic Pepperoni",
+                    Description = "Tomato sauce, mozzarella and pepperoni on white dough. Simple. Classic. Timeless.",
                     CreatorUserId = Guid.Parse("7BC9CF3B-7464-4B4A-EA3B-08DDB8A10943"),
                     SauceId = 1,
                     DoughId = 1,
+                    ImageUrl = "https://images.unsplash.com/photo-1716237389720-2c4fdabf0ac0?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 }
             ];
         }

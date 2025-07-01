@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PizzaApp.Data;
 
@@ -11,9 +12,11 @@ using PizzaApp.Data;
 namespace PizzaApp.Data.Migrations
 {
     [DbContext(typeof(PizzaAppContext))]
-    partial class PizzaAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250701135146_SeededPepperoniPizzaImageUrl")]
+    partial class SeededPepperoniPizzaImageUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -589,12 +592,6 @@ namespace PizzaApp.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasComment("Foreign Key to User who created the pizza.");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasComment("Short pizza description");
-
                     b.Property<int>("DoughId")
                         .HasColumnType("int")
                         .HasComment("The type of dough the pizza is made with.");
@@ -632,7 +629,6 @@ namespace PizzaApp.Data.Migrations
                         {
                             Id = 1,
                             CreatorUserId = new Guid("7bc9cf3b-7464-4b4a-ea3b-08ddb8a10943"),
-                            Description = "Tomato sauce, mozzarella and pepperoni on white dough. Simple. Classic. Timeless.",
                             DoughId = 1,
                             ImageUrl = "https://images.unsplash.com/photo-1716237389720-2c4fdabf0ac0?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                             Name = "Classic Pepperoni",
