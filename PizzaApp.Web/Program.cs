@@ -5,6 +5,7 @@ namespace PizzaApp.Web
     using PizzaApp.Data;
     using PizzaApp.Data.Models;
     using PizzaApp.Services.Core;
+    using PizzaApp.Services.Core.Interfaces;
     using System.Threading.Tasks;
 
     public class Program
@@ -37,6 +38,7 @@ namespace PizzaApp.Web
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<UserSeedingService>();
+            builder.Services.AddScoped<IPizzaService, PizzaService>();
 
             WebApplication? app = builder.Build();
 

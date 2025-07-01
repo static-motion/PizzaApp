@@ -1,0 +1,7 @@
+﻿@using PizzaApp.Web.ViewModels
+@model IEnumerable<MenuPizzaViewModel>
+
+@foreach (MenuPizzaViewModel pizzaViewModel in Model)
+{
+    @await Html.PartialAsync("_PizzaOverviewCardPartial", pizzaViewModel);
+}
