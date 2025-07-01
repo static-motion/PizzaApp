@@ -4,10 +4,12 @@ namespace PizzaApp.Web
     using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data;
     using PizzaApp.Data.Models;
+    using PizzaApp.Services.Core;
+    using System.Threading.Tasks;
 
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
             
@@ -34,8 +36,15 @@ namespace PizzaApp.Web
                 .AddEntityFrameworkStores<PizzaAppContext>();
 
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<UserSeedingService>();
 
             WebApplication? app = builder.Build();
+
+            using (IServiceScope scope = app.Services.CreateScope())
+            {
+                UserSeedingService userSeeding = scope.ServiceProvider.GetRequiredService<UserSeedingService>();
+                await userSeeding.SeedUsersAndRolesAsync();
+            }
             
             if (app.Environment.IsDevelopment())
             {
