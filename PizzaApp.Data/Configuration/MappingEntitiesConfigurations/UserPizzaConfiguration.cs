@@ -22,6 +22,9 @@ namespace PizzaApp.Data.Configurations.MappingEntitiesConfigurations
                 .WithMany(p => p.FavoriteOf)
                 .HasForeignKey(e => e.PizzaId)
                 .IsRequired();
+
+            entity
+                .HasQueryFilter(e => e.Pizza.IsDeleted == false);
         }
     }
 }

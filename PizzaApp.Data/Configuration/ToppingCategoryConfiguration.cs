@@ -20,6 +20,9 @@
 
             entity
                 .HasData(CreateSeed());
+
+            entity
+                .HasQueryFilter(e => e.IsDeleted == false);
         }
 
         private static List<ToppingCategory> CreateSeed()

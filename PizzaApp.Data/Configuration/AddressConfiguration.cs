@@ -36,6 +36,9 @@
             entity
                 .Property(e => e.IsDeleted)
                 .IsRequired();
+
+            entity
+                .HasQueryFilter(e => e.IsDeleted == false);
         }
     }
 }

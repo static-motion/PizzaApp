@@ -3,7 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using PizzaApp.Data.Models;
-
+    using System.Linq.Expressions;
     using static PizzaApp.Data.Common.EntityConstraints.Pizza;
 
     class PizzaConfiguration : IEntityTypeConfiguration<Pizza>
@@ -47,6 +47,14 @@
 
             entity
                 .HasData(GeneratePizzaSeed());
+
+            entity
+                .HasQueryFilter(e =>
+                    e.IsDeleted == false // the pizza must be active
+                    && (e.Sauce == null || e.Sauce.IsDeleted == false) // the sauce must be either not set or active
+                    && e.Dough.IsDeleted == false // the dough must be active
+                    && e.Toppings.All(t => t.Topping.IsDeleted == false) // all toppings must be active
+                );
         }
 
         private static IEnumerable<Pizza> GeneratePizzaSeed()
