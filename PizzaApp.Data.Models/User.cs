@@ -7,7 +7,7 @@
     [Comment("The general public website user. This entity has addresses, created pizzas, favorited pizzas and order associated with it.")]
     public class User : IdentityUser<Guid>
     {
-        // "A list of the User's addresses.
+        // A list of the User's addresses.
         public ICollection<Address> Addresses { get; set; }
             = new List<Address>();
 

@@ -1,11 +1,12 @@
 ﻿namespace PizzaApp.Data.Models
 {
     using Microsoft.EntityFrameworkCore;
+    using PizzaApp.Data.Models.Interfaces;
     using PizzaApp.Data.Models.MappingEntities;
 
     [Comment("All pizzas offered - both admin and user created.")]
     // TODO: Add a flag to differentiate betwen user and admin made pizzas? Or use querying to find pizzas only created by admins (could be slow when there are a lot of pizzas)
-    public class Pizza
+    public class Pizza : ISoftDeletable
     {
         [Comment("Primary Key unique identifier.")]
         public int Id { get; set; }
@@ -40,5 +41,9 @@
 
         public ICollection<OrderPizza> Orders { get; set; }
             = new HashSet<OrderPizza>();
+
+
+        [Comment("Shows if the pizza has been soft deleted.")]
+        public bool IsDeleted { get; set; }
     }
 }

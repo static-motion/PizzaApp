@@ -1,9 +1,10 @@
 ﻿namespace PizzaApp.Data.Models
 {
     using Microsoft.EntityFrameworkCore;
+    using PizzaApp.Data.Models.Interfaces;
 
     [Comment("All the addresses as created by the Users.")]
-    public class Address
+    public class Address : ISoftDeletable
     {
         [Comment("Primary Key unique identifier.")]
         public int Id { get; set; }
@@ -25,7 +26,7 @@
         public ICollection<Order> Deliveries { get; set; }
             = new HashSet<Order>();
 
-        [Comment("Shows if the address has been deleted.")]
+        [Comment("Shows if the address has been soft deleted.")]
         public bool IsDeleted { get; set; }
     }
 }
