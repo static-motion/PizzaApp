@@ -22,10 +22,12 @@
 
         [Comment("The type of dough the pizza is made with.")]
         public int DoughId { get; set; }
+
         public Dough Dough { get; set; } = null!;
 
         [Comment("The sauce used on the pizza. Can be null.")]
         public int? SauceId { get; set; }
+
         public Sauce? Sauce { get; set; }
 
         [Comment("URL of the image of the pizza.")]
@@ -41,7 +43,6 @@
 
         public ICollection<OrderPizza> Orders { get; set; }
             = new HashSet<OrderPizza>();
-
 
         [Comment("Shows if the pizza has been soft deleted.")]
         public bool IsDeleted { get; set; }

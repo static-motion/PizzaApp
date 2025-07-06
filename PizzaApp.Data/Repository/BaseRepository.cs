@@ -85,23 +85,6 @@
             EntityEntry changeTrackerEntry = this.DbSet.Update(item);
             return changeTrackerEntry.State == EntityState.Modified;
         }
-
-        protected void PerformSoftDeleteOfEntity(TEntity entity)
-        {
-            PropertyInfo? isDeletedProperty
-                = this.GetIsDeletedProperty(entity)
-                ?? throw new InvalidOperationException();
-
-            isDeletedProperty.SetValue(entity, true);
-        }
-
-        protected PropertyInfo? GetIsDeletedProperty(TEntity entity)
-        {
-            PropertyInfo? propertyInfo = entity
-                .GetType()
-                .GetProperty("IsDeleted", typeof(bool));
-            return propertyInfo;
-        }
     }
 }
-}
+
