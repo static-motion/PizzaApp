@@ -56,8 +56,10 @@
                     var role = new IdentityRole<Guid>(roleName);
                     var result = await _roleManager.CreateAsync(role);
 
+                    // TODO: HANDLE
                     if (result.Succeeded)
                     {
+                        
                         //_logger.LogInformation("Created role: {RoleName}", roleName);
                     }
                     else
