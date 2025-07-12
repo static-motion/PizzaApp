@@ -1,14 +1,13 @@
 ﻿namespace PizzaApp.Data.Repository
 {
-    using Microsoft.EntityFrameworkCore.ChangeTracking;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.ChangeTracking;
+    using PizzaApp.Data.Models.Interfaces;
     using PizzaApp.Data.Repository.Interfaces;
     using System.Linq.Expressions;
-    using System.Reflection;
-    using PizzaApp.Data.Models.Interfaces;
 
     public abstract class BaseRepository<TEntity, TKey> 
-        : IAsyncRepository<TEntity, TKey> where TEntity : class
+        : IRepository<TEntity, TKey> where TEntity : class
     {
         protected readonly PizzaAppContext DbContext;
         protected readonly DbSet<TEntity> DbSet;
@@ -76,8 +75,7 @@
 
         public async Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            TEntity? entity = await this.DbSet.SingleOrDefaultAsync(predicate);
-            return entity;
+            return await this.DbSet.SingleOrDefaultAsync(predicate);
         }
 
         public bool Update(TEntity item)

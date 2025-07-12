@@ -6,7 +6,7 @@
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    public interface IAsyncRepository<TEntity, TKey>
+    public interface IRepository<TEntity, TKey>
     {
         Task AddAsync(TEntity item);
 
