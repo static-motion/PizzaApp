@@ -4,6 +4,8 @@ namespace PizzaApp.Web
     using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data;
     using PizzaApp.Data.Models;
+    using PizzaApp.Data.Repository;
+    using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.Services.Core;
     using PizzaApp.Services.Core.Interfaces;
     using System.Threading.Tasks;
@@ -38,6 +40,7 @@ namespace PizzaApp.Web
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<UserSeedingService>();
+            builder.Services.AddScoped<IPizzaRepository, PizzaRepository>();
             builder.Services.AddScoped<IPizzaService, PizzaService>();
 
             WebApplication? app = builder.Build();

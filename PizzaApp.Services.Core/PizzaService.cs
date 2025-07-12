@@ -2,24 +2,25 @@
 {
     using Microsoft.EntityFrameworkCore;
 
-    using PizzaApp.Data;
-    using PizzaApp.Services.Core.Interfaces;
-    using PizzaApp.Web.ViewModels;
-
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    using PizzaApp.Data.Repository.Interfaces;
+    using PizzaApp.Services.Core.Interfaces;
+    using PizzaApp.Web.ViewModels;
+
     public class PizzaService : IPizzaService
     {
-        private readonly PizzaAppContext _dbContext;
-        public PizzaService(PizzaAppContext context)
+        private readonly IPizzaRepository _pizzaRepository;
+        public PizzaService(IPizzaRepository repository)
         {
-            this._dbContext = context;
+            this._pizzaRepository = repository;
         }
 
         public async Task<IEnumerable<MenuPizzaViewModel>> GetAllPizzasForMenuAsync()
         {
-            return await this._dbContext.Pizzas
+            return await this._pizzaRepository
+                .GetAllAttached()
                 .Select(p => new MenuPizzaViewModel
                 {
                     Id = p.Id,
