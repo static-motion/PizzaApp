@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PizzaApp.Data;
 
@@ -11,9 +12,11 @@ using PizzaApp.Data;
 namespace PizzaApp.Data.Migrations
 {
     [DbContext(typeof(PizzaAppContext))]
-    partial class PizzaAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250706163713_ImplementedSoftDeleteAndQueryFilteringForModels")]
+    partial class ImplementedSoftDeleteAndQueryFilteringForModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -195,7 +198,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Addresses", null, t =>
+                    b.ToTable("Addresses", t =>
                         {
                             t.HasComment("All the addresses as created by the Users.");
                         });
@@ -236,7 +239,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Desserts", null, t =>
+                    b.ToTable("Desserts", t =>
                         {
                             t.HasComment("All the desserts offered.");
                         });
@@ -308,7 +311,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Doughs", null, t =>
+                    b.ToTable("Doughs", t =>
                         {
                             t.HasComment("All the dough types used for making pizzas.");
                         });
@@ -376,7 +379,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Drinks", null, t =>
+                    b.ToTable("Drinks", t =>
                         {
                             t.HasComment("All the drinks offered.");
                         });
@@ -446,7 +449,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasIndex("DessertId");
 
-                    b.ToTable("OrdersDesserts", null, t =>
+                    b.ToTable("OrdersDesserts", t =>
                         {
                             t.HasComment("A many-to-many mapping entity used to show which desserts appear in which orders.");
                         });
@@ -474,7 +477,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasIndex("DrinkId");
 
-                    b.ToTable("OrdersDrinks", null, t =>
+                    b.ToTable("OrdersDrinks", t =>
                         {
                             t.HasComment("A many-to-many mapping entity used to show which drinks appear in which orders.");
                         });
@@ -502,7 +505,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasIndex("PizzaId");
 
-                    b.ToTable("OrdersPizzas", null, t =>
+                    b.ToTable("OrdersPizzas", t =>
                         {
                             t.HasComment("A many-to-many mapping entity used to show which pizzas appear in which orders.");
                         });
@@ -522,7 +525,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasIndex("PizzaId");
 
-                    b.ToTable("PizzasToppings", null, t =>
+                    b.ToTable("PizzasToppings", t =>
                         {
                             t.HasComment("A many-to-many mapping entity between Pizza and Toppings, used to show which toppings are contained in which pizzas.");
                         });
@@ -554,7 +557,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasIndex("PizzaId");
 
-                    b.ToTable("UsersPizzas", null, t =>
+                    b.ToTable("UsersPizzas", t =>
                         {
                             t.HasComment("A many-to-many mapping entity between User and Pizza, showing pizza entities which have been marked as favorite by users");
                         });
@@ -594,7 +597,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders", null, t =>
+                    b.ToTable("Orders", t =>
                         {
                             t.HasComment("All the users' orders in the database.");
                         });
@@ -650,7 +653,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasIndex("SauceId");
 
-                    b.ToTable("Pizzas", null, t =>
+                    b.ToTable("Pizzas", t =>
                         {
                             t.HasComment("All pizzas offered - both admin and user created.");
                         });
@@ -701,7 +704,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sauces", null, t =>
+                    b.ToTable("Sauces", t =>
                         {
                             t.HasComment("All the sauces offered.");
                         });
@@ -779,7 +782,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasIndex("ToppingCategoryId");
 
-                    b.ToTable("Toppings", null, t =>
+                    b.ToTable("Toppings", t =>
                         {
                             t.HasComment("All the toppings offered.");
                         });
@@ -871,7 +874,7 @@ namespace PizzaApp.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ToppingCategories", null, t =>
+                    b.ToTable("ToppingCategories", t =>
                         {
                             t.HasComment("The topping categories offered by the pizza app (meats, veggies etc.)");
                         });
