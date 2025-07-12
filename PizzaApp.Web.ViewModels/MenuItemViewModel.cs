@@ -1,6 +1,6 @@
 ﻿namespace PizzaApp.Web.ViewModels
 {
-    public class MenuPizzaViewModel
+    public class MenuItemViewModel
     {
         public int Id { get; set; }
 

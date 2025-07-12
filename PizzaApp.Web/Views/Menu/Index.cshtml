@@ -1,7 +1,17 @@
 ﻿@using PizzaApp.Web.ViewModels
-@model IEnumerable<MenuPizzaViewModel>
+@model IEnumerable<MenuItemViewModel>
 
-@foreach (MenuPizzaViewModel pizzaViewModel in Model)
-{
-    @await Html.PartialAsync("_PizzaOverviewCardPartial", pizzaViewModel);
-}
+<div class="container menu-page">
+    <div class="container-fluid">
+        <partial name="_MenuSidebar" /> 
+        <div class="row flex-wrap">
+            <div class="col py-3">
+                @foreach (MenuItemViewModel menuViewModel in Model)
+                {
+                    <partial name="_MenuItemOverviewCardPartial" model="menuViewModel" />
+                }
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,16 @@
+﻿@using PizzaApp.Web.ViewModels
+@model MenuItemViewModel
+
+
+<div class="card" style="width: 18rem;">
+    <img class="card-img-top" src=@Model.ImageUrl alt="Image of @Model.Name">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Name</h5>
+        <p class="card-text">@Model.Description</p>
+        <div class="card-btn-container">
+            <a href="#" class="card-btn btn btn-danger"><i class="fa-solid fa-cart-plus"></i></a>
+            <a href="#" class="card-btn btn btn-warning"><i class="fa-solid fa-circle-info"></i></a>
+        </div>
+    </div>
+</div>
+

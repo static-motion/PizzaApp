@@ -6,17 +6,30 @@
 
     public class MenuController : Controller
     {
-        private readonly IPizzaService _pizzaService;
-        public MenuController(IPizzaService pizzaService)
+        private readonly IMenuService _menuService;
+        public MenuController(IMenuService pizzaService)
         {
-            this._pizzaService = pizzaService;
+            this._menuService = pizzaService;
         }
-        public async Task<IActionResult> Index()
-        {
-            IEnumerable<MenuPizzaViewModel> allPizzas 
-                = await this._pizzaService.GetAllPizzasForMenuAsync();
 
-            return this.View(allPizzas);
+        [Route("/Menu")]
+        [Route("/Menu/{category}")]
+        public async Task<IActionResult> Index(string category)
+        {
+            if (string.IsNullOrEmpty(category))
+            {
+                category = "pizzas"; // Default category
+            }
+
+            IEnumerable<MenuItemViewModel> allItemsOfCategory = category.ToLower() switch
+            {
+                "pizzas" => await this._menuService.GetAllPizzasForMenuAsync(),
+                "drinks" => await this._menuService.GetAllDrinksForMenuAsync(),
+                "desserts" => await this._menuService.GetAllDessertsForMenuAsync(),
+                _ => await this._menuService.GetAllPizzasForMenuAsync()
+            };
+
+            return this.View(allItemsOfCategory);
         }
     }
 }
