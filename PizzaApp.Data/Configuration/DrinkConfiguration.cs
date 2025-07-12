@@ -21,7 +21,7 @@
             entity
                 .Property(e => e.Description)
                 .HasMaxLength(DescriptionMaxLength)
-                .IsRequired(false);
+                .IsRequired();
 
             entity
                 .Property(e => e.Price)
