@@ -40,8 +40,13 @@ namespace PizzaApp.Web
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<UserSeedingService>();
+
             builder.Services.AddScoped<IPizzaRepository, PizzaRepository>();
-            builder.Services.AddScoped<IPizzaService, PizzaService>();
+            builder.Services.AddScoped<IDrinkRepository, DrinkRepository>();
+            builder.Services.AddScoped<IDessertRepository, DessertRepository>();
+
+            builder.Services.AddScoped<IMenuService, MenuService>();
+
 
             WebApplication? app = builder.Build();
 
