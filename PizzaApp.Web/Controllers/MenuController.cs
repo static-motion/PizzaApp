@@ -1,35 +1,61 @@
 ﻿namespace PizzaApp.Web.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+
+    using PizzaApp.GCommon.Enums;
+    using PizzaApp.GCommon.Extensions;
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels;
 
     public class MenuController : Controller
     {
+        private static IEnumerable<string> CategoryNames = Enum.GetNames<MenuCategory>();
+
         private readonly IMenuService _menuService;
-        public MenuController(IMenuService pizzaService)
+        public MenuController(IMenuService menuService)
         {
-            this._menuService = pizzaService;
+            this._menuService = menuService;
         }
 
+        [HttpGet]
+        [Route("/Menu/Index")]
         [Route("/Menu")]
-        [Route("/Menu/{category}")]
-        public async Task<IActionResult> Index(string category)
+        public IActionResult Index()
         {
-            if (string.IsNullOrEmpty(category))
+            return this.RedirectToAction(nameof(Category), new { category = MenuCategory.Pizzas });
+        }
+
+        [HttpGet("/Menu/{category}")]
+        public async Task<IActionResult> Category(string category)
+        {
+            MenuCategory? categoryEnum = MenuCategoryExtensions.FromUrlString(category);
+
+            if (categoryEnum is null)
+                return this.NotFound();
+
+            IEnumerable<MenuItemViewModel> menuItems;
+
+            switch (categoryEnum)
             {
-                category = "pizzas"; // Default category
+                case MenuCategory.Pizzas:
+                    menuItems = await this._menuService.GetAllPizzasForMenuAsync();
+                    break;
+                case MenuCategory.Drinks:
+                    menuItems = await this._menuService.GetAllDrinksForMenuAsync();
+                    break;
+                case MenuCategory.Desserts:
+                    menuItems = await this._menuService.GetAllDessertsForMenuAsync();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"Unsupported menu category: {categoryEnum}");
             }
-
-            IEnumerable<MenuItemViewModel> allItemsOfCategory = category.ToLower() switch
+            MenuCategoryViewModel menuView = new()
             {
-                "pizzas" => await this._menuService.GetAllPizzasForMenuAsync(),
-                "drinks" => await this._menuService.GetAllDrinksForMenuAsync(),
-                "desserts" => await this._menuService.GetAllDessertsForMenuAsync(),
-                _ => await this._menuService.GetAllPizzasForMenuAsync()
+                Category = categoryEnum.Value,
+                Items = menuItems,
+                AllCategories = CategoryNames
             };
-
-            return this.View(allItemsOfCategory);
+            return this.View(menuView);
         }
     }
 }

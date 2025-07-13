@@ -33,6 +33,21 @@ body {
 
 
 .card-btn {
-    width: 100%;
+    width: 48%;
+}
+
+.add-to-favorites {
+    position: absolute;
+    color: red;
+    width: 20px;
+    height: 20px;
+    top: 5px;
+    right: 5px;
+}
+
+.favorites-icon {
+    position: absolute;
+    top: 2px;
+    left: 2px;
 }
 

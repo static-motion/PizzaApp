@@ -1,12 +1,12 @@
 ﻿@using PizzaApp.Web.ViewModels
-@model IEnumerable<MenuItemViewModel>
+@model MenuCategoryViewModel
 
 <div class="container menu-page">
     <div class="container-fluid">
-        <partial name="_MenuSidebar" /> 
+        <partial name="_MenuSidebar" model="@Model.AllCategories"/> 
         <div class="row flex-wrap">
             <div class="col py-3">
-                @foreach (MenuItemViewModel menuViewModel in Model)
+                @foreach (MenuItemViewModel menuViewModel in Model.Items)
                 {
                     <partial name="_MenuItemOverviewCardPartial" model="menuViewModel" />
                 }
