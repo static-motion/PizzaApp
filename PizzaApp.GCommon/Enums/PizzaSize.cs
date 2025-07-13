@@ -1,4 +1,4 @@
-﻿namespace PizzaApp.Data.Common.Enums
+﻿namespace PizzaApp.GCommon.Enums
 {
     public enum PizzaSize
     {

@@ -1,8 +1,8 @@
 ﻿namespace PizzaApp.Data.Models
 {
     using Microsoft.EntityFrameworkCore;
-    using PizzaApp.Data.Common.Enums;
     using PizzaApp.Data.Models.MappingEntities;
+    using PizzaApp.GCommon.Enums;
 
     [Comment("All the users' orders in the database.")]
     public class Order
