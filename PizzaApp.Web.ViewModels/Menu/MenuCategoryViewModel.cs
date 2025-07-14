@@ -1,4 +1,4 @@
-﻿namespace PizzaApp.Web.ViewModels
+﻿namespace PizzaApp.Web.ViewModels.Menu
 {
     using PizzaApp.GCommon.Enums;
 

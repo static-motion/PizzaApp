@@ -5,7 +5,7 @@
     using PizzaApp.GCommon.Enums;
     using PizzaApp.GCommon.Extensions;
     using PizzaApp.Services.Core.Interfaces;
-    using PizzaApp.Web.ViewModels;
+    using PizzaApp.Web.ViewModels.Menu;
 
     public class MenuController : Controller
     {
@@ -33,29 +33,25 @@
             if (categoryEnum is null)
                 return this.NotFound();
 
-            IEnumerable<MenuItemViewModel> menuItems;
+            IEnumerable<MenuItemViewModel> menuItems 
+                = await this._menuService.GetAllMenuItemsForCategoryAsync(categoryEnum.Value);
+            
 
-            switch (categoryEnum)
-            {
-                case MenuCategory.Pizzas:
-                    menuItems = await this._menuService.GetAllPizzasForMenuAsync();
-                    break;
-                case MenuCategory.Drinks:
-                    menuItems = await this._menuService.GetAllDrinksForMenuAsync();
-                    break;
-                case MenuCategory.Desserts:
-                    menuItems = await this._menuService.GetAllDessertsForMenuAsync();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException($"Unsupported menu category: {categoryEnum}");
-            }
             MenuCategoryViewModel menuView = new()
             {
-                Category = categoryEnum.Value,
+                Category = categoryEnum.Value, // not necessary for now, might clean up later TODO
                 Items = menuItems,
                 AllCategories = CategoryNames
             };
+
             return this.View(menuView);
+        }
+
+        [HttpGet("/Menu/Pizzas/{id:int}")]
+        public async Task<IActionResult> PizzaDetails(int id)
+        {
+            OrderPizzaViewModel? vm = await this._menuService.GetPizzaDetailsByIdAsync(id);
+            return this.View(vm);
         }
     }
 }

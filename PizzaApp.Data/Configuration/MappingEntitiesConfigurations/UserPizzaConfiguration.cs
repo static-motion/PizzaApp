@@ -19,7 +19,7 @@ namespace PizzaApp.Data.Configurations.MappingEntitiesConfigurations
 
             entity
                 .HasOne(e => e.Pizza)
-                .WithMany(p => p.FavoriteOf)
+                .WithMany(p => p.FavoritedBy)
                 .HasForeignKey(e => e.PizzaId)
                 .IsRequired();
 

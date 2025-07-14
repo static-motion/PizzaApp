@@ -1,4 +1,6 @@
 ﻿@using PizzaApp.Web.ViewModels
+@using PizzaApp.Web.ViewModels.Menu
+@using PizzaApp.GCommon.Enums
 @model MenuItemViewModel
 
 
@@ -9,9 +11,14 @@
         <h5 class="card-title">@Model.Name</h5>
         <p class="card-text">@Model.Description</p>
         <div class="card-btn-container">
-            <a asp-controller="Menu" asp-action="Details" asp-route-id="@Model.Id" class="card-btn btn btn-primary"><i class="fa-solid fa-circle-info"></i></a>
-            
-            <a href="#" class="card-btn btn btn-danger"><i class="fa-solid fa-cart-plus"></i></a>
+            @if (Model.Category == MenuCategory.Pizzas)
+            {
+                <a asp-controller="Menu" asp-action="@Model.Category" asp-route-id="@Model.Id" class="card-btn btn btn-danger"><i class="fa-solid fa-cart-plus"></i></a>
+            } 
+            else
+            {
+                <a class="card-btn btn btn-danger"><i class="fa-solid fa-cart-plus"></i></a>
+            }
         </div>
     </div>
 </div>

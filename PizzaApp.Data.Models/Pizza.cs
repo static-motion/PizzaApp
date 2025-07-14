@@ -38,7 +38,7 @@
 
         public User Creator { get; set; } = null!;
 
-        public ICollection<UserPizza> FavoriteOf { get; set; }
+        public ICollection<UserPizza> FavoritedBy { get; set; }
             = new HashSet<UserPizza>();
 
         public ICollection<OrderPizza> Orders { get; set; }

@@ -1,25 +1,35 @@
 ﻿namespace PizzaApp.Services.Core
 {
     using Microsoft.EntityFrameworkCore;
-
+    using PizzaApp.Data.Repository.Interfaces;
+    using PizzaApp.GCommon.Enums;
+    using PizzaApp.Services.Core.Interfaces;
+    using PizzaApp.Web.ViewModels.Menu;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-
-    using PizzaApp.Data.Repository.Interfaces;
-    using PizzaApp.Services.Core.Interfaces;
-    using PizzaApp.Web.ViewModels;
 
     public class MenuService : IMenuService
     {
         private readonly IPizzaRepository _pizzaRepository;
         private readonly IDrinkRepository _drinkRepository;
         private readonly IDessertRepository _dessertRepository;
+        private readonly ISauceRepository _sauceRepository;
+        private readonly IDoughRepository _doughRepository;
+        private readonly IToppingRepository _toppingRepository;
 
-        public MenuService(IPizzaRepository pizzaRepository, IDrinkRepository drinkRepository, IDessertRepository dessertRepository)
+        public MenuService(IPizzaRepository pizzaRepository, 
+            IDrinkRepository drinkRepository, 
+            IDessertRepository dessertRepository,
+            ISauceRepository sauceRepository,
+            IDoughRepository doughRepository,
+            IToppingRepository toppingRepository)
         {
             this._pizzaRepository = pizzaRepository;
             this._drinkRepository = drinkRepository;
             this._dessertRepository = dessertRepository;
+            this._sauceRepository = sauceRepository;
+            this._doughRepository = doughRepository;
+            this._toppingRepository = toppingRepository;
         }
 
         public async Task<IEnumerable<MenuItemViewModel>> GetAllPizzasForMenuAsync()
@@ -62,6 +72,98 @@
                     ImageUrl = d.ImageUrl
 
                 }).ToListAsync();
+        }
+
+        public async Task<IEnumerable<MenuItemViewModel>> GetAllMenuItemsForCategoryAsync(MenuCategory category)
+        {
+            IEnumerable<MenuItemViewModel> menuItems =  category switch
+            {
+                MenuCategory.Pizzas => await this.GetAllPizzasForMenuAsync(),
+                MenuCategory.Drinks => await this.GetAllDrinksForMenuAsync(),
+                MenuCategory.Desserts => await this.GetAllDessertsForMenuAsync(),
+                _ => throw new ArgumentOutOfRangeException($"Unsupported menu category: {category}"), // will throw an exception if I add a
+                                                                                                      // new category without updating this switch
+            };
+
+            // attach the category to each item
+            foreach (MenuItemViewModel item in menuItems)
+            {
+                item.Category = category;
+            }
+
+            return menuItems;
+        }
+
+        public async Task<OrderPizzaViewModel?> GetPizzaDetailsByIdAsync(int id)
+        {
+
+            PizzaDetailsViewModel? pizzaDetails = await this._pizzaRepository
+                .GetAllAttached()
+                .Where(p => p.Id == id)
+                .Select(p => new PizzaDetailsViewModel
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    DoughId = p.Dough.Id,
+                    SauceId = p.SauceId,
+                    ImageUrl = p.ImageUrl,
+                    Price = p.Dough.Price 
+                          + (p.Sauce == null ? 0 : p.Sauce.Price) 
+                          + p.Toppings.Sum(t => t.Topping.Price),
+                    SelectedToppingIds = p.Toppings.Select(t => t.ToppingId).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (pizzaDetails is null)
+                return null;
+
+            IEnumerable<ToppingCategoryViewModel> allToppingsByCategories 
+                = await this._toppingRepository
+                .GetAllAttached()
+                .Select(tc => new ToppingCategoryViewModel
+                {
+                    Id = tc.Id,
+                    Name = tc.Name,
+                    Toppings = tc.Toppings.Select(t => new ToppingViewModel
+                    { 
+                        Id = t.Id,
+                        Name = t.Name,
+                        Price = t.Price
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            IEnumerable<DoughViewModel> allDoughs = await this._doughRepository
+                .GetAllAttached()
+                .Select(d => new DoughViewModel
+                {
+                    Id = d.Id,
+                    Name = d.Type,
+                    Price = d.Price
+                })
+                .ToListAsync();
+
+            IEnumerable<SauceViewModel> allSauces = await this._sauceRepository
+                .GetAllAttached()
+                .Select(s => new SauceViewModel
+                {
+                    Id = s.Id,
+                    Name = s.Type,
+                    Price = s.Price
+                })
+                .ToListAsync();
+
+            //allToppings.GroupBy(t => t.Id); WHAT A MESS
+            OrderPizzaViewModel orderPizzaView = new()
+            {
+                Pizza = pizzaDetails,
+                ToppingCategories = allToppingsByCategories,
+                Doughs = allDoughs,
+                Sauces = allSauces
+            };
+
+            return orderPizzaView;
         }
     }
 }

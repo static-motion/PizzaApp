@@ -44,6 +44,9 @@ namespace PizzaApp.Web
             builder.Services.AddScoped<IPizzaRepository, PizzaRepository>();
             builder.Services.AddScoped<IDrinkRepository, DrinkRepository>();
             builder.Services.AddScoped<IDessertRepository, DessertRepository>();
+            builder.Services.AddScoped<IDoughRepository, DoughRepository>();
+            builder.Services.AddScoped<IToppingRepository, ToppingRepository>();
+            builder.Services.AddScoped<ISauceRepository, SauceRepository>();
 
             builder.Services.AddScoped<IMenuService, MenuService>();
 

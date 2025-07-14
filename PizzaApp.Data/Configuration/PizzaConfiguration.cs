@@ -2,8 +2,9 @@
 {
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     using PizzaApp.Data.Models;
-    using System.Linq.Expressions;
+
     using static PizzaApp.Data.Common.EntityConstraints.Pizza;
 
     class PizzaConfiguration : IEntityTypeConfiguration<Pizza>

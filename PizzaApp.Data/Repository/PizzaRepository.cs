@@ -5,7 +5,8 @@
 
     public class PizzaRepository : BaseRepository<Pizza, int>, IPizzaRepository
     {
-        public PizzaRepository(PizzaAppContext dbContext) : base(dbContext)
+        public PizzaRepository(PizzaAppContext dbContext) 
+            : base(dbContext)
         {
         }
     }
