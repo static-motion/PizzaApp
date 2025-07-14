@@ -102,7 +102,39 @@
                     Name = "Philadelphia",
                     Description = "Velvety, indulgent, and irresistibly smooth. Philadelphia cheese turns pizza into a decadent delight.",
                     Price = 1,
-                }
+                },
+                new Topping()
+                {
+                    Id = 8,
+                    ToppingCategoryId = 3,
+                    Name = "Bell Peppers",
+                    Description = "Nature’s way of saying, ‘Yeah, this pizza needed more color.’",
+                    Price = 1,
+                },
+                new Topping()
+                {
+                    Id = 9,
+                    ToppingCategoryId = 3,
+                    Name = "Mushrooms",
+                    Description = "The pizza topping that makes vegetarians and carnivores high-five!",
+                    Price = 1,
+                },
+                new Topping()
+                {
+                    Id = 10,
+                    ToppingCategoryId = 3,
+                    Name = "Onions",
+                    Description = "Pizza’s way of keeping first dates interesting.",
+                    Price = 1,
+                },
+                new Topping()
+                {
+                    Id = 11,
+                    ToppingCategoryId = 3,
+                    Name = "Olives",
+                    Description = "Tiny, salty, and judging you for picking them off.",
+                    Price = 1,
+                },
             ];
         }
     }
