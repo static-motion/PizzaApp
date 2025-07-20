@@ -4,8 +4,8 @@
 @{
     ViewData["Title"] = Model.Pizza.Name;
 }
-
-<form asp-action="Create" method="post" class="container">
+<a class="btn btn-success btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+<form asp-action="AddToCart" method="post" class="container">
     <img class="img-pizza-details" src="@Model.Pizza.ImageUrl"/>
     <div class="mb-3">
         @* <label asp-for="Pizza.Name" class="form-label">Pizza Name</label>
@@ -18,53 +18,67 @@
         <h3>@Model.Pizza.Description</h3>
     </div>
 
-    <!-- Dough Select -->
-    <div class="mb-3">
-        <label asp-for="Pizza.DoughId" class="form-label">Dough</label>
-        <select asp-for="Pizza.DoughId" class="form-select">
-            <option value="">Select dough</option>
-            @foreach (var dough in Model.Doughs)
-            {
-                <option value="@dough.Id">@dough.Name</option>
-            }
-        </select>
-    </div>
-
-    <!-- Sauce Select -->
-    <div class="mb-3">
-        <label asp-for="Pizza.SauceId" class="form-label">Sauce</label>
-        <select asp-for="Pizza.SauceId" class="form-select">
-            <option value="">Select sauce</option>
-            @foreach (var sauce in Model.Sauces)
-            {
-                <option value="@sauce.Id">@sauce.Name</option>
-            }
-        </select>
-    </div>
-
-    <!-- Toppings by Category as Radio Groups -->
-    @foreach (var category in Model.ToppingCategories)
-    {
-        <fieldset class="mb-3">
-            <legend>@category.Name</legend>
-            <div class="row">
-                @foreach (var topping in category.Toppings)
-                {
-                    <div class="form-check col-md-4">
-                        <input class="form-check-input"
-                               type="checkbox"
-                               name=@{"Selected" + category.Name + "Ids"}   @*"Selected@category.Name_@category.Id" *@
-                               id="topping_@topping.Id"
-                               value="@topping.Id"
-                               @(Model.Pizza.SelectedToppingIds.Contains(topping.Id) ? "checked" : "") />
-                        <label class="form-check-label" for="topping_@topping.Id">
-                            @topping.Name (@topping.Price.ToString("C"))
-                        </label>
-                    </div>
-                }
+    <div class="pizza-options-container">
+        
+        <div class="pizza-options-selects">
+            <!-- Dough Select -->
+            <div class="mb-3">
+                <label asp-for="Pizza.DoughId" class="form-label">Dough</label>
+                <select asp-for="Pizza.DoughId" class="form-select">
+                    <option value="">Select dough</option>
+                    @foreach (var dough in Model.Doughs)
+                    {
+                        <option value="@dough.Id">@dough.Name</option>
+                    }
+                </select>
             </div>
-        </fieldset>
-    }
 
+            <!-- Sauce Select -->
+            <div class="mb-3">
+                <label asp-for="Pizza.SauceId" class="form-label">Sauce</label>
+                <select asp-for="Pizza.SauceId" class="form-select">
+                    <option value="">Select sauce</option>
+                    @foreach (var sauce in Model.Sauces)
+                    {
+                        <option value="@sauce.Id">@sauce.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        
+        <div class="pizza-options-checkboxes">
+            <!-- Toppings by Category as Radio Groups -->
+            @foreach (var category in Model.ToppingCategories)
+            {
+                <fieldset class="mb-3">
+                    <legend>@category.Name</legend>
+                    <div class="row">
+                        @foreach (var topping in category.Toppings)
+                        {
+                            <div class="form-check col-md-4">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       name="Selected_@category.Name"
+                                       id="topping_@topping.Id"
+                                       value="@topping.Id"
+                                       @(Model.Pizza.SelectedToppingIds.Contains(topping.Id) ? "checked" : "") />
+                                <label class="form-check-label" for="topping_@topping.Id">
+                                    @topping.Name (@topping.Price.ToString("C"))
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </fieldset>
+            }
+        </div>
+    </div>
     <button type="submit" class="btn btn-danger">I want one!</button>
 </form>
+
+@section Styles {
+    <link href="@Url.Content("~/css/Menu/pizza-details.css")" rel="stylesheet" type="text/css" />
+}
+
+@section Scripts {
+    <script src="@Url.Content("~/js/pizza-details.js")"></script>
+}

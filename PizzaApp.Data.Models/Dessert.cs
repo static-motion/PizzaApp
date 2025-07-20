@@ -5,7 +5,7 @@
     using PizzaApp.Data.Models.Interfaces;
 
     [Comment("All the desserts offered.")]
-    public class Dessert : ISoftDeletable
+    public class Dessert : ISoftDeletable, ISimpleMenuItem
     {
         [Comment("Primary Key unique identifier.")]
         public int Id { get; set; }

@@ -47,7 +47,7 @@
 
         private async Task SeedRolesAsync()
         {
-            var roles = new[] { "Admin", "User", "Manager" };
+            var roles = new[] { "Admin", "User", "Manager", "Staff" };
 
             foreach (var roleName in roles)
             {

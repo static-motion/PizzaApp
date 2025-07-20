@@ -29,24 +29,7 @@ body {
 
 .container-main {
     padding: 3rem;
-}
-
-
-.card-btn {
-    width: 100%;
-}
-
-.add-to-favorites {
-    position: absolute;
-    color: red;
-    width: 20px;
-    height: 20px;
-    top: 5px;
-    right: 5px;
-}
-
-.img-pizza-details {
-    object-fit: cover;
-    height: 500px;
-    width: 100%;
+    max-width: 1320px;
+    margin: auto;
+    display: none;
 }

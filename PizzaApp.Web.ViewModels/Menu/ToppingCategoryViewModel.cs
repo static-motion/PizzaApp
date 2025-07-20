@@ -6,6 +6,6 @@
 
         public required string Name { get; set; }
 
-        public IEnumerable<ToppingViewModel> Toppings { get; set; } = null!;
+        public IReadOnlyList<ToppingViewModel> Toppings { get; set; } = null!;
     }
 }

@@ -1,0 +1,14 @@
+﻿.img-pizza-details {
+    object-fit: cover;
+    height: 500px;
+    width: 100%;
+}
+
+.pizza-options-container {
+    display: flex;
+    gap: 4em;
+}
+
+.pizza-options-selects, .pizza-options-checkboxes {
+    flex-basis: 50%;
+}

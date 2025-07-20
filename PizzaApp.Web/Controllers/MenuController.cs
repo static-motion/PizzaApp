@@ -50,8 +50,14 @@
         [HttpGet("/Menu/Pizzas/{id:int}")]
         public async Task<IActionResult> PizzaDetails(int id)
         {
-            OrderPizzaViewModel? vm = await this._menuService.GetPizzaDetailsByIdAsync(id);
-            return this.View(vm);
+            OrderPizzaViewModel? orderPizzaViewModel = await this._menuService.GetPizzaDetailsByIdAsync(id);
+            
+            if (orderPizzaViewModel is null)
+                return this.NotFound();
+
+            return this.View(orderPizzaViewModel);
         }
+
+
     }
 }
