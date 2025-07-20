@@ -5,11 +5,11 @@ namespace PizzaApp.Web
     using PizzaApp.Data;
     using PizzaApp.Data.Models;
     using PizzaApp.Data.Repository;
-    using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.Services.Core;
     using PizzaApp.Services.Core.Interfaces;
     using System.Threading.Tasks;
 
+    using static PizzaApp.Web.Infrastructure.Extensions.ServiceCollectionExtensions;
     public class Program
     {
         public static async Task Main(string[] args)
@@ -39,23 +39,25 @@ namespace PizzaApp.Web
                 .AddEntityFrameworkStores<PizzaAppContext>();
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped<UserSeedingService>();
+            builder.Services.AddCustomServices(typeof(MenuService).Assembly);
+            builder.Services.AddRepositories(typeof(PizzaRepository).Assembly);
+            /*builder.Services.AddScoped<UserSeedingService>();
 
             builder.Services.AddScoped<IPizzaRepository, PizzaRepository>();
             builder.Services.AddScoped<IDrinkRepository, DrinkRepository>();
             builder.Services.AddScoped<IDessertRepository, DessertRepository>();
             builder.Services.AddScoped<IDoughRepository, DoughRepository>();
-            builder.Services.AddScoped<IToppingRepository, ToppingRepository>();
+            builder.Services.AddScoped<IToppingCategoryRepository, ToppingCategoryRepository>();
             builder.Services.AddScoped<ISauceRepository, SauceRepository>();
 
-            builder.Services.AddScoped<IMenuService, MenuService>();
+            builder.Services.AddScoped<IMenuService, MenuService>();*/
 
 
             WebApplication? app = builder.Build();
 
             using (IServiceScope scope = app.Services.CreateScope())
             {
-                UserSeedingService userSeeding = scope.ServiceProvider.GetRequiredService<UserSeedingService>();
+                IUserSeedingService userSeeding = scope.ServiceProvider.GetRequiredService<IUserSeedingService>();
                 await userSeeding.SeedUsersAndRolesAsync();
             }
             

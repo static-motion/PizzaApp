@@ -6,7 +6,7 @@ namespace PizzaApp.Web.Controllers
 
     using Microsoft.AspNetCore.Mvc;
 
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         public HomeController(ILogger<HomeController> logger)
         {

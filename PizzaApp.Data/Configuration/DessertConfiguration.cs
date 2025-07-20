@@ -3,7 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using PizzaApp.Data.Models;
-    using static PizzaApp.Data.Common.EntityConstraints.Dessert;
+    using static PizzaApp.GCommon.EntityConstraints.Dessert;
 
     class DessertConfiguration : IEntityTypeConfiguration<Dessert>
     {
@@ -20,7 +20,7 @@
             entity
                 .Property(e => e.Description)
                 .HasMaxLength(DescriptionMaxLength)
-                .IsRequired();
+                .IsRequired(false);
 
             entity
                 .Property(e => e.Price)

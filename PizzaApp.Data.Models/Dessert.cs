@@ -14,7 +14,7 @@
         public required string Name { get; set; }
 
         [Comment("Short description of the dessert.")]
-        public required string Description { get; set; }
+        public string? Description { get; set; }
 
         [Comment("Current price of the dessert.")]
         public decimal Price { get; set; }

@@ -45,17 +45,18 @@
 
         public async Task<IEnumerable<TEntity>> GetAllAsync(bool asNoTracking = false)
         {
+            var query = this.DbSet.AsQueryable();
             if (asNoTracking)
             {
-                return await this.DbSet.AsNoTracking().ToArrayAsync();
+                query.AsNoTracking();
             }
             return await this.DbSet.ToArrayAsync();
         }
 
-        public IQueryable<TEntity> GetAllAttached()
+        /*public IQueryable<TEntity> GetAllAttached()
         {
             return this.DbSet.AsQueryable();
-        }
+        }*/
 
         public ValueTask<TEntity?> GetByIdAsync(TKey id)
         {
@@ -82,6 +83,11 @@
         {
             EntityEntry changeTrackerEntry = this.DbSet.Update(item);
             return changeTrackerEntry.State == EntityState.Modified;
+        }
+
+        public Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return this.DbSet.AnyAsync(predicate);
         }
     }
 }

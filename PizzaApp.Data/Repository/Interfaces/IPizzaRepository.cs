@@ -4,5 +4,6 @@
 
     public interface IPizzaRepository : IRepository<Pizza, int>
     {
+        public Task<Pizza?> GetByIdWithIngredientsAsync(int id);
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PizzaApp.Data;
 
@@ -11,9 +12,11 @@ using PizzaApp.Data;
 namespace PizzaApp.Data.Migrations
 {
     [DbContext(typeof(PizzaAppContext))]
-    partial class PizzaAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250720114350_ChangedOrderableItemsDescriptionToNullable")]
+    partial class ChangedOrderableItemsDescriptionToNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -711,7 +714,7 @@ namespace PizzaApp.Data.Migrations
                             Id = 1,
                             Description = "Our signature tomato sauce with a special blend of herbs and spices that everyone knows and loves!",
                             IsDeleted = false,
-                            Price = 1m,
+                            Price = 0m,
                             Type = "Tomato"
                         },
                         new
@@ -719,7 +722,7 @@ namespace PizzaApp.Data.Migrations
                             Id = 2,
                             Description = "Heavy cream sauce for rich and creamy pizzas. Did we mention it's very creamy?",
                             IsDeleted = false,
-                            Price = 1m,
+                            Price = 0m,
                             Type = "Cream"
                         },
                         new
@@ -727,7 +730,7 @@ namespace PizzaApp.Data.Migrations
                             Id = 3,
                             Description = "Our custom made BBQ sauce with rich sweet and smokey aromas. Perfect for meaty pizzas!",
                             IsDeleted = false,
-                            Price = 1m,
+                            Price = 0m,
                             Type = "BBQ"
                         },
                         new
@@ -735,7 +738,7 @@ namespace PizzaApp.Data.Migrations
                             Id = 4,
                             Description = "Olive oil, basil and garlic. We DARE you to think of a better flavor combination!",
                             IsDeleted = false,
-                            Price = 1m,
+                            Price = 0m,
                             Type = "Pesto"
                         });
                 });

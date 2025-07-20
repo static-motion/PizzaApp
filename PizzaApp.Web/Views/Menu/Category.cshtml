@@ -7,10 +7,7 @@
         <partial name="_MenuSidebarPartial" model="@Model.AllCategories"/> 
         <div class="row flex-wrap">
             <div class="col py-3">
-                @foreach (MenuItemViewModel menuViewModel in Model.Items)
-                {
-                    <partial name="_MenuItemOverviewCardPartial" model="menuViewModel" />
-                }
+                <partial name="_MenuItemsPartial" model="@Model.Items" />
             </div>
         </div>
     </div>

@@ -1,4 +1,4 @@
-﻿namespace PizzaApp.Data.Common
+﻿namespace PizzaApp.GCommon
 {
     public static class EntityConstraints
     {

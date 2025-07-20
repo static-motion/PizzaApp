@@ -2,8 +2,9 @@
 {
     using Microsoft.AspNetCore.Identity;
     using PizzaApp.Data.Models;
+    using PizzaApp.Services.Core.Interfaces;
 
-    public class UserSeedingService
+    public class UserSeedingService : IUserSeedingService
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
@@ -59,7 +60,7 @@
                     // TODO: HANDLE
                     if (result.Succeeded)
                     {
-                        
+
                         //_logger.LogInformation("Created role: {RoleName}", roleName);
                     }
                     else

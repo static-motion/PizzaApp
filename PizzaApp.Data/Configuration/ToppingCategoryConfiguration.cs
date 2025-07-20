@@ -4,7 +4,7 @@
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using PizzaApp.Data.Models;
 
-    using static PizzaApp.Data.Common.EntityConstraints.ToppingType;
+    using static PizzaApp.GCommon.EntityConstraints.ToppingType;
 
     class ToppingCategoryConfiguration : IEntityTypeConfiguration<ToppingCategory>
     {

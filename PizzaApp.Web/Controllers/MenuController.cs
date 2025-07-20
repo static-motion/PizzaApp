@@ -7,7 +7,7 @@
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels.Menu;
 
-    public class MenuController : Controller
+    public class MenuController : BaseController
     {
         private static IEnumerable<string> CategoryNames = Enum.GetNames<MenuCategory>();
 

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
@@ -16,7 +15,7 @@
 
         Task<IEnumerable<TEntity>> GetAllAsync(bool asNoTracking = false);
 
-        IQueryable<TEntity> GetAllAttached();
+        //IQueryable<TEntity> GetAllAttached();
 
         ValueTask<TEntity?> GetByIdAsync(TKey id);
 
@@ -25,6 +24,8 @@
         Task SaveChangesAsync();
 
         Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+
+        Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
 
         bool SoftDelete(TEntity entity);
 

@@ -5,7 +5,7 @@
 
     using PizzaApp.Data.Models;
 
-    using static PizzaApp.Data.Common.EntityConstraints.Pizza;
+    using static PizzaApp.GCommon.EntityConstraints.Pizza;
 
     class PizzaConfiguration : IEntityTypeConfiguration<Pizza>
     {
@@ -22,7 +22,7 @@
             entity
                 .Property(e => e.Description)
                 .HasMaxLength(DescriptionMaxLength)
-                .IsRequired();
+                .IsRequired(false);
 
             entity
                 .HasOne(e => e.Dough)

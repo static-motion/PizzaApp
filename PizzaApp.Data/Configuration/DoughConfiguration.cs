@@ -3,7 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using PizzaApp.Data.Models;
-    using static PizzaApp.Data.Common.EntityConstraints.Dough;
+    using static PizzaApp.GCommon.EntityConstraints.Dough;
 
     class DoughConfiguration : IEntityTypeConfiguration<Dough>
     {

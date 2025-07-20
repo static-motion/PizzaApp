@@ -4,7 +4,7 @@
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using PizzaApp.Data.Models;
 
-    using static PizzaApp.Data.Common.EntityConstraints.Sauce;
+    using static PizzaApp.GCommon.EntityConstraints.Sauce;
 
     class SauceConfiguration : IEntityTypeConfiguration<Sauce>
     {
@@ -43,25 +43,29 @@
                 {
                     Id = 1,
                     Type = "Tomato",
-                    Description = "Our signature tomato sauce with a special blend of herbs and spices that everyone knows and loves!"
+                    Description = "Our signature tomato sauce with a special blend of herbs and spices that everyone knows and loves!",
+                    Price = 1
                 },
                 new Sauce 
                 {
                     Id = 2,
                     Type = "Cream",
-                    Description = "Heavy cream sauce for rich and creamy pizzas. Did we mention it's very creamy?"
+                    Description = "Heavy cream sauce for rich and creamy pizzas. Did we mention it's very creamy?",
+                    Price = 1
                 },
                 new Sauce 
                 {
                     Id = 3,
                     Type = "BBQ",
-                    Description = "Our custom made BBQ sauce with rich sweet and smokey aromas. Perfect for meaty pizzas!"
+                    Description = "Our custom made BBQ sauce with rich sweet and smokey aromas. Perfect for meaty pizzas!",
+                    Price = 1
                 },
                 new Sauce
                 {
                     Id = 4,
                     Type = "Pesto",
-                    Description = "Olive oil, basil and garlic. We DARE you to think of a better flavor combination!"
+                    Description = "Olive oil, basil and garlic. We DARE you to think of a better flavor combination!",
+                    Price = 1
                 }
             ];
 

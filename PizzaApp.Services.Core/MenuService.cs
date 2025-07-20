@@ -1,6 +1,7 @@
 ﻿namespace PizzaApp.Services.Core
 {
     using Microsoft.EntityFrameworkCore;
+    using PizzaApp.Data.Models;
     using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.GCommon.Enums;
     using PizzaApp.Services.Core.Interfaces;
@@ -16,7 +17,7 @@
         private readonly IDessertRepository _dessertRepository;
         private readonly ISauceRepository _sauceRepository;
         private readonly IDoughRepository _doughRepository;
-        private readonly IToppingRepository _toppingRepository;
+        private readonly IToppingCategoryRepository _toppingRepository;
 
         private Dictionary<MenuCategory, Func<Task<IEnumerable<MenuItemViewModel>>>> _menuCategoryMethodLookup;
 
@@ -25,7 +26,7 @@
             IDessertRepository dessertRepository,
             ISauceRepository sauceRepository,
             IDoughRepository doughRepository,
-            IToppingRepository toppingRepository)
+            IToppingCategoryRepository toppingRepository)
         {
             this._pizzaRepository = pizzaRepository;
             this._drinkRepository = drinkRepository;
@@ -46,8 +47,9 @@
 
         public async Task<IEnumerable<MenuItemViewModel>> GetAllPizzasForMenuAsync()
         {
-            return await this._pizzaRepository
-                .GetAllAttached()
+            IEnumerable<Pizza> allPizzas = await this._pizzaRepository.GetAllAsync();
+            
+            return allPizzas
                 .Select(p => new MenuItemViewModel
                 {
                     Id = p.Id,
@@ -55,13 +57,14 @@
                     Description = p.Description,
                     ImageUrl = p.ImageUrl
 
-                }).ToListAsync();
+                });
         }
 
         public async Task<IEnumerable<MenuItemViewModel>> GetAllDrinksForMenuAsync()
         {
-            return await this._drinkRepository
-                .GetAllAttached()
+            IEnumerable<Drink> allDrinks = await this._drinkRepository.GetAllAsync();
+            
+            return allDrinks
                 .Select(d => new MenuItemViewModel
                 {
                     Id = d.Id,
@@ -69,13 +72,14 @@
                     Description = d.Description,
                     ImageUrl = d.ImageUrl
 
-                }).ToListAsync();
+                });
         }
 
         public async Task<IEnumerable<MenuItemViewModel>> GetAllDessertsForMenuAsync()
         {
-            return await this._dessertRepository
-                .GetAllAttached()
+            IEnumerable<Dessert> allDesserts = await this._dessertRepository.GetAllAsync();
+
+            return allDesserts
                 .Select(d => new MenuItemViewModel
                 {
                     Id = d.Id,
@@ -83,7 +87,7 @@
                     Description = d.Description,
                     ImageUrl = d.ImageUrl
 
-                }).ToListAsync();
+                });
         }
 
         public async Task<IReadOnlyCollection<MenuItemViewModel>> GetAllMenuItemsForCategoryAsync(MenuCategory category)
@@ -132,57 +136,61 @@
             return orderPizzaView;
         }
 
-        private Task<PizzaDetailsViewModel?> GetPizzaDetailsViewModelByIdAsync(int id)
+        private async Task<PizzaDetailsViewModel?> GetPizzaDetailsViewModelByIdAsync(int id)
         {
-            return this._pizzaRepository
-                .GetAllAttached()
-                .Where(p => p.Id == id)
-                .Select(p => new PizzaDetailsViewModel
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    DoughId = p.Dough.Id,
-                    SauceId = p.SauceId,
-                    ImageUrl = p.ImageUrl,
-                    Price = p.Dough.Price
-                          + (p.Sauce == null ? 0 : p.Sauce.Price)
-                          + p.Toppings.Sum(t => t.Topping.Price),
-                    SelectedToppingIds = p.Toppings.Select(t => t.ToppingId).ToList()
-                })
-                .FirstOrDefaultAsync();
+            Pizza? pizza = await this._pizzaRepository.GetByIdWithIngredientsAsync(id);
+            if (pizza is null)
+                return null;
+
+            return new PizzaDetailsViewModel
+            {
+                Id = pizza.Id,
+                Name = pizza.Name,
+                Description = pizza.Description,
+                DoughId = pizza.Dough.Id,
+                SauceId = pizza.SauceId,
+                ImageUrl = pizza.ImageUrl,
+                Price = pizza.Dough.Price
+                      + (pizza.Sauce == null ? 0 : pizza.Sauce.Price)
+                      + pizza.Toppings.Sum(t => t.Topping.Price),
+                SelectedToppingIds = pizza.Toppings.Select(t => t.ToppingId).ToList()
+            };
+        
         }
 
-        private Task<List<SauceViewModel>> GetAllSaucesAsync()
+        private async Task<List<SauceViewModel>> GetAllSaucesAsync()
         {
-            return this._sauceRepository
-                .GetAllAttached()
-                .Select(s => new SauceViewModel
+            IEnumerable<Sauce> allSauces = await this._sauceRepository.GetAllAsync(asNoTracking: true);
+                
+                return allSauces.Select(s => new SauceViewModel
                 {
                     Id = s.Id,
                     Name = s.Type,
                     Price = s.Price
                 })
-                .ToListAsync();
+                .ToList();
         }
 
-        private Task<List<DoughViewModel>> GetAllDoughsAsync()
+        private async Task<List<DoughViewModel>> GetAllDoughsAsync()
         {
-            return this._doughRepository
-                .GetAllAttached()
+            IEnumerable<Dough> allDoughs = await this._doughRepository.GetAllAsync(asNoTracking: true);
+
+            return allDoughs
                 .Select(d => new DoughViewModel
                 {
                     Id = d.Id,
                     Name = d.Type,
                     Price = d.Price
                 })
-                .ToListAsync();
+                .ToList();
         }
 
-        private Task<List<ToppingCategoryViewModel>> GetAllCategoriesWithToppingsAsync()
+        private async Task<List<ToppingCategoryViewModel>> GetAllCategoriesWithToppingsAsync()
         {
-            return this._toppingRepository
-                .GetAllAttached()
+            IEnumerable<ToppingCategory> allToppingCategories = await this._toppingRepository
+                .GetAllWithToppingsAsync(asNoTracking: true);
+            
+            return allToppingCategories
                 .Select(tc => new ToppingCategoryViewModel
                 {
                     Id = tc.Id,
@@ -193,8 +201,7 @@
                         Name = t.Name,
                         Price = t.Price
                     }).ToList()
-                })
-                .ToListAsync();
+                }).ToList();
         }
     }
 }
