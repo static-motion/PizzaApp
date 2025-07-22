@@ -90,11 +90,20 @@
                 .ToList();
         }
 
-        public async Task<bool> CreatePizzaAsync(PizzaInputModel pizza, List<int> selectedToppingIds, string userId)
+        public async Task<bool> CreatePizzaAsync(PizzaInputModel pizza, IEnumerable<int> selectedToppingIds, string userId)
         {
             IEnumerable<Topping> toppings = await this._toppingRepository.GetAllToppingsFromRangeAsync(selectedToppingIds);
             
-            if (toppings.Count() != selectedToppingIds.Count)
+            bool doughExists = await this._doughRepository.ExistsAsync(d => d.Id == pizza.DoughId);
+            bool sauceExists = await this._sauceRepository.ExistsAsync(s => s.Id == pizza.SauceId);
+
+            if (!doughExists || !sauceExists)
+            {
+                // Invalid dough or sauce ID
+                return false;
+            }
+
+            if (toppings.Count() != selectedToppingIds.Count())
             {
                 // Not all selected toppings are valid
                 return false;

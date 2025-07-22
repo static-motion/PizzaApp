@@ -1,5 +1,6 @@
 ﻿namespace PizzaApp.Web.Controllers
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
     using PizzaApp.GCommon.Enums;
@@ -20,12 +21,14 @@
         [HttpGet]
         [Route("/Menu/Index")]
         [Route("/Menu")]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             return this.RedirectToAction(nameof(Category), new { category = MenuCategory.Pizzas });
         }
 
         [HttpGet("/Menu/{category}")]
+        [AllowAnonymous]
         public async Task<IActionResult> Category(string category)
         {
             MenuCategory? categoryEnum = MenuCategoryExtensions.FromUrlString(category);

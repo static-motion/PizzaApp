@@ -33,7 +33,9 @@
             string userId = this.GetUserId()!; // BaseController has the global [Authorize] attribute
                                                // userId should not be null
 
-            await this._pizzaService.CreatePizzaAsync(createdPizza.Pizza, createdPizza.SelectedToppingIds.ToList(), userId);
+            await this._pizzaService.CreatePizzaAsync(createdPizza.Pizza, 
+                createdPizza.SelectedToppingIds, 
+                userId);
             return this.View();
         }
     }

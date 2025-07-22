@@ -1,5 +1,5 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
-    const pizzaForm = document.forms['create-pizza'];
+    const pizzaForm = document.forms['pizza-form'];
 
     pizzaForm.reset();
 
@@ -18,9 +18,8 @@
                 sum += +option.getAttribute('data-price');
             }
         })
-
-        pizzaForm.total.textContent = `$${sum}`
-    }
+        pizzaForm.total.textContent = `$${(Math.round(sum * 100) / 100).toFixed(2)}`
+    };
     pizzaForm.onsubmit = e => {
         //e.preventDefault()  // disable submit
     }

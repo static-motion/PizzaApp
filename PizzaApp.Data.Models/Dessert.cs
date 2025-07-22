@@ -27,5 +27,7 @@
 
         [Comment("Shows if the entity is active.")]
         public bool IsDeleted { get; set; }
+        public ICollection<ShoppingCartDessert> ShoppingCarts { get; set; }
+            = new HashSet<ShoppingCartDessert>();
     }
 }

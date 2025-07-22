@@ -25,6 +25,9 @@
         public ICollection<OrderDrink> OrdersDrinks { get; set; }
             = new HashSet<OrderDrink>();
 
+        public ICollection<ShoppingCartDrink> ShoppingCarts { get; set; }
+            = new HashSet<ShoppingCartDrink>();
+
         [Comment("Shows if the entity is active.")]
         public bool IsDeleted { get; set; }
     }

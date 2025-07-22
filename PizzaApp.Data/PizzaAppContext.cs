@@ -38,6 +38,14 @@
 
         public DbSet<UserPizza> UsersPizzas { get; set; }
 
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+
+        public DbSet<ShoppingCartPizza> ShoppingCartsPizzas { get; set; }
+
+        public DbSet<ShoppingCartDrink> ShoppingCartsDrinks { get; set; }
+
+        public DbSet<ShoppingCartDessert> ShoppingCartsDesserts { get; set; }
+
         public PizzaAppContext(DbContextOptions<PizzaAppContext> options)
             : base(options)
         {

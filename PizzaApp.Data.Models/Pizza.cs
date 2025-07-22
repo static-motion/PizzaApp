@@ -3,6 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data.Models.Interfaces;
     using PizzaApp.Data.Models.MappingEntities;
+    using PizzaApp.GCommon.Enums;
 
     [Comment("All pizzas offered - both admin and user created.")]
     // TODO: Add a flag to differentiate betwen user and admin made pizzas? Or use querying to find pizzas only created by admins (could be slow when there are a lot of pizzas)
@@ -38,11 +39,23 @@
 
         public User Creator { get; set; } = null!;
 
+        public Pizza? BasePizza { get; set; }
+
+        public int? BasePizzaId { get; set; }
+
+        public PizzaType PizzaType { get; set; }
+
         public ICollection<UserPizza> FavoritedBy { get; set; }
             = new HashSet<UserPizza>();
 
         public ICollection<OrderPizza> Orders { get; set; }
             = new HashSet<OrderPizza>();
+
+        public ICollection<Pizza> BaseOf { get; set; }
+            = new HashSet<Pizza>();
+
+        public ICollection<ShoppingCartPizza> ShoppingCarts { get; set; }
+            = new HashSet<ShoppingCartPizza>();
 
         [Comment("Shows if the pizza has been soft deleted.")]
         public bool IsDeleted { get; set; }

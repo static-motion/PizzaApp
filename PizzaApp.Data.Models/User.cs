@@ -22,5 +22,9 @@
         // Every order the User has made.
         public ICollection<Order> OrderHistory { get; set; }
             = new HashSet<Order>();
+
+        public int ShoppingCartId { get; set; }
+
+        public ShoppingCart ShoppingCart { get; set; } = null!;
     }
 }

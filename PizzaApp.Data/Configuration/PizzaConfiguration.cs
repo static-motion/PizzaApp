@@ -4,7 +4,7 @@
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
     using PizzaApp.Data.Models;
-
+    using PizzaApp.GCommon.Enums;
     using static PizzaApp.GCommon.EntityConstraints.Pizza;
 
     class PizzaConfiguration : IEntityTypeConfiguration<Pizza>
@@ -47,7 +47,18 @@
                 .IsRequired();
 
             entity
-                .HasData(GeneratePizzaSeed());
+                .HasOne(e => e.BasePizza)
+                .WithMany(e => e.BaseOf)
+                .HasForeignKey(e => e.BasePizzaId)
+                .IsRequired(false);
+
+            entity
+                .Property(e => e.PizzaType)
+                .HasDefaultValue(PizzaType.BasePizza)
+                .IsRequired();
+
+            //entity
+                //.HasData(GeneratePizzaSeed());
 
             entity
                 .HasQueryFilter(e =>

@@ -5,6 +5,7 @@
     using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.GCommon.Enums;
     using PizzaApp.Services.Core.Interfaces;
+    using PizzaApp.Web.ViewModels;
     using PizzaApp.Web.ViewModels.Menu;
     using System.Collections.Generic;
     using System.Collections.Immutable;
@@ -128,9 +129,12 @@
             OrderPizzaViewModel orderPizzaView = new()
             {
                 Pizza = pizzaDetails,
-                ToppingCategories = allToppingsByCategories,
-                Doughs = allDoughs,
-                Sauces = allSauces
+                Ingredients = new PizzaIngredientsViewModel
+                {
+                    ToppingCategories = allToppingsByCategories,
+                    Doughs = allDoughs,
+                    Sauces = allSauces
+                }
             };
 
             return orderPizzaView;

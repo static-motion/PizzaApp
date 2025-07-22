@@ -526,18 +526,66 @@ namespace PizzaApp.Data.Migrations
                         {
                             t.HasComment("A many-to-many mapping entity between Pizza and Toppings, used to show which toppings are contained in which pizzas.");
                         });
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            ToppingId = 1,
-                            PizzaId = 1
-                        },
-                        new
-                        {
-                            ToppingId = 4,
-                            PizzaId = 1
-                        });
+            modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.ShoppingCartDessert", b =>
+                {
+                    b.Property<int>("ShoppingCartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DessertId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.HasKey("ShoppingCartId", "DessertId");
+
+                    b.HasIndex("DessertId");
+
+                    b.ToTable("ShoppingCartsDesserts");
+                });
+
+            modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.ShoppingCartDrink", b =>
+                {
+                    b.Property<int>("ShoppingCartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DrinkId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.HasKey("ShoppingCartId", "DrinkId");
+
+                    b.HasIndex("DrinkId");
+
+                    b.ToTable("ShoppingCartsDrinks");
+                });
+
+            modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.ShoppingCartPizza", b =>
+                {
+                    b.Property<int>("ShoppingCartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PizzaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.HasKey("ShoppingCartId", "PizzaId");
+
+                    b.HasIndex("PizzaId");
+
+                    b.ToTable("ShoppingCartsPizzas");
                 });
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.UserPizza", b =>
@@ -609,6 +657,9 @@ namespace PizzaApp.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("BasePizzaId")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("CreatorUserId")
                         .HasColumnType("uniqueidentifier")
                         .HasComment("Foreign Key to User who created the pizza.");
@@ -637,11 +688,18 @@ namespace PizzaApp.Data.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasComment("Name of the pizza as given by its creator (User)");
 
+                    b.Property<int>("PizzaType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
                     b.Property<int?>("SauceId")
                         .HasColumnType("int")
                         .HasComment("The sauce used on the pizza. Can be null.");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BasePizzaId");
 
                     b.HasIndex("CreatorUserId");
 
@@ -652,19 +710,6 @@ namespace PizzaApp.Data.Migrations
                     b.ToTable("Pizzas", t =>
                         {
                             t.HasComment("All pizzas offered - both admin and user created.");
-                        });
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatorUserId = new Guid("7bc9cf3b-7464-4b4a-ea3b-08ddb8a10943"),
-                            Description = "Tomato sauce, mozzarella and pepperoni on white dough. Simple. Classic. Timeless.",
-                            DoughId = 1,
-                            ImageUrl = "https://images.unsplash.com/photo-1716237389720-2c4fdabf0ac0?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                            IsDeleted = false,
-                            Name = "Classic Pepperoni",
-                            SauceId = 1
                         });
                 });
 
@@ -738,6 +783,22 @@ namespace PizzaApp.Data.Migrations
                             Price = 1m,
                             Type = "Pesto"
                         });
+                });
+
+            modelBuilder.Entity("PizzaApp.Data.Models.ShoppingCart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShoppingCarts");
                 });
 
             modelBuilder.Entity("PizzaApp.Data.Models.Topping", b =>
@@ -978,6 +1039,9 @@ namespace PizzaApp.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ShoppingCartId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -994,6 +1058,9 @@ namespace PizzaApp.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("ShoppingCartId")
+                        .IsUnique();
 
                     b.ToTable("AspNetUsers", null, t =>
                         {
@@ -1139,6 +1206,63 @@ namespace PizzaApp.Data.Migrations
                     b.Navigation("Topping");
                 });
 
+            modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.ShoppingCartDessert", b =>
+                {
+                    b.HasOne("PizzaApp.Data.Models.Dessert", "Dessert")
+                        .WithMany("ShoppingCarts")
+                        .HasForeignKey("DessertId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PizzaApp.Data.Models.ShoppingCart", "ShoppingCart")
+                        .WithMany("Desserts")
+                        .HasForeignKey("ShoppingCartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dessert");
+
+                    b.Navigation("ShoppingCart");
+                });
+
+            modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.ShoppingCartDrink", b =>
+                {
+                    b.HasOne("PizzaApp.Data.Models.Drink", "Drink")
+                        .WithMany("ShoppingCarts")
+                        .HasForeignKey("DrinkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PizzaApp.Data.Models.ShoppingCart", "ShoppingCart")
+                        .WithMany("Drinks")
+                        .HasForeignKey("ShoppingCartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Drink");
+
+                    b.Navigation("ShoppingCart");
+                });
+
+            modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.ShoppingCartPizza", b =>
+                {
+                    b.HasOne("PizzaApp.Data.Models.Pizza", "Pizza")
+                        .WithMany("ShoppingCarts")
+                        .HasForeignKey("PizzaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PizzaApp.Data.Models.ShoppingCart", "ShoppingCart")
+                        .WithMany("Pizzas")
+                        .HasForeignKey("ShoppingCartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pizza");
+
+                    b.Navigation("ShoppingCart");
+                });
+
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.UserPizza", b =>
                 {
                     b.HasOne("PizzaApp.Data.Models.Pizza", "Pizza")
@@ -1179,6 +1303,10 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.Pizza", b =>
                 {
+                    b.HasOne("PizzaApp.Data.Models.Pizza", "BasePizza")
+                        .WithMany("BaseOf")
+                        .HasForeignKey("BasePizzaId");
+
                     b.HasOne("PizzaApp.Data.Models.User", "Creator")
                         .WithMany("CreatedPizzas")
                         .HasForeignKey("CreatorUserId")
@@ -1194,6 +1322,8 @@ namespace PizzaApp.Data.Migrations
                     b.HasOne("PizzaApp.Data.Models.Sauce", "Sauce")
                         .WithMany("Pizzas")
                         .HasForeignKey("SauceId");
+
+                    b.Navigation("BasePizza");
 
                     b.Navigation("Creator");
 
@@ -1213,6 +1343,17 @@ namespace PizzaApp.Data.Migrations
                     b.Navigation("ToppingCategory");
                 });
 
+            modelBuilder.Entity("PizzaApp.Data.Models.User", b =>
+                {
+                    b.HasOne("PizzaApp.Data.Models.ShoppingCart", "ShoppingCart")
+                        .WithOne("User")
+                        .HasForeignKey("PizzaApp.Data.Models.User", "ShoppingCartId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ShoppingCart");
+                });
+
             modelBuilder.Entity("PizzaApp.Data.Models.Address", b =>
                 {
                     b.Navigation("Deliveries");
@@ -1221,6 +1362,8 @@ namespace PizzaApp.Data.Migrations
             modelBuilder.Entity("PizzaApp.Data.Models.Dessert", b =>
                 {
                     b.Navigation("Orders");
+
+                    b.Navigation("ShoppingCarts");
                 });
 
             modelBuilder.Entity("PizzaApp.Data.Models.Dough", b =>
@@ -1231,6 +1374,8 @@ namespace PizzaApp.Data.Migrations
             modelBuilder.Entity("PizzaApp.Data.Models.Drink", b =>
                 {
                     b.Navigation("OrdersDrinks");
+
+                    b.Navigation("ShoppingCarts");
                 });
 
             modelBuilder.Entity("PizzaApp.Data.Models.Order", b =>
@@ -1244,9 +1389,13 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.Pizza", b =>
                 {
+                    b.Navigation("BaseOf");
+
                     b.Navigation("FavoritedBy");
 
                     b.Navigation("Orders");
+
+                    b.Navigation("ShoppingCarts");
 
                     b.Navigation("Toppings");
                 });
@@ -1254,6 +1403,18 @@ namespace PizzaApp.Data.Migrations
             modelBuilder.Entity("PizzaApp.Data.Models.Sauce", b =>
                 {
                     b.Navigation("Pizzas");
+                });
+
+            modelBuilder.Entity("PizzaApp.Data.Models.ShoppingCart", b =>
+                {
+                    b.Navigation("Desserts");
+
+                    b.Navigation("Drinks");
+
+                    b.Navigation("Pizzas");
+
+                    b.Navigation("User")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PizzaApp.Data.Models.Topping", b =>
