@@ -48,7 +48,7 @@
 
         public async Task<IEnumerable<MenuItemViewModel>> GetAllPizzasForMenuAsync()
         {
-            IEnumerable<Pizza> allPizzas = await this._pizzaRepository.GetAllAsync();
+            IEnumerable<Pizza> allPizzas = await this._pizzaRepository.GetAllBasePizzasAsync();
             
             return allPizzas
                 .Select(p => new MenuItemViewModel

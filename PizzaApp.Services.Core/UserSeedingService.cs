@@ -38,6 +38,11 @@
                 EmailConfirmed = true,
             };
 
+            admin.ShoppingCart = new ShoppingCart
+            {
+                User = admin
+            };
+
             IdentityResult result = await this._userManager.CreateAsync(admin, adminPassword);
             if (!result.Succeeded)
             {

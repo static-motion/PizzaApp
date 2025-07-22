@@ -6,7 +6,6 @@
     using PizzaApp.GCommon.Enums;
 
     [Comment("All pizzas offered - both admin and user created.")]
-    // TODO: Add a flag to differentiate betwen user and admin made pizzas? Or use querying to find pizzas only created by admins (could be slow when there are a lot of pizzas)
     public class Pizza : ISoftDeletable
     {
         [Comment("Primary Key unique identifier.")]

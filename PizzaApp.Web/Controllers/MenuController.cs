@@ -5,6 +5,7 @@
 
     using PizzaApp.GCommon.Enums;
     using PizzaApp.GCommon.Extensions;
+    using PizzaApp.Services.Common.Dtos;
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels.Menu;
 
@@ -13,9 +14,12 @@
         private static IEnumerable<string> CategoryNames = Enum.GetNames<MenuCategory>();
 
         private readonly IMenuService _menuService;
-        public MenuController(IMenuService menuService)
+        private readonly ICartService _cartService;
+
+        public MenuController(IMenuService menuService, ICartService cartService)
         {
             this._menuService = menuService;
+            this._cartService = cartService;
         }
 
         [HttpGet]
@@ -61,6 +65,25 @@
             return this.View(orderPizzaViewModel);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddToCart(OrderPizzaViewModel? orderPizzaViewModel)
+        {
+            if (orderPizzaViewModel is null)
+            {
+                // TODO: Handle better
+                return this.BadRequest("Invalid pizza details.");
+            }
+            string userId = this.GetUserId()!;
 
+            PizzaCartDto pizzaDto = new()
+            {
+                PizzaId = orderPizzaViewModel.Pizza.Id,
+                DoughId = orderPizzaViewModel.Pizza.DoughId,
+                SauceId = orderPizzaViewModel.Pizza.SauceId,
+                SelectedToppingsIds = orderPizzaViewModel.SelectedToppingIds
+            };
+            bool addedToCart = await this._cartService.AddPizzaToCartAsync(pizzaDto, userId);
+            return this.RedirectToAction(nameof(PizzaDetails), new { id = pizzaDto.PizzaId });
+        }
     }
 }

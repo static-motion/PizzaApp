@@ -36,7 +36,7 @@
             await this._pizzaService.CreatePizzaAsync(createdPizza.Pizza, 
                 createdPizza.SelectedToppingIds, 
                 userId);
-            return this.View();
+            return this.RedirectToAction(nameof(Create));
         }
     }
 }

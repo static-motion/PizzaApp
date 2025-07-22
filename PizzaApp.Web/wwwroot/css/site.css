@@ -33,3 +33,12 @@ body {
     margin: auto;
     display: none;
 }
+
+.navbar-nav {
+    gap: 4px;
+}
+
+.nav-item {
+    border: 2px solid black;
+    border-radius: 10px;
+}
