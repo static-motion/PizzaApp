@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PizzaApp.Data.Models.MappingEntities;
-
-namespace PizzaApp.Data.Configurations.MappingEntitiesConfigurations
+﻿namespace PizzaApp.Data.Configuration.MappingEntitiesConfigurations
 {
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+    using PizzaApp.Data.Models.MappingEntities;
+
     class OrderDrinkConfiguration : IEntityTypeConfiguration<OrderDrink>
     {
         public void Configure(EntityTypeBuilder<OrderDrink> entity)
