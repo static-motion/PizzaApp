@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PizzaApp.Data;
 
@@ -11,9 +12,11 @@ using PizzaApp.Data;
 namespace PizzaApp.Data.Migrations
 {
     [DbContext(typeof(PizzaAppContext))]
-    partial class PizzaAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250723142433_ShoppingCartNowPartOfUserModel")]
+    partial class ShoppingCartNowPartOfUserModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -837,9 +840,11 @@ namespace PizzaApp.Data.Migrations
                         .HasDefaultValue(1)
                         .HasComment("Quantity of this item in cart");
 
+                    b.Property<int>("ShoppingCartId")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasComment("Foreign Key to User. Indicates whose shopping cart this pizza is in.");
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 

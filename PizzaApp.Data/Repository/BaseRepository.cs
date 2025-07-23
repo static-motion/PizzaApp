@@ -6,8 +6,8 @@
     using PizzaApp.Data.Repository.Interfaces;
     using System.Linq.Expressions;
 
-    public abstract class BaseRepository<TEntity, TKey> 
-        : IRepository<TEntity, TKey> where TEntity : class
+    public abstract class BaseRepository<TEntity, TKey>
+            : IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
     {
         protected readonly PizzaAppContext DbContext;
         protected readonly DbSet<TEntity> DbSet;
@@ -53,11 +53,6 @@
             return await this.DbSet.ToArrayAsync();
         }
 
-        /*public IQueryable<TEntity> GetAllAttached()
-        {
-            return this.DbSet.AsQueryable();
-        }*/
-
         public ValueTask<TEntity?> GetByIdAsync(TKey id)
         {
             return this.DbSet.FindAsync(id);
@@ -88,6 +83,17 @@
         public Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
         {
             return this.DbSet.AnyAsync(predicate);
+        }
+
+        public async Task<IEnumerable<TEntity>> GetRangeByIdsAsync(IEnumerable<TKey> ids)
+        {
+            IEnumerable<TEntity> entities = await this.DbSet.Where(e => ids.Contains(e.Id)).ToListAsync();
+            if (entities.Count() != ids.Count())
+            {
+                throw new InvalidOperationException("Not all entities were found for the provided IDs.");
+            }
+
+            return entities;
         }
     }
 }

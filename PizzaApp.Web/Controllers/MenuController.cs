@@ -80,7 +80,8 @@
                 PizzaId = orderPizzaViewModel.Pizza.Id,
                 DoughId = orderPizzaViewModel.Pizza.DoughId,
                 SauceId = orderPizzaViewModel.Pizza.SauceId,
-                SelectedToppingsIds = orderPizzaViewModel.SelectedToppingIds
+                SelectedToppingsIds = orderPizzaViewModel.SelectedToppingIds,
+                Quantity = 1
             };
             bool addedToCart = await this._cartService.AddPizzaToCartAsync(pizzaDto, userId);
             return this.RedirectToAction(nameof(PizzaDetails), new { id = pizzaDto.PizzaId });

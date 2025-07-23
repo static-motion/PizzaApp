@@ -6,7 +6,7 @@
     using PizzaApp.GCommon.Enums;
 
     [Comment("All pizzas offered - both admin and user created.")]
-    public class Pizza : ISoftDeletable
+    public class Pizza : ISoftDeletable, IEntity<int>
     {
         [Comment("Primary Key unique identifier.")]
         public int Id { get; set; }
@@ -38,10 +38,6 @@
 
         public User Creator { get; set; } = null!;
 
-        public Pizza? BasePizza { get; set; }
-
-        public int? BasePizzaId { get; set; }
-
         public PizzaType PizzaType { get; set; }
 
         public ICollection<UserPizza> FavoritedBy { get; set; }
@@ -49,9 +45,6 @@
 
         public ICollection<OrderPizza> Orders { get; set; }
             = new HashSet<OrderPizza>();
-
-        public ICollection<Pizza> BaseOf { get; set; }
-            = new HashSet<Pizza>();
 
         public ICollection<ShoppingCartPizza> ShoppingCarts { get; set; }
             = new HashSet<ShoppingCartPizza>();

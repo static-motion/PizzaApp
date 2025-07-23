@@ -2,8 +2,8 @@
 {
     public class ShoppingCartDessert
     {
-        public int ShoppingCartId { get; set; }
-        public ShoppingCart ShoppingCart { get; set; } = null!;
+        public Guid UserId { get; set; }
+        public User User { get; set; } = null!;
 
         public int DessertId { get; set; }
         public Dessert Dessert { get; set; } = null!;

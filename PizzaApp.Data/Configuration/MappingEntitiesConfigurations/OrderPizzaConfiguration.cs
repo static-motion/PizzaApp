@@ -8,7 +8,7 @@
     {
         public void Configure(EntityTypeBuilder<OrderPizza> entity)
         {
-            entity.HasKey(e => new { e.OrderId, e.PizzaId });
+            entity.HasKey(e => new { e.OrderId, e.BasePizzaId });
 
             entity
                 .HasOne(e => e.Order)
@@ -17,9 +17,9 @@
                 .IsRequired();
 
             entity
-                .HasOne(e => e.Pizza)
+                .HasOne(e => e.BasePizza)
                 .WithMany(d => d.Orders)
-                .HasForeignKey(e => e.PizzaId)
+                .HasForeignKey(e => e.BasePizzaId)
                 .IsRequired();
 
             entity
@@ -32,6 +32,19 @@
                 .HasColumnType("decimal(8,2)")
                 .IsRequired()
                 .HasSentinel(0);
+
+
+            entity
+                .HasOne(e => e.Sauce)
+                .WithMany(s => s.SauceOrders)
+                .HasForeignKey(e => e.SauceId)
+                .IsRequired(false);
+
+            entity
+                .HasOne(e => e.Dough)
+                .WithMany(s => s.DoughOrders)
+                .HasForeignKey(e => e.DoughId)
+                .IsRequired(false);
         }
     }
 }

@@ -2,9 +2,10 @@
 {
     using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data.Models.Interfaces;
+    using PizzaApp.Data.Models.MappingEntities;
 
     [Comment("All the dough types used for making pizzas.")]
-    public class Dough : ISoftDeletable
+    public class Dough : ISoftDeletable, IEntity<int>
     {
         [Comment("Unique identifier")]
         public int Id { get; set; }
@@ -23,5 +24,7 @@
 
         [Comment("Shows if the entity is active.")]
         public bool IsDeleted { get; set; }
+        public ICollection<OrderPizza> DoughOrders { get; set; } 
+            = new HashSet<OrderPizza>();
     }
 }

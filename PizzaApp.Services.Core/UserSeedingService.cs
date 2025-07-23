@@ -2,16 +2,19 @@
 {
     using Microsoft.AspNetCore.Identity;
     using PizzaApp.Data.Models;
+    using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.Services.Core.Interfaces;
 
     public class UserSeedingService : IUserSeedingService
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-        public UserSeedingService(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        private readonly IUserRepository _cartRepository;
+        public UserSeedingService(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, IUserRepository cartRepository)
         {
             this._userManager = userManager;
             this._roleManager = roleManager;
+            this._cartRepository = cartRepository;
         }
 
 
@@ -30,19 +33,12 @@
 
             if (admin is not null)
                 return; // await this._userManager.DeleteAsync(admin);
-
             admin = new()
             {
                 Email = adminEmail,
                 UserName = adminEmail,
                 EmailConfirmed = true,
             };
-
-            admin.ShoppingCart = new ShoppingCart
-            {
-                User = admin
-            };
-
             IdentityResult result = await this._userManager.CreateAsync(admin, adminPassword);
             if (!result.Succeeded)
             {

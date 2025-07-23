@@ -1,11 +1,12 @@
 ﻿namespace PizzaApp.Data.Models
 {
     using Microsoft.EntityFrameworkCore;
+    using PizzaApp.Data.Models.Interfaces;
     using PizzaApp.Data.Models.MappingEntities;
     using PizzaApp.GCommon.Enums;
 
     [Comment("All the users' orders in the database.")]
-    public class Order
+    public class Order : IEntity<Guid>
     {
         [Comment("Primary Key unique identifier")]
         public Guid Id { get; set; }

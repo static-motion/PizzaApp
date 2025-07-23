@@ -47,12 +47,6 @@
                 .IsRequired();
 
             entity
-                .HasOne(e => e.BasePizza)
-                .WithMany(e => e.BaseOf)
-                .HasForeignKey(e => e.BasePizzaId)
-                .IsRequired(false);
-
-            entity
                 .Property(e => e.PizzaType)
                 .HasDefaultValue(PizzaType.BasePizza)
                 .IsRequired();
@@ -63,7 +57,6 @@
                     && (e.Sauce == null || e.Sauce.IsDeleted == false) // the sauce must be either not set or active
                     && e.Dough.IsDeleted == false // the dough must be active
                     && e.Toppings.All(t => t.Topping.IsDeleted == false) // all toppings must be active
-
                 );
         }
     }

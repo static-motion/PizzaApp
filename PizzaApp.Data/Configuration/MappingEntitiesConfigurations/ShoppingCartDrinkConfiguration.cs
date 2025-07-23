@@ -9,12 +9,12 @@
         public void Configure(EntityTypeBuilder<ShoppingCartDrink> entity)
         {
             entity
-                .HasKey(e => new {e.ShoppingCartId, e.DrinkId});
+                .HasKey(e => new {e.UserId, e.DrinkId});
 
             entity
-                .HasOne(e => e.ShoppingCart)
-                .WithMany(e => e.Drinks)
-                .HasForeignKey(e => e.ShoppingCartId)
+                .HasOne(e => e.User)
+                .WithMany(e => e.ShoppingCartDrinks)
+                .HasForeignKey(e => e.UserId)
                 .IsRequired();
 
             entity

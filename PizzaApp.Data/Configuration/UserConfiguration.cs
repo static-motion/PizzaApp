@@ -8,12 +8,6 @@
     {
         public void Configure(EntityTypeBuilder<User> entity)
         {
-            entity
-                .HasOne(e => e.ShoppingCart)
-                .WithOne(u => u.User)
-                .HasForeignKey<User>(e => e.ShoppingCartId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .IsRequired();
         }
     }
 }

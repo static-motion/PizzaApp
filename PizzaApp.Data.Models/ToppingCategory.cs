@@ -4,7 +4,7 @@
     using PizzaApp.Data.Models.Interfaces;
 
     [Comment("The topping categories offered by the pizza app (meats, veggies etc.)")]
-    public class ToppingCategory : ISoftDeletable
+    public class ToppingCategory : ISoftDeletable, IEntity<int>
     {
         [Comment("Unique identifier")]
         public int Id { get; set; }

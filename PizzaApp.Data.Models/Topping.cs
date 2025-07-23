@@ -5,7 +5,7 @@
     using PizzaApp.Data.Models.MappingEntities;
 
     [Comment("All the toppings offered.")]
-    public class Topping : ISoftDeletable
+    public class Topping : ISoftDeletable, IEntity<int>
     {
         [Comment("Primary Key unique identifier")]
         public int Id { get; set; }

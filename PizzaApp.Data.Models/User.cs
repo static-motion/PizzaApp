@@ -2,10 +2,11 @@
 {
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
+    using PizzaApp.Data.Models.Interfaces;
     using PizzaApp.Data.Models.MappingEntities;
 
     [Comment("The general public website user. This entity has addresses, created pizzas, favorited pizzas and order associated with it.")]
-    public class User : IdentityUser<Guid>
+    public class User : IdentityUser<Guid>, IEntity<Guid>
     {
         // A list of the User's addresses.
         public ICollection<Address> Addresses { get; set; }
@@ -23,8 +24,11 @@
         public ICollection<Order> OrderHistory { get; set; }
             = new HashSet<Order>();
 
-        public int ShoppingCartId { get; set; }
-
-        public ShoppingCart ShoppingCart { get; set; } = null!;
+        public ICollection<ShoppingCartPizza> ShoppingCartPizzas { get; set; }
+            = new HashSet<ShoppingCartPizza>();
+        public ICollection<ShoppingCartDrink> ShoppingCartDrinks { get; set; }
+            = new HashSet<ShoppingCartDrink>();
+        public ICollection<ShoppingCartDessert> ShoppingCartDesserts { get; set; }
+            = new HashSet<ShoppingCartDessert>();
     }
 }

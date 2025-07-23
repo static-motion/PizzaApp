@@ -1,4 +1,4 @@
-﻿namespace PizzaApp.Web.ViewModels.Menu
+﻿namespace PizzaApp.Web.ViewModels
 {
     public class ToppingCategoryViewModel
     {

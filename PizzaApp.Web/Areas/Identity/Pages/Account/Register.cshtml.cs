@@ -153,12 +153,6 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account
             try
             {
                 User user = Activator.CreateInstance<User>();
-
-                // Initialize the ShoppingCart for the user
-                user.ShoppingCart = new ShoppingCart
-                {
-                    User = user
-                };
                 return Activator.CreateInstance<User>();
             }
             catch

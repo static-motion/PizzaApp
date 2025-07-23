@@ -10,5 +10,6 @@
 
         public ICollection<int> SelectedToppingsIds { get; set; }
             = new List<int>();
+        public int Quantity { get; set; }
     }
 }

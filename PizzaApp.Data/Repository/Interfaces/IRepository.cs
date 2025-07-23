@@ -15,7 +15,7 @@
 
         Task<IEnumerable<TEntity>> GetAllAsync(bool asNoTracking = false);
 
-        //IQueryable<TEntity> GetAllAttached();
+        Task<IEnumerable<TEntity>> GetRangeByIdsAsync(IEnumerable<TKey> ids);
 
         ValueTask<TEntity?> GetByIdAsync(TKey id);
 

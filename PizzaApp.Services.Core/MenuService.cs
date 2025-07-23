@@ -1,6 +1,5 @@
 ﻿namespace PizzaApp.Services.Core
 {
-    using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data.Models;
     using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.GCommon.Enums;

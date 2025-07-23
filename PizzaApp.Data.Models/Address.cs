@@ -4,7 +4,7 @@
     using PizzaApp.Data.Models.Interfaces;
 
     [Comment("All the addresses as created by the Users.")]
-    public class Address : ISoftDeletable
+    public class Address : ISoftDeletable, IEntity<int>
     {
         [Comment("Primary Key unique identifier.")]
         public int Id { get; set; }

@@ -1,64 +1,153 @@
 ﻿namespace PizzaApp.Services.Core
 {
-    using Microsoft.AspNetCore.Identity;
+    using PizzaApp.Data.Common.Serialization;
     using PizzaApp.Data.Models;
-    using PizzaApp.Data.Models.MappingEntities;
     using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.Services.Common.Dtos;
     using PizzaApp.Services.Core.Interfaces;
-    using GCommon.Enums;
+    using PizzaApp.Web.ViewModels;
+    using PizzaApp.Web.ViewModels.ShoppingCart;
+    using System.Collections.Generic;
 
     public class CartService : ICartService
     {
-        private readonly ICartRepository _cartRepository;
-        private readonly UserManager<User> _userManager;
+        private readonly IUserRepository _userRepository;
+        private readonly IDoughRepository _doughRepository;
+        private readonly ISauceRepository _sauceRepository;
+        private readonly IToppingCategoryRepository _toppingCategoryRepository;
+        private readonly IPizzaRepository _pizzaRepository;
 
-        public CartService(ICartRepository cartRepository, UserManager<User> userManager)
+        public CartService(IUserRepository userRepository,
+            IDoughRepository doughRepository, 
+            ISauceRepository sauceRepository, 
+            IToppingCategoryRepository toppingCategoryRepository,
+            IPizzaRepository pizzaRepository)
         {
-            this._cartRepository = cartRepository;
-            this._userManager = userManager;
+            this._userRepository = userRepository;
+            this._doughRepository = doughRepository;
+            this._sauceRepository = sauceRepository;
+            this._toppingCategoryRepository = toppingCategoryRepository;
+            this._pizzaRepository = pizzaRepository;
         }
 
         // TODO: refactor later 
         public async Task<bool> AddPizzaToCartAsync(PizzaCartDto pizzaDto, string userId)
         {
             Guid userIdGuid = Guid.Parse(userId);
-            ShoppingCart cart = await this._cartRepository.GetCompleteCartByUserIdAsync(userIdGuid) ?? throw new Exception("Cart not found for user.");
+            User? user = await this._userRepository.GetUserWithShoppingCartAsync(userIdGuid);
 
-            // A new pizza is created here because the user can modify the base pizza
-            // and we want to keep the base pizza intact. Any modifications to the
-            // pizza will damage data integrity
-            // especially when checking order history. Maybe a better way to do this is to add 
-            // a new db column called PizzaSnapshot where we store every ordered pizza regardless of whether
-            // it is a base pizza or a user modified pizza.
-            Pizza pizza = new()
+            if (user is null)
             {
-                Name = Guid.NewGuid().ToString(), // Name it a guid because the name will be taken from the base pizza
+                return false;
+            }
+
+            PizzaComponentsDto components = new()
+            {
                 DoughId = pizzaDto.DoughId,
                 SauceId = pizzaDto.SauceId,
-                CreatorUserId = userIdGuid,
-                Toppings = pizzaDto.SelectedToppingsIds.Select(toppingId => new PizzaTopping
-                {
-                    ToppingId = toppingId
-                }).ToList(),
-                BasePizzaId = pizzaDto.PizzaId,
-                PizzaType = PizzaType.OrderPizza // This is a pizza which is created for this order only,
-                                                 // it will only appear in the cart and order history.
-                                                 // Not sure if it's the best way to handle this.
+                SelectedToppings = pizzaDto.SelectedToppingsIds
             };
 
-            // we don't care if the pizza already exists in
-            // the cart because every ordered pizza is unique
-            cart.Pizzas.Add(new ShoppingCartPizza
+            ShoppingCartPizza pizza = new()
             {
-                Pizza = pizza,
-                ShoppingCartId = cart.Id
-            });
+                BasePizzaId = pizzaDto.PizzaId,
+                Quantity = pizzaDto.Quantity,
+                Price = 10m, // TODO: Calculate price based on components
+                User = user,
+                UserId = user.Id,
+            };
 
-            this._cartRepository.Update(cart);
-            await this._cartRepository.SaveChangesAsync();
+            // serialize components to JSON
+            pizza.SerializeComponentsToJson(components);
 
+            // check if pizza already in cart
+            ShoppingCartPizza? equalPizza = user.ShoppingCartPizzas.FirstOrDefault(p => 
+                (p.GetComponentsFromJson()?.Equals(components) ?? false) // check if components match
+                && pizza.BasePizzaId == p.BasePizzaId); // check if base pizza matches
+
+            // if pizza with same components exists, increase quantity
+            if (equalPizza is not null)
+            {
+                equalPizza.Quantity += pizzaDto.Quantity;
+            }
+            else // if not add new pizza to the cart
+            {
+                user.ShoppingCartPizzas.Add(pizza);
+            }
+
+            await this._userRepository.SaveChangesAsync();
             return true;
+        }
+
+        //TODO: Refactor to return all cart items instead of pizzas only.
+        public async Task<IEnumerable<PizzaShoppingCartViewModel>> GetUserCart(Guid userId)
+        {
+            User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId) 
+                ?? throw new InvalidOperationException("User not found");
+
+            IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
+                .GetAllWithToppingsAsync(asNoTracking: true);
+
+            List<PizzaShoppingCartViewModel> pizzasInCart = new List<PizzaShoppingCartViewModel>();
+
+            foreach (ShoppingCartPizza pizza in user.ShoppingCartPizzas)
+            {
+                // load base pizza
+                string? basePizzaName = (await this._pizzaRepository.GetByIdAsync(pizza.BasePizzaId))?.Name;
+
+                PizzaComponentsDto components = 
+                    pizza.GetComponentsFromJson() 
+                    ?? throw new InvalidOperationException("Pizza components not found or invalid.");
+
+                if (basePizzaName is null)
+                {
+                    throw new InvalidOperationException($"Base pizza with ID {pizza.BasePizzaId} not found.");
+                }
+                // load dough, sauce and toppings
+                Dough dough = await this._doughRepository.GetByIdAsync(components.DoughId); //TODO: FIX
+
+                Sauce? sauce = components.SauceId.HasValue ? 
+                    await this._sauceRepository.GetByIdAsync(components.SauceId.Value)
+                    : null;
+
+                // this is stupid I hate the repository pattern
+                PizzaShoppingCartViewModel pizzaViewModel = new()
+                {
+                    Name = basePizzaName,
+                    DoughName = dough?.Type ?? "Unknown Dough",
+                    SauceName = sauce?.Type,
+                    Quantity = pizza.Quantity,
+                    Price = pizza.Price
+                };
+
+                foreach (int toppingId in components.SelectedToppings)
+                {
+                    Topping? topping = allToppingCategories.SelectMany(tc => tc.Toppings)
+                        .FirstOrDefault(t => t.Id == toppingId);
+                    if (topping is null)
+                    {
+                        continue;
+                    }
+
+                    string categoryName = topping.ToppingCategory.Name;
+
+                    if (!pizzaViewModel.Toppings.ContainsKey(categoryName))
+                    {
+                        pizzaViewModel.Toppings.Add(categoryName, new List<ToppingViewModel>());
+                    }
+
+                    pizzaViewModel.Toppings[categoryName].Add(new ToppingViewModel()
+                    {
+                        Id = topping.Id,
+                        Name = topping.Name,
+                        Price = topping.Price
+                    });
+                }
+
+                pizzasInCart.Add(pizzaViewModel);
+            }
+
+            return pizzasInCart;
         }
     }
 }

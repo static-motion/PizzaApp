@@ -2,9 +2,10 @@
 {
     using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data.Models.Interfaces;
+    using PizzaApp.Data.Models.MappingEntities;
 
     [Comment("All the sauces offered.")]
-    public class Sauce : ISoftDeletable
+    public class Sauce : ISoftDeletable, IEntity<int>
     {
         [Comment("Primary Key unique identifier")]
         public int Id { get; set; }
@@ -23,5 +24,8 @@
 
         [Comment("Shows if the entity is active.")]
         public bool IsDeleted { get; set; }
+
+        public ICollection<OrderPizza> SauceOrders { get; set; }
+            = new HashSet<OrderPizza>();
     }
 }
