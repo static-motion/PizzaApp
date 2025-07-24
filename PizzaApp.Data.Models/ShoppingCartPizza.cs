@@ -27,9 +27,6 @@
         [Comment("JSON serialized pizza data")]
         public string? PizzaComponentsJson { get; set; }
 
-        [Comment("Calculated price including customizations")]
-        public decimal Price { get; set; }
-
         // Helper methods to work with components data
         public PizzaComponentsDto? GetComponentsFromJson()
         {

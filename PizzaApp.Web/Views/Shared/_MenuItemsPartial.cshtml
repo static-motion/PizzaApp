@@ -25,14 +25,7 @@
             <h5 class="card-title">@menuViewModel.Name</h5>
             <p class="card-text">@menuViewModel.Description</p>
             <div class="card-btn-container">
-                @if (menuViewModel.Category == MenuCategory.Pizzas)
-                {
-                    <a asp-controller="Menu" asp-action="@menuViewModel.Category" asp-route-id="@menuViewModel.Id" class="card-btn btn btn-danger"><i class="fa-solid fa-cart-plus"></i></a>
-                } 
-                else
-                {
-                    <a class="card-btn btn btn-danger"><i class="fa-solid fa-cart-plus"></i></a>
-                }
+                <a asp-controller="Menu" asp-action="@menuViewModel.Category" asp-route-id="@menuViewModel.Id" class="card-btn btn btn-danger"><i class="fa-solid fa-cart-plus"></i></a>
             </div>
         </div>
     </div>

@@ -34,13 +34,6 @@
                 .Property(e => e.PizzaComponentsJson)
                 .HasMaxLength(1000)
                 .IsRequired(false);
-
-            entity
-                .Property(e => e.Price)
-                .HasPrecision(8, 2)
-                .HasColumnType("decimal(8,2)")
-                .HasSentinel(0m)
-                .IsRequired();
         }
     }
 }

@@ -4,7 +4,7 @@
 
     public static class MenuCategoryExtensions
     {
-        public static MenuCategory? FromUrlString(string categoryString)
+        public static MenuCategory? FromString(string categoryString)
         {
             if (string.IsNullOrEmpty(categoryString))
                 return null;

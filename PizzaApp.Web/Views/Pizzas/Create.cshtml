@@ -24,7 +24,6 @@
     <div class="mb-3">
         <label asp-for="Pizza.DoughId" class="form-label">Dough</label>
         <select asp-for="Pizza.DoughId" class="form-select">
-            <option value="">Select dough</option>
             @foreach (var dough in Model.Ingredients.Doughs)
             {
                 <option data-price="@dough.Price" value="@dough.Id">@dough.Name</option>

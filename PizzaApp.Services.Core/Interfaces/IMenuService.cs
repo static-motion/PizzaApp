@@ -10,5 +10,6 @@
         public Task<IEnumerable<MenuItemViewModel>> GetAllPizzasForMenuAsync();
         public Task<IReadOnlyCollection<MenuItemViewModel>> GetAllMenuItemsForCategoryAsync(MenuCategory category);
         public Task<OrderPizzaViewModel?> GetPizzaDetailsByIdAsync(int id);
+        public Task<OrderItemViewModel?> GetOrderItemDetailsAsync(int id, MenuCategory? categoryEnum);
     }
 }

@@ -6,7 +6,7 @@
     bool hasImage = Model.Pizza.ImageUrl != null;
 }
 <a class="btn btn-success btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
-<form asp-action="AddToCart" method="post" class="container" name="pizza-form">
+<form asp-action="AddPizzaToCart" method="post" class="container" name="pizza-form">
     @if (hasImage)
     {
         <img class="img-pizza-details" src="@Model.Pizza.ImageUrl"/>
@@ -25,7 +25,6 @@
             <div class="mb-3">
                 <label asp-for="Pizza.DoughId" class="form-label">Dough</label>
                 <select asp-for="Pizza.DoughId" class="form-select">
-                    <option value="">Select dough</option>
                     @foreach (var dough in Model.Ingredients.Doughs)
                     {
                         <option data-price="@dough.Price" value="@dough.Id">@dough.Name</option>
@@ -72,15 +71,31 @@
             }
         </div>
     </div>
-    <div>Price: <output name="total">$@Model.Pizza.Price</output></div>
-    <button type="submit" class="btn btn-danger">I want one!</button>
+    <!-- Quantity Selector -->
+    <div class="mb-3">
+        <label for="quantity-input" class="form-label">Quantity:</label>
+        <div class="quantity-selector">
+            <button type="button" id="minus-btn" class="btn btn-secondary">-</button>
+            <input asp-for="Pizza.Quantity" id="quantity-input" class="form-control text-center" value="1" min="1" />
+            <button type="button" id="plus-btn" class="btn btn-secondary">+</button>
+        </div>
+    </div>
+
+    <!-- Price Display -->
+    <div class="mb-3 fs-4">
+        Price: <output name="total" id="total-price">$@Model.Pizza.Price.ToString("F2")</output>
+    </div>
+
+    <!-- Hidden input to store the base price for calculations -->
+    <input type="hidden" id="base-price" value="@Model.Pizza.Price" />
+    <button type="submit" class="btn btn-danger">Add to cart</button>
 </form>
 
 @section Styles {
-    <link href="@Url.Content("~/css/Menu/pizza-details.css")" rel="stylesheet" type="text/css" />
+    <link href="~/css/Menu/pizza-details.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/Menu/quantity-selector.css" rel="stylesheet" type="text/css" />
 }
 
 @section Scripts {
-    <script src="~/js/pizza-details.js"></script>
-    <script src="~/js/pizzas/create-pizza.js"></script>
+    <script src="~/js/menu-pizza-details.js"></script>
 }

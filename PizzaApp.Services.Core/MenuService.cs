@@ -8,6 +8,7 @@
     using PizzaApp.Web.ViewModels.Menu;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Net.Http.Headers;
     using System.Threading.Tasks;
 
     public class MenuService : IMenuService
@@ -205,6 +206,52 @@
                         Price = t.Price
                     }).ToList()
                 }).ToList();
+        }
+
+        public async Task<OrderItemViewModel?> GetOrderItemDetailsAsync(int id, MenuCategory? category)
+        {
+            return category switch
+            {
+                MenuCategory.Drinks => await this.GetDrinkById(id),
+                MenuCategory.Desserts => await this.GetDessertById(id),
+                _ => null
+            };
+        }
+
+        private async Task<OrderItemViewModel?> GetDrinkById(int id)
+        {
+            Drink? drink = await this._drinkRepository.GetByIdAsync(id);
+
+            if (drink is null)
+                return null;
+
+            return new OrderItemViewModel()
+            {
+                Id = drink.Id,
+                Name = drink.Name,
+                Category = MenuCategory.Drinks,
+                Description = drink.Description,
+                ImageUrl = drink.ImageUrl,
+                Price = drink.Price
+            };
+        }
+
+        private async Task<OrderItemViewModel?> GetDessertById(int id)
+        {
+            Dessert? dessert = await this._dessertRepository.GetByIdAsync(id);
+
+            if (dessert is null)
+                return null;
+
+            return new OrderItemViewModel()
+            {
+                Id = dessert.Id,
+                Name = dessert.Name,
+                Category = MenuCategory.Desserts,
+                Description = dessert.Description,
+                ImageUrl = dessert.ImageUrl,
+                Price = dessert.Price
+            };
         }
     }
 }

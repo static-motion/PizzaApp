@@ -35,7 +35,7 @@
         [AllowAnonymous]
         public async Task<IActionResult> Category(string category)
         {
-            MenuCategory? categoryEnum = MenuCategoryExtensions.FromUrlString(category);
+            MenuCategory? categoryEnum = MenuCategoryExtensions.FromString(category);
 
             if (categoryEnum is null)
                 return this.NotFound();
@@ -54,19 +54,33 @@
             return this.View(menuView);
         }
 
-        [HttpGet("/Menu/Pizzas/{id:int}")]
-        public async Task<IActionResult> PizzaDetails(int id)
+        [HttpGet("/Menu/{category}/{id:int}")]
+        public async Task<IActionResult> ItemDetails(int id, string category)
         {
-            OrderPizzaViewModel? orderPizzaViewModel = await this._menuService.GetPizzaDetailsByIdAsync(id);
-            
-            if (orderPizzaViewModel is null)
+            MenuCategory? categoryEnum = MenuCategoryExtensions.FromString(category);
+
+            if (categoryEnum is null)
                 return this.NotFound();
 
-            return this.View(orderPizzaViewModel);
-        }
+            if (categoryEnum == MenuCategory.Pizzas)
+            {
+                OrderPizzaViewModel? orderPizzaViewModel = await this._menuService.GetPizzaDetailsByIdAsync(id);
 
+                if (orderPizzaViewModel is null)
+                    return this.NotFound();
+
+                return this.View("PizzaDetails", orderPizzaViewModel);
+            }
+
+            OrderItemViewModel? orderItem = await this._menuService.GetOrderItemDetailsAsync(id, categoryEnum);
+
+            if (orderItem is null)
+                return this.NotFound();
+
+            return this.View("ItemDetails", orderItem);
+        }
         [HttpPost]
-        public async Task<IActionResult> AddToCart(OrderPizzaViewModel? orderPizzaViewModel)
+        public async Task<IActionResult> AddPizzaToCart(OrderPizzaViewModel? orderPizzaViewModel)
         {
             if (orderPizzaViewModel is null)
             {
@@ -81,10 +95,28 @@
                 DoughId = orderPizzaViewModel.Pizza.DoughId,
                 SauceId = orderPizzaViewModel.Pizza.SauceId,
                 SelectedToppingsIds = orderPizzaViewModel.SelectedToppingIds,
-                Quantity = 1
+                Quantity = orderPizzaViewModel.Pizza.Quantity
             };
             bool addedToCart = await this._cartService.AddPizzaToCartAsync(pizzaDto, userId);
-            return this.RedirectToAction(nameof(PizzaDetails), new { id = pizzaDto.PizzaId });
+            return this.RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddItemToCart(OrderItemViewModel? orderItem)
+        {
+            if (orderItem is null)
+            {
+                // TODO: Handle better
+                return this.BadRequest("Invalid menu item.");
+            }
+            if (!this.ModelState.IsValid)
+            {
+                // TODO: Handle
+            }
+            string userId = this.GetUserId()!;
+
+            bool addedToCart = await this._cartService.AddItemToCartAsync(orderItem, userId);
+            return this.RedirectToAction(nameof(Index));
         }
     }
 }

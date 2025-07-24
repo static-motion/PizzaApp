@@ -15,8 +15,11 @@
         {
             return this.DbContext.Users
                 .Include(c => c.ShoppingCartPizzas)
+                    .ThenInclude(c => c.BasePizza)
                 .Include(c => c.ShoppingCartDrinks)
+                    .ThenInclude(c => c.Drink)
                 .Include(c => c.ShoppingCartDesserts)
+                    .ThenInclude(c => c.Dessert)
                 .FirstOrDefaultAsync(c => c.Id == userId);
         }
     }

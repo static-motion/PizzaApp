@@ -1,0 +1,57 @@
+﻿@using PizzaApp.Web.ViewModels.Menu
+@model OrderItemViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+    bool hasImage = Model.ImageUrl != null;
+}
+
+<a class="btn btn-success btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+
+<form asp-action="AddItemToCart" method="post" class="container" name="pizza-form">
+    @if (hasImage)
+    {
+        <img class="img-item-details" src="@Model.ImageUrl" alt="@Model.Name" />
+    }
+
+    <div class="mb-3">
+        <h2>@Model.Name</h2>
+        <input asp-for="Id" type="hidden" />
+        <input type="hidden" asp-for="Category" />
+        <input type="hidden" asp-for="Name" />
+    </div>
+
+    <div class="mb-3">
+        <h3>@Model.Description</h3>
+    </div>
+
+    <!-- Quantity Selector -->
+    <div class="mb-3">
+        <label for="quantity-input" class="form-label">Quantity:</label>
+        <div class="quantity-selector">
+            <button type="button" id="minus-btn" class="btn btn-secondary">-</button>
+            <input asp-for="Quantity" id="quantity-input" class="form-control text-center" value="1" min="1" />
+            <button type="button" id="plus-btn" class="btn btn-secondary">+</button>
+        </div>
+    </div>
+
+    <!-- Price Display -->
+    <div class="mb-3 fs-4">
+        Price: <output name="total" id="total-price">$@Model.Price.ToString("F2")</output>
+    </div>
+
+    <!-- Hidden input to store the base price for calculations -->
+    <input type="hidden" id="base-price" value="@Model.Price" />
+
+    <button type="submit" class="btn btn-danger btn-lg">Add to Cart</button>
+</form>
+
+@section Styles {
+    <link href="~/css/Menu/pizza-details.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/Menu/quantity-selector.css" rel="stylesheet" type="text/css" />
+
+}
+
+@section Scripts {
+    <script src="~/js/menu-item-details.js"> </script>
+}

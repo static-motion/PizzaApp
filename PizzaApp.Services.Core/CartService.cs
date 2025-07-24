@@ -2,10 +2,13 @@
 {
     using PizzaApp.Data.Common.Serialization;
     using PizzaApp.Data.Models;
+    using PizzaApp.Data.Models.MappingEntities;
     using PizzaApp.Data.Repository.Interfaces;
+    using PizzaApp.GCommon.Enums;
     using PizzaApp.Services.Common.Dtos;
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels;
+    using PizzaApp.Web.ViewModels.Menu;
     using PizzaApp.Web.ViewModels.ShoppingCart;
     using System.Collections.Generic;
 
@@ -16,21 +19,97 @@
         private readonly ISauceRepository _sauceRepository;
         private readonly IToppingCategoryRepository _toppingCategoryRepository;
         private readonly IPizzaRepository _pizzaRepository;
+        private readonly IDrinkRepository _drinkRepository;
+        private readonly IDessertRepository _dessertRepository;
 
         public CartService(IUserRepository userRepository,
             IDoughRepository doughRepository, 
             ISauceRepository sauceRepository, 
             IToppingCategoryRepository toppingCategoryRepository,
-            IPizzaRepository pizzaRepository)
+            IPizzaRepository pizzaRepository,
+            IDrinkRepository drinkRepository,
+            IDessertRepository dessertRepository)
         {
             this._userRepository = userRepository;
             this._doughRepository = doughRepository;
             this._sauceRepository = sauceRepository;
             this._toppingCategoryRepository = toppingCategoryRepository;
             this._pizzaRepository = pizzaRepository;
+            this._drinkRepository = drinkRepository;
+            this._dessertRepository = dessertRepository;
         }
 
-        // TODO: refactor later 
+        public async Task<bool> AddItemToCartAsync(OrderItemViewModel orderItem, string userId)
+        {
+            Guid userIdGuid = Guid.Parse(userId);
+            User? user = await this._userRepository.GetUserWithShoppingCartAsync(userIdGuid);
+
+            if (user is null)
+            {
+                return false;
+            }
+
+            bool result = orderItem.Category switch
+            {
+                MenuCategory.Drinks => await this.AddDrinkToCartAsync(orderItem, user),
+                MenuCategory.Desserts => await this.AddDessertToCartAsync(orderItem, user),
+                _ => false
+            };
+
+            return result;
+        }
+
+        private async Task<bool> AddDrinkToCartAsync(OrderItemViewModel item, User user)
+        {
+            Drink? drink = await this._drinkRepository.GetByIdAsync(item.Id);
+
+            if (drink is null)
+                return false;
+
+            ShoppingCartDrink? cartDrink = user.ShoppingCartDrinks.FirstOrDefault(d => d.DrinkId == item.Id);
+            if (cartDrink is not null)
+            {
+                cartDrink.Quantity += item.Quantity;
+                return true;
+            }
+
+            user.ShoppingCartDrinks.Add(new ShoppingCartDrink()
+            {
+                DrinkId = item.Id,
+                Quantity = item.Quantity,
+                UserId = user.Id
+            });
+
+            await this._userRepository.SaveChangesAsync();
+            return true;
+        }
+
+        private async Task<bool> AddDessertToCartAsync(OrderItemViewModel item, User user)
+        {
+            Dessert? dessert = await this._dessertRepository.GetByIdAsync(item.Id);
+
+            if (dessert is null)
+                return false;
+
+            ShoppingCartDessert? cartDessert = user.ShoppingCartDesserts.FirstOrDefault(d => d.DessertId == item.Id);
+            if (cartDessert is not null)
+            {
+                cartDessert.Quantity += item.Quantity;
+                return true;
+            }
+
+            user.ShoppingCartDesserts.Add(new ShoppingCartDessert()
+            {
+                DessertId = item.Id,
+                Quantity = item.Quantity,
+                UserId = user.Id
+            });
+
+            await this._userRepository.SaveChangesAsync();
+            return true;
+        }
+
+        // TODO: refactor later
         public async Task<bool> AddPizzaToCartAsync(PizzaCartDto pizzaDto, string userId)
         {
             Guid userIdGuid = Guid.Parse(userId);
@@ -52,7 +131,7 @@
             {
                 BasePizzaId = pizzaDto.PizzaId,
                 Quantity = pizzaDto.Quantity,
-                Price = 10m, // TODO: Calculate price based on components
+                // Price = 10m, // TODO: Calculate price based on components
                 User = user,
                 UserId = user.Id,
             };
@@ -79,45 +158,79 @@
             return true;
         }
 
-        //TODO: Refactor to return all cart items instead of pizzas only.
-        public async Task<IEnumerable<PizzaShoppingCartViewModel>> GetUserCart(Guid userId)
+        //TODO: The current cart index view doesn't use all properties from the view models. Fix when possible.
+        public async Task<ShoppingCartItemsViewModel> GetUserCart(Guid userId)
         {
             User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId) 
                 ?? throw new InvalidOperationException("User not found");
 
+            IEnumerable<ShoppingCartPizzaViewModel> pizzasInCart = await this.GetAllPizzaViewModelsAsync(user);
+            
+            IEnumerable<ShoppingCartDrinkViewModel> drinksInCart = user.ShoppingCartDrinks
+                .Select(d => new ShoppingCartDrinkViewModel
+                {
+                    Id = d.DrinkId,
+                    Name = d.Drink.Name,
+                    Quantity = d.Quantity,
+                    Price = d.Drink.Price,
+                    ImageUrl = d.Drink.ImageUrl
+                }).ToList();
+
+            IEnumerable<ShoppingCartDessertViewModel> dessertsInCart = user.ShoppingCartDesserts
+                .Select(d => new ShoppingCartDessertViewModel
+                {
+                    Id = d.DessertId,
+                    Name = d.Dessert.Name,
+                    Quantity = d.Quantity,
+                    Price = d.Dessert.Price,
+                    ImageUrl = d.Dessert.ImageUrl
+                }).ToList();
+
+            ShoppingCartItemsViewModel result = new()
+            {
+                Pizzas = pizzasInCart,
+                Drinks = drinksInCart,
+                Desserts = dessertsInCart
+            };
+
+            return result;
+        }
+
+        private async Task<IEnumerable<ShoppingCartPizzaViewModel>> GetAllPizzaViewModelsAsync(User user)
+        {
             IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
                 .GetAllWithToppingsAsync(asNoTracking: true);
-
-            List<PizzaShoppingCartViewModel> pizzasInCart = new List<PizzaShoppingCartViewModel>();
+            List<ShoppingCartPizzaViewModel> pizzasInCart = new();
 
             foreach (ShoppingCartPizza pizza in user.ShoppingCartPizzas)
             {
                 // load base pizza
-                string? basePizzaName = (await this._pizzaRepository.GetByIdAsync(pizza.BasePizzaId))?.Name;
+                Pizza? basePizza = await this._pizzaRepository.GetByIdAsync(pizza.BasePizzaId);
 
-                PizzaComponentsDto components = 
-                    pizza.GetComponentsFromJson() 
+                PizzaComponentsDto components =
+                    pizza.GetComponentsFromJson()
                     ?? throw new InvalidOperationException("Pizza components not found or invalid.");
 
-                if (basePizzaName is null)
+                if (basePizza is null)
                 {
                     throw new InvalidOperationException($"Base pizza with ID {pizza.BasePizzaId} not found.");
                 }
                 // load dough, sauce and toppings
                 Dough dough = await this._doughRepository.GetByIdAsync(components.DoughId); //TODO: FIX
 
-                Sauce? sauce = components.SauceId.HasValue ? 
+                Sauce? sauce = components.SauceId.HasValue ?
                     await this._sauceRepository.GetByIdAsync(components.SauceId.Value)
                     : null;
 
                 // this is stupid I hate the repository pattern
-                PizzaShoppingCartViewModel pizzaViewModel = new()
+                ShoppingCartPizzaViewModel pizzaViewModel = new()
                 {
-                    Name = basePizzaName,
+                    Id = pizza.Id,
+                    Name = basePizza.Name,
                     DoughName = dough?.Type ?? "Unknown Dough",
                     SauceName = sauce?.Type,
                     Quantity = pizza.Quantity,
-                    Price = pizza.Price
+                    ImageUrl = basePizza.ImageUrl
                 };
 
                 foreach (int toppingId in components.SelectedToppings)
@@ -131,23 +244,60 @@
 
                     string categoryName = topping.ToppingCategory.Name;
 
-                    if (!pizzaViewModel.Toppings.ContainsKey(categoryName))
+                    if (!pizzaViewModel.Toppings.TryGetValue(categoryName, out List<ToppingViewModel>? category))
                     {
-                        pizzaViewModel.Toppings.Add(categoryName, new List<ToppingViewModel>());
+                        category = new List<ToppingViewModel>();
+                        pizzaViewModel.Toppings.Add(categoryName, category);
                     }
 
-                    pizzaViewModel.Toppings[categoryName].Add(new ToppingViewModel()
+                    category.Add(new ToppingViewModel()
                     {
                         Id = topping.Id,
                         Name = topping.Name,
                         Price = topping.Price
                     });
                 }
-
+                pizzaViewModel.Price = pizzaViewModel.Toppings.Values.SelectMany(t => t).Sum(t => t.Price) + dough.Price + sauce.Price;
                 pizzasInCart.Add(pizzaViewModel);
+
+            }
+            return pizzasInCart;
+        }
+
+        public async Task<bool> RemoveItemFromCartAsync(int itemId, string userId, MenuCategory menuCategory)
+        {
+            Guid userIdGuid = Guid.Parse(userId);
+            User? user = await this._userRepository.GetUserWithShoppingCartAsync(userIdGuid);
+
+            if (user is null)
+                return false; // TODO: throw exception instead for better error handling
+
+            switch (menuCategory)
+            {
+                case MenuCategory.Pizzas:
+                    ShoppingCartPizza? pizzaToRemove = user.ShoppingCartPizzas.FirstOrDefault(p => p.Id == itemId);
+                    if (pizzaToRemove is null)
+                        return false;
+                    user.ShoppingCartPizzas.Remove(pizzaToRemove);
+                    break;
+                case MenuCategory.Drinks:
+                    ShoppingCartDrink? drinkToRemove = user.ShoppingCartDrinks.FirstOrDefault(d => d.DrinkId == itemId);
+                    if (drinkToRemove is null)
+                        return false;
+                    user.ShoppingCartDrinks.Remove(drinkToRemove);
+                    break;
+                case MenuCategory.Desserts:
+                    ShoppingCartDessert? dessertToRemove = user.ShoppingCartDesserts.FirstOrDefault(d => d.DessertId == itemId);
+                    if (dessertToRemove is null)
+                        return false;
+                    user.ShoppingCartDesserts.Remove(dessertToRemove);
+                    break;
+                default:
+                    return false; // Unsupported category TODO: Throw exception instead for better error handling
             }
 
-            return pizzasInCart;
+            await this._userRepository.SaveChangesAsync();
+            return true; // Successfully removed the item from the cart
         }
     }
 }

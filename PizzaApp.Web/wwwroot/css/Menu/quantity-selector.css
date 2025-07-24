@@ -1,0 +1,33 @@
+﻿.quantity-selector {
+    display: flex;
+    width: 150px;
+}
+
+.quantity-selector .form-control {
+    width: 50px;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+}
+
+.quantity-selector .btn:first-of-type {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.quantity-selector .btn:last-of-type {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
