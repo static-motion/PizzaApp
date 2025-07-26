@@ -20,6 +20,7 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account
         private readonly UserManager<User> _userManager;
 
         public ConfirmEmailModel(UserManager<User> userManager)
+
         {
             _userManager = userManager;
         }

@@ -20,6 +20,7 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account
         private readonly SignInManager<User> _signInManager;
 
         public ConfirmEmailChangeModel(UserManager<User> userManager, SignInManager<User> signInManager)
+
         {
             _userManager = userManager;
             _signInManager = signInManager;

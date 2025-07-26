@@ -73,7 +73,6 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
             [Display(Name = "New email")]
             public string NewEmail { get; set; }
         }
-
         private async Task LoadAsync(User user)
         {
             var email = await this._userManager.GetEmailAsync(user);

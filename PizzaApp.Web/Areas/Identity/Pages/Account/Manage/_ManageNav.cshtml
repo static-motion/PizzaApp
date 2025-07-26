@@ -1,5 +1,6 @@
 ﻿@using PizzaApp.Data.Models
 @inject SignInManager<User> SignInManager
+
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }

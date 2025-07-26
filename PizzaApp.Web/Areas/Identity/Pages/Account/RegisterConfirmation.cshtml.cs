@@ -21,7 +21,7 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _sender;
 
-        public RegisterConfirmationModel(UserManager<User> userManager, IEmailSender sender)
+        public RegisterConfirmationModel(UserManager<User> userManager, IEmailSender sen
         {
             _userManager = userManager;
             _sender = sender;

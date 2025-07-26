@@ -20,6 +20,7 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
 
         public TwoFactorAuthenticationModel(
             UserManager<User> userManager, SignInManager<User> signInManager, ILogger<TwoFactorAuthenticationModel> logger)
+
         {
             _userManager = userManager;
             _signInManager = signInManager;

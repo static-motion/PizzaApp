@@ -6,3 +6,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.container-main').style.display = 'block';
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const dropdownIcon = document.querySelector(".user-icon-dropdown");
+    const dropdownMenu = document.querySelector(".account-dropdown-menu")
+    dropdownIcon.addEventListener('click', () => {
+        dropdownMenu.classList.toggle('hidden');
+    });
+});
