@@ -3,6 +3,7 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,19 +13,16 @@ using PizzaApp.Data.Models;
 
 namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
 {
-    public class ResetAuthenticatorModel : PageModel
+    public class GenerateRecoveryCodesModel : PageModel
     {
         private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly ILogger<ResetAuthenticatorModel> _logger;
+        private readonly ILogger<GenerateRecoveryCodesModel> _logger;
 
-        public ResetAuthenticatorModel(
+        public GenerateRecoveryCodesModel(
             UserManager<User> userManager,
-            SignInManager<User> signInManager,
-            ILogger<ResetAuthenticatorModel> logger)
+            ILogger<GenerateRecoveryCodesModel> logger)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _logger = logger;
         }
 
@@ -33,14 +31,27 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         [TempData]
+        public string[] RecoveryCodes { get; set; }
+
+        /// <summary>
+        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+        ///     directly from your code. This API may change or be removed in future releases.
+        /// </summary>
+        [TempData]
         public string StatusMessage { get; set; }
 
-        public async Task<IActionResult> OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var isTwoFactorEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
+            if (!isTwoFactorEnabled)
+            {
+                throw new InvalidOperationException($"Cannot generate recovery codes for user because they do not have 2FA enabled.");
             }
 
             return Page();
@@ -54,15 +65,19 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            await _userManager.SetTwoFactorEnabledAsync(user, false);
-            await _userManager.ResetAuthenticatorKeyAsync(user);
+            var isTwoFactorEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
             var userId = await _userManager.GetUserIdAsync(user);
-            _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", user.Id);
+            if (!isTwoFactorEnabled)
+            {
+                throw new InvalidOperationException($"Cannot generate recovery codes for user as they do not have 2FA enabled.");
+            }
 
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.";
+            var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+            RecoveryCodes = recoveryCodes.ToArray();
 
-            return RedirectToPage("./EnableAuthenticator");
+            _logger.LogInformation("User with ID '{UserId}' has generated new 2FA recovery codes.", userId);
+            StatusMessage = "You have generated new recovery codes.";
+            return RedirectToPage("./ShowRecoveryCodes");
         }
     }
 }
