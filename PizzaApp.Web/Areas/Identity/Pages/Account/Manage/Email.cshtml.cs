@@ -76,7 +76,7 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
 
         private async Task LoadAsync(User user)
         {
-            var email = await _userManager.GetEmailAsync(user);
+            var email = await this._userManager.GetEmailAsync(user);
             Email = email;
 
             Input = new InputModel
