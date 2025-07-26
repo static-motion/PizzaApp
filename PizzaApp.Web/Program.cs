@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using PizzaApp.Data;
 namespace PizzaApp.Web
 {
     using Microsoft.AspNetCore.Identity;
