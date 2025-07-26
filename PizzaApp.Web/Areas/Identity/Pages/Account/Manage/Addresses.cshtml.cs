@@ -11,6 +11,7 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
 
     public class AddressesModel : PageModel
     {
+        // TODO: Use UserService to access addresses.
         private readonly UserManager<User> _userManager;
 
         public AddressesModel(UserManager<User> userManager)
@@ -114,9 +115,9 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
             this.AvailableCities =
             [
                 new() { Text = "Plovdiv", Value = "Plovdiv" },
-            new() { Text = "Varna", Value = "Varna" },
-            new() { Text = "Sofia", Value = "Sofia" },
-        ];
+                new() { Text = "Varna", Value = "Varna" },
+                new() { Text = "Sofia", Value = "Sofia" },
+            ];
         }
 
         private Guid GetUserId()

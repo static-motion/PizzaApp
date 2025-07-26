@@ -6,23 +6,20 @@
 @if (SignInManager.IsSignedIn(User))
 {
     <ul class="navbar-nav">
-        @* <li class="nav-item">
-            <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-        </li> *@
-        <li class="nav-item">
+        <li class="nav-item navbar-nav-item">
             <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index"><i class="fa-solid fa-cart-shopping fa-xl"></i> Cart</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item navbar-nav-item btn-danger">
             <a class="nav-link text-dark" asp-area="" asp-controller="Menu" asp-action="Index"><i class="fa-solid fa-pizza-slice fa-xl"></i> Menu</a>
         </li>
-        <li class="nav-item user-icon-dropdown">
+        <li class="nav-item navbar-nav-item user-icon-dropdown">
             <span class="nav-link text-dark"><i class="fa-solid fa-circle-user fa-xl"></i></span>
             <ul class="account-dropdown-menu hidden">
                 <li>
-                    <a asp-controller="Account" asp-action="Index">Account</a>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index">Profile</a>
                 </li>
                 <li>
-                    <a asp-controller="Account" asp-action="Addresses">Addresses</a>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Addresses">Addresses</a>
                 </li>
                 <li>
                     <a asp-controller="Account" asp-action="Orders">Orders</a>
@@ -34,12 +31,6 @@
                 </li>
             </ul>
         </li>
-
-        @* <li class="nav-item">
-            <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-            </form>
-        </li> *@
     </ul>
     
 }

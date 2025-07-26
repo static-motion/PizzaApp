@@ -52,6 +52,7 @@ namespace PizzaApp.Web
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Logout", "/Logout");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/Index", "/Profile");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/Email", "/Profile/Email");
+                options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/Addresses", "/Profile/Addresses");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/PersonalData", "/Profile/PersonalData");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/ChangePassword", "/Profile/ChangePassword");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/DeletePersonalData", "/Profile/DeletePersonalData");
