@@ -4,11 +4,10 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using PizzaApp.Data.Models;
 
 namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
@@ -88,10 +87,16 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
+            bool parsed = Guid.TryParse(_userManager.GetUserId(this.User), out Guid userId);
+
+            if (!parsed)
+            {
+                return this.NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+            var user = await _userManager.Users.Include(u => u.Addresses).FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return this.NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
             if (!ModelState.IsValid)

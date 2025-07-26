@@ -1,0 +1,55 @@
+﻿@page
+@model AddressesModel
+@{
+    ViewData["Title"] = "My Addresses";
+}
+
+<h2>Delivery Addresses</h2>
+
+@if (Model.SavedAddresses.Any())
+{
+    <h3 class="mt-4">Saved Addresses</h3>
+    <ul class="list-group">
+        @foreach (var address in Model.SavedAddresses)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>
+                    <strong>@address.City</strong>, @address.AddressLine1
+                    @if (!string.IsNullOrWhiteSpace(address.AddressLine2))
+                    {
+                        <text>, @address.AddressLine2</text>
+                    }
+                </span>
+                <form method="post" asp-page-handler="Delete" asp-route-id="@address.Id">
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p class="mt-4">You don't have any saved addresses.</p>
+}
+
+<h3>Add a new address</h3>
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Input.City">City</label>
+        <select asp-for="Input.City" class="form-control" asp-items="Model.AvailableCities">
+            <option value="">-- Select City --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Input.AddressLine1">Address Line 1</label>
+        <input asp-for="Input.AddressLine1" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Input.AddressLine2">Address Line 2 (Optional)</label>
+        <input asp-for="Input.AddressLine2" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Address</button>
+</form>
