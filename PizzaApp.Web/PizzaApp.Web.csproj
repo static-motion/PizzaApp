@@ -25,4 +25,8 @@
     <ProjectReference Include="..\PizzaApp.Web.ViewModels\PizzaApp.Web.ViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Identity\Data\" />
+  </ItemGroup>
+
 </Project>

@@ -29,7 +29,7 @@ namespace PizzaApp.Web
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services
-                .AddDefaultIdentity<User>(options =>
+                .AddIdentity<User, IdentityRole<Guid>>(options =>
                 {
                     options.SignIn.RequireConfirmedAccount = true;
                     options.Password.RequireNonAlphanumeric = false;
@@ -38,23 +38,14 @@ namespace PizzaApp.Web
                     options.Password.RequireUppercase = false;
                     options.Password.RequiredLength = 3;
                 })
+                .AddDefaultUI()
                 .AddRoles<IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<PizzaAppContext>();
 
+            builder.Services.AddRazorPages();
             builder.Services.AddControllersWithViews();
             builder.Services.AddCustomServices(typeof(MenuService).Assembly);
             builder.Services.AddRepositories(typeof(PizzaRepository).Assembly);
-            /*builder.Services.AddScoped<UserSeedingService>();
-
-            builder.Services.AddScoped<IPizzaRepository, PizzaRepository>();
-            builder.Services.AddScoped<IDrinkRepository, DrinkRepository>();
-            builder.Services.AddScoped<IDessertRepository, DessertRepository>();
-            builder.Services.AddScoped<IDoughRepository, DoughRepository>();
-            builder.Services.AddScoped<IToppingCategoryRepository, ToppingCategoryRepository>();
-            builder.Services.AddScoped<ISauceRepository, SauceRepository>();
-
-            builder.Services.AddScoped<IMenuService, MenuService>();*/
-
 
             WebApplication? app = builder.Build();
 
@@ -81,7 +72,6 @@ namespace PizzaApp.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
