@@ -90,7 +90,7 @@
                 .ToList();
         }
 
-        public async Task<bool> CreatePizzaAsync(PizzaInputModel pizza, IEnumerable<int> selectedToppingIds, string userId)
+        public async Task<bool> CreatePizzaAsync(PizzaInputModel pizza, IEnumerable<int> selectedToppingIds, Guid userId)
         {
             IEnumerable<Topping> toppings = await this._toppingRepository.GetAllToppingsFromRangeAsync(selectedToppingIds);
             
@@ -117,7 +117,7 @@
                 Description = pizza.Description,
                 DoughId = pizza.DoughId,
                 SauceId = pizza.SauceId,
-                CreatorUserId = Guid.Parse(userId),
+                CreatorUserId = userId,
             };
 
             foreach (Topping topping in toppings)

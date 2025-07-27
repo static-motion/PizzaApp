@@ -10,9 +10,9 @@
 
     public interface ICartService
     {
-        Task<bool> AddItemToCartAsync(OrderItemViewModel orderItem, string userId);
-        Task<bool> AddPizzaToCartAsync(PizzaCartDto pizzaDto, string userId);
-        Task<ShoppingCartItemsViewModel> GetUserCart(Guid userId);
-        Task<bool> RemoveItemFromCartAsync(int itemId, string userId, MenuCategory menuCategory);
+        Task<bool> AddItemToCartAsync(OrderItemViewModel orderItem, Guid userId);
+        Task<bool> AddPizzaToCartAsync(PizzaCartDto pizzaDto, Guid userId);
+        Task<ShoppingCartViewModel> GetUserCart(Guid userId);
+        Task<bool> RemoveItemFromCartAsync(int itemId, Guid userId, MenuCategory menuCategory);
     }
 }

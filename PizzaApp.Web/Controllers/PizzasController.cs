@@ -30,12 +30,12 @@
             if (!this.ModelState.IsValid || createdPizza.Pizza is null)
                 return this.RedirectToAction(nameof(Create), createdPizza);
 
-            string userId = this.GetUserId()!; // BaseController has the global [Authorize] attribute
+            Guid? userId = this.GetUserId(); // BaseController has the global [Authorize] attribute
                                                // userId should not be null
 
             await this._pizzaService.CreatePizzaAsync(createdPizza.Pizza, 
                 createdPizza.SelectedToppingIds, 
-                userId);
+                userId!.Value);
             return this.RedirectToAction(nameof(Create));
         }
     }

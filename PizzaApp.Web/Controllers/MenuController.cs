@@ -87,7 +87,7 @@
                 // TODO: Handle better
                 return this.BadRequest("Invalid pizza details.");
             }
-            string userId = this.GetUserId()!;
+            Guid? userId = this.GetUserId();
 
             PizzaCartDto pizzaDto = new()
             {
@@ -97,7 +97,7 @@
                 SelectedToppingsIds = orderPizzaViewModel.SelectedToppingIds,
                 Quantity = orderPizzaViewModel.Pizza.Quantity
             };
-            bool addedToCart = await this._cartService.AddPizzaToCartAsync(pizzaDto, userId);
+            bool addedToCart = await this._cartService.AddPizzaToCartAsync(pizzaDto, userId!.Value);
             return this.RedirectToAction(nameof(Index));
         }
 
@@ -113,9 +113,9 @@
             {
                 // TODO: Handle
             }
-            string userId = this.GetUserId()!;
+            Guid? userId = this.GetUserId(); // TODO: handle null userId
 
-            bool addedToCart = await this._cartService.AddItemToCartAsync(orderItem, userId);
+            bool addedToCart = await this._cartService.AddItemToCartAsync(orderItem, userId!.Value);
             return this.RedirectToAction(nameof(Index));
         }
     }

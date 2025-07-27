@@ -7,7 +7,7 @@
 
     public interface IPizzaService
     {
-        Task<bool> CreatePizzaAsync(PizzaInputModel pizza, IEnumerable<int> selectedToppingIds, string userId);
+        Task<bool> CreatePizzaAsync(PizzaInputModel pizza, IEnumerable<int> selectedToppingIds, Guid userId);
         Task<PizzaIngredientsViewModel> GetAllIngredientsAsync();
     }
 }

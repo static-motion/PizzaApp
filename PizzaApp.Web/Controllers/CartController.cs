@@ -14,15 +14,16 @@
         {
             this._cartService = cartService;
         }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            Guid userId = Guid.Parse(this.GetUserId()!);
+            Guid? userId = this.GetUserId();
 
-            ShoppingCartItemsViewModel shoppingCart =
-                await this._cartService.GetUserCart(userId);
+            ShoppingCartViewModel shoppingCart =
+                await this._cartService.GetUserCart(userId!.Value);
 
-            return this.View(shoppingCart);
+            return this.View("IndexAlt", shoppingCart);
         }
 
         [HttpPost]
@@ -31,10 +32,22 @@
             MenuCategory menuCategory = MenuCategoryExtensions.FromString(category)
                 ?? throw new ArgumentException("Invalid category");
 
-            string userId = this.GetUserId()!;
+            Guid? userId = this.GetUserId();
 
-            bool isRemoved = await this._cartService.RemoveItemFromCartAsync(itemId, userId, menuCategory);
+            bool isRemoved = await this._cartService.RemoveItemFromCartAsync(itemId, userId!.Value, menuCategory);
             return this.RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PlaceOrder(OrderDetailsInputModel orderDetails)
+        {
+            if (!this.ModelState.IsValid) // TODO: handle better lol
+            {
+                return this.BadRequest(this.ModelState);
+            }
+
+            Guid? userId = this.GetUserId();
+            throw new NotImplementedException();
         }
     }
 }

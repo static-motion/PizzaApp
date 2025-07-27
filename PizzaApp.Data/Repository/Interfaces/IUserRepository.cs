@@ -7,5 +7,6 @@
     {
         Task<User?> GetUserWithAddressesAsync(Guid userId);
         Task<User?> GetUserWithShoppingCartAsync(Guid userId);
+        Task<User?> GetUserWithAddressesAndCartAsync(Guid userId);
     }
 }

@@ -11,6 +11,15 @@
         {
         }
 
+        public Task<User?> GetUserWithAddressesAndCartAsync(Guid userId)
+        {
+            IQueryable<User> query = this.DbContext.Users.Where(u => u.Id == userId);
+            query = IncludeShoppingCart(query)
+                .Include(u => u.Addresses);
+
+            return query.FirstOrDefaultAsync();
+        }
+
         public async Task<User?> GetUserWithAddressesAsync(Guid userId)
         {
             return await this.DbContext.Users
@@ -21,14 +30,23 @@
 
         public Task<User?> GetUserWithShoppingCartAsync(Guid userId)
         {
-            return this.DbContext.Users
+            IQueryable<User> query = this.DbContext.Users
+                .Where(u => u.Id == userId);
+
+            query = IncludeShoppingCart(query);
+
+            return query.FirstOrDefaultAsync();
+        }
+
+        private static IQueryable<User> IncludeShoppingCart(IQueryable<User> query)
+        {
+            return query
                 .Include(c => c.ShoppingCartPizzas)
-                    .ThenInclude(c => c.BasePizza)
+                    .ThenInclude(scp => scp.BasePizza)
                 .Include(c => c.ShoppingCartDrinks)
-                    .ThenInclude(c => c.Drink)
+                    .ThenInclude(scd => scd.Drink)
                 .Include(c => c.ShoppingCartDesserts)
-                    .ThenInclude(c => c.Dessert)
-                .FirstOrDefaultAsync(c => c.Id == userId);
+                    .ThenInclude(scd => scd.Dessert);
         }
     }
 }

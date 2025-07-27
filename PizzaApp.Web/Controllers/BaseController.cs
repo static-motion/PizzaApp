@@ -12,9 +12,10 @@
             return this.User.Identity?.IsAuthenticated ?? false;
         }
 
-        protected string? GetUserId()
+        protected Guid? GetUserId()
         {
-            return this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? id = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return Guid.TryParse(id, out Guid guidId) ? guidId : null;
         }
     }
 }
