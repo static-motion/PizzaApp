@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using PizzaApp.Data;
 namespace PizzaApp.Web
 {
     using Microsoft.AspNetCore.Identity;
@@ -13,6 +10,7 @@ namespace PizzaApp.Web
     using System.Threading.Tasks;
 
     using static PizzaApp.Web.Infrastructure.Extensions.ServiceCollectionExtensions;
+
     public class Program
     {
         public static async Task Main(string[] args)
@@ -42,8 +40,6 @@ namespace PizzaApp.Web
                 .AddRoles<IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<PizzaAppContext>();
 
-            /*builder.Services.AddRazorPages();*/
-
             builder.Services.AddRazorPages(options =>
             {
                 // Customize specific Identity routes
@@ -58,6 +54,7 @@ namespace PizzaApp.Web
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/DeletePersonalData", "/Profile/DeletePersonalData");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/EnableAuthenticator", "/Profile/EnableAuthenticator");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/TwoFactorAuthentication", "/Profile/TwoFactorAuthentication");
+                options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/ResetAuthenticator", "/Profile/ResetAuthenticator");
             });
 
             builder.Services.AddControllersWithViews();
@@ -74,7 +71,7 @@ namespace PizzaApp.Web
             
             if (app.Environment.IsDevelopment())
             {
-                app.UseMigrationsEndPoint();
+                //app.UseMigrationsEndPoint();
             }
             else
             {
