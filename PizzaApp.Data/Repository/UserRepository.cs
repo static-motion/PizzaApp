@@ -11,6 +11,14 @@
         {
         }
 
+        public async Task<User?> GetUserWithAddressesAsync(Guid userId)
+        {
+            return await this.DbContext.Users
+                .Where(u => u.Id == userId)
+                .Include(u => u.Addresses)
+                .FirstOrDefaultAsync();
+        }
+
         public Task<User?> GetUserWithShoppingCartAsync(Guid userId)
         {
             return this.DbContext.Users
