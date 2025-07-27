@@ -22,7 +22,7 @@
             ShoppingCartItemsViewModel shoppingCart =
                 await this._cartService.GetUserCart(userId);
 
-            return this.View("AltIndexView", shoppingCart);
+            return this.View(shoppingCart);
         }
 
         [HttpPost]

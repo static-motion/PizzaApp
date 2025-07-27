@@ -1,112 +1,124 @@
-﻿@* @using PizzaApp.Web.ViewModels.ShoppingCart
-@model ICollection<PizzaShoppingCartViewModel>
-
+﻿@model PizzaApp.Web.ViewModels.ShoppingCart.ShoppingCartItemsViewModel
 @{
-    ViewData["Title"] = "Shopping Cart";
+    ViewData["Title"] = "Your Shopping Cart";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4">Your Pizza Cart</h1>
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">@ViewData["Title"]</h2>
 
-    @if (Model == null || !Model.Any())
+    @if (!Model.Pizzas.Any() && !Model.Drinks.Any() && !Model.Desserts.Any())
     {
-        <div class="alert alert-info">
-            Your cart is empty. <a asp-controller="Menu" asp-action="Index" class="alert-link">Browse our menu</a> to add delicious pizzas!
+        <div class="text-center">
+            <p>Your shopping cart is empty.</p>
+            <a asp-controller="Menu" asp-action="Index" class="btn btn-primary">Browse Menu</a>
         </div>
     }
     else
     {
         <div class="row">
-            <div class="col-md-8">
-                @foreach (var pizza in Model)
-                {
-                    <div class="card mb-4">
-                        <div class="card-header bg-light">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">@pizza.Name</h4>
-                                <span class="badge bg-primary">Qty: @pizza.Quantity</span>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row mb-2">
-                                <div class="col-md-6">
-                                    <p><strong>Dough:</strong> @pizza.DoughName</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p><strong>Sauce:</strong> @(pizza.SauceName ?? "No sauce")</p>
-                                </div>
-                            </div>
+            <!-- Cart Items -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Cart Items</h5>
+                        <hr />
 
-                            @if (pizza.Toppings.Any())
+                        <!-- Pizza Items -->
+                        @if (Model.Pizzas.Any())
+                        {
+                            <h6 class="text-muted">Pizzas</h6>
+                            @foreach (var pizza in Model.Pizzas)
                             {
-                                <h5 class="mt-3">Toppings:</h5>
-                                @foreach (string category in pizza.Toppings.Keys)
-                                {
-                                    <div class="mb-2">
-                                        <h6 class="text-muted">@category</h6>
-                                        <ul class="list-group list-group-flush">
-                                            @foreach (ToppingViewModel topping in pizza.Toppings[category])
-                                            {
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    <span>@topping.Name</span>
-                                                    <span class="badge bg-secondary rounded-pill">+@topping.Price.ToString("C")</span>
-                                                </li>
-                                            }
-                                        </ul>
+                                <div class="row mb-3 align-items-center">
+                                    <div class="col-6">
+                                        <strong>@pizza.Name</strong> - @pizza.DoughName Dough, @pizza.SauceName Sauce
+                                        @foreach (string category in pizza.Toppings.Keys)
+                                        {
+                                            <div class="row">
+                                                @category:
+                                                <br />
+                                                <small>@string.Join(", ", pizza.Toppings[category].Select(t => t.Name))</small>
+                                            </div>
+                                        }
                                     </div>
-                                    
-                                }
+                                    <div class="col-2 text-center">@pizza.Quantity</div>
+                                    <div class="col-2 text-end fw-bold">$@(pizza.Price* pizza.Quantity)</div>
+                                    <div class="col-2 text-end">
+                                        <form asp-controller="Cart" asp-action="RemoveItem" method="post">
+                                            <input type="hidden" name="itemId" value="@pizza.Id" />
+                                            <input type="hidden" name="category" value="Pizzas" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+                                        </form>
+                                    </div>
+                                </div>
                             }
+                        }
 
-                            <div class="d-flex justify-content-end mt-3">
-                                <h5>Price: @((pizza.Price * pizza.Quantity).ToString("C"))</h5>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <button class="btn btn-outline-primary btn-sm">Edit</button>
-                                    <button class="btn btn-outline-danger btn-sm ms-2">Remove</button>
-                                </div>
-                                <div>
-                                    <div class="input-group" style="width: 120px;">
-                                        <button class="btn btn-outline-secondary btn-sm" type="button">-</button>
-                                        <input type="text" class="form-control form-control-sm text-center" value="@pizza.Quantity" readonly>
-                                        <button class="btn btn-outline-secondary btn-sm" type="button">+</button>
+                        <!-- Drink Items -->
+                        @if (Model.Drinks.Any())
+                        {
+                            <h6 class="text-muted mt-4">Drinks</h6>
+                            @foreach (var drink in Model.Drinks)
+                            {
+                                <div class="row mb-3 align-items-center">
+                                    <div class="col-6"><strong>@drink.Name</strong></div>
+                                    <div class="col-2 text-center">@drink.Quantity</div>
+                                    <div class="col-2 text-end fw-bold">$@(drink.Price* drink.Quantity)</div>
+                                    <div class="col-2 text-end">
+                                        <form asp-controller="Cart" asp-action="RemoveItem" method="post">
+                                            <input type="hidden" name="itemId" value="@drink.Id" />
+                                            <input type="hidden" name="category" value="Drinks" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+                                        </form>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            }
+                        }
+
+                        <!-- Dessert Items -->
+                        @if (Model.Desserts.Any())
+                        {
+                            <h6 class="text-muted mt-4">Desserts</h6>
+                            @foreach (var dessert in Model.Desserts)
+                            {
+                                <div class="row mb-3 align-items-center">                                    <div class="col-6"><strong>@dessert.Name</strong></div>
+                                    <div class="col-2 text-center">@dessert.Quantity</div>
+                                    <div class="col-2 text-end fw-bold">$@(dessert.Price* dessert.Quantity)</div>
+                                    <div class="col-2 text-end">
+                                        <form asp-controller="Cart" asp-action="RemoveItem" method="post">
+                                            <input type="hidden" name="itemId" value="@dessert.Id" />
+                                            <input type="hidden" name="category" value="Desserts" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                        }
                     </div>
-                }
+                </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <h4 class="mb-0">Order Summary</h4>
-                    </div>
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal:</span>
-                            <span>@Model.Sum(p => p.Price * p.Quantity).ToString("C")</span>
+                        <h5 class="card-title">Order Summary</h5>
+                        <hr />
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Subtotal</span>
+                            <span>$@Model.GrandTotal.ToString("F2")</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Delivery Fee:</span>
-                            <span>$2.99</span>
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>Total</span>
+                            <span>$@Model.GrandTotal.ToString("F2")</span>
                         </div>
-                        <hr>
-                        <div class="d-flex justify-content-between fw-bold">
-                            <span>Total:</span>
-                            <span>@((Model.Sum(p => p.Price * p.Quantity) + 2.99m).ToString("C"))</span>
+                        <hr />
+                        <div class="d-grid">
+                            <a asp-controller="Cart" asp-action="PlaceOrder" method="post" class="btn btn-primary">Finalize Order</a>
                         </div>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn btn-primary w-100">Proceed to Checkout</button>
-                        <a asp-controller="Menu" asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Continue Shopping</a>
                     </div>
                 </div>
             </div>
         </div>
     }
-</div> *@
+</div>
