@@ -25,6 +25,10 @@
         [Comment("Date and time at which the order was created.")]
         public DateTime CreatedOn { get; set; }
 
+        public required string PhoneNumber { get; set; }
+
+        public string? Comment { get; set; }
+
         public ICollection<OrderDessert> OrderDeserts { get; set; }
             = new List<OrderDessert>();
 
