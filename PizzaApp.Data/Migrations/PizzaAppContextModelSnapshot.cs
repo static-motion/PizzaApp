@@ -478,9 +478,10 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.OrderPizza", b =>
                 {
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
-                        .HasComment("Foreign Key to Orders. Shows which Order this pizza was used in.");
+                        .HasComment("Primary Key for OrderPizza. ");
 
                     b.Property<int>("BasePizzaId")
                         .HasColumnType("int")
@@ -490,9 +491,9 @@ namespace PizzaApp.Data.Migrations
                         .HasColumnType("int")
                         .HasComment("Dough used for this specific order pizza");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int")
-                        .HasComment("Primary Key for OrderPizza. ");
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasComment("Foreign Key to Orders. Shows which Order this pizza was used in.");
 
                     b.Property<decimal>("PricePerItemAtPurchase")
                         .HasColumnType("decimal(8,2)")
@@ -506,11 +507,13 @@ namespace PizzaApp.Data.Migrations
                         .HasColumnType("int")
                         .HasComment("Sauce used for this specific order Pizza. Can be null.");
 
-                    b.HasKey("OrderId", "BasePizzaId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BasePizzaId");
 
                     b.HasIndex("DoughId");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("SauceId");
 
@@ -522,19 +525,13 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.OrderPizzaTopping", b =>
                 {
-                    b.Property<int>("OrderPizzaId")
-                        .HasColumnType("int")
+                    b.Property<Guid>("OrderPizzaId")
+                        .HasColumnType("uniqueidentifier")
                         .HasComment("Foreign Key to OrderPizzas, part of composite Primary Key.");
 
                     b.Property<int>("ToppingId")
                         .HasColumnType("int")
                         .HasComment("Foreign Key to Toppings, part of composite Primary Key.");
-
-                    b.Property<int>("OrderPizzaBasePizzaId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("OrderPizzaOrderId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("PriceAtPurchase")
                         .HasColumnType("decimal(8,2)")
@@ -543,8 +540,6 @@ namespace PizzaApp.Data.Migrations
                     b.HasKey("OrderPizzaId", "ToppingId");
 
                     b.HasIndex("ToppingId");
-
-                    b.HasIndex("OrderPizzaOrderId", "OrderPizzaBasePizzaId");
 
                     b.ToTable("OrderPizzaTopping", t =>
                         {
@@ -1245,17 +1240,19 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.OrderPizzaTopping", b =>
                 {
-                    b.HasOne("PizzaApp.Data.Models.Topping", "Topping")
-                        .WithMany()
-                        .HasForeignKey("ToppingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("PizzaApp.Data.Models.MappingEntities.OrderPizza", "OrderPizza")
+                        .WithMany("Toppings")
+                        .HasForeignKey("OrderPizzaId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PizzaApp.Data.Models.MappingEntities.OrderPizza", null)
-                        .WithMany("Toppings")
-                        .HasForeignKey("OrderPizzaOrderId", "OrderPizzaBasePizzaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("PizzaApp.Data.Models.Topping", "Topping")
+                        .WithMany("OrderPizzaToppings")
+                        .HasForeignKey("ToppingId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("OrderPizza");
 
                     b.Navigation("Topping");
                 });
@@ -1470,6 +1467,8 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.Topping", b =>
                 {
+                    b.Navigation("OrderPizzaToppings");
+
                     b.Navigation("PizzasToppings");
                 });
 

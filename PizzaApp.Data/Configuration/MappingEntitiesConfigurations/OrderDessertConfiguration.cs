@@ -32,7 +32,7 @@
                 .Property(e => e.PricePerItemAtPurchase)
                 .IsRequired()
                 .HasColumnType("decimal(8,2)")
-                .HasSentinel(0);
+                .HasSentinel(0m);
         }
     }
 }

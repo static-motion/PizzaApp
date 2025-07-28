@@ -6,7 +6,7 @@
     public class OrderPizza
     {
         [Comment("Primary Key for OrderPizza. ")]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Comment("Foreign Key to Orders. Shows which Order this pizza was used in.")]
         public Guid OrderId { get; set; }

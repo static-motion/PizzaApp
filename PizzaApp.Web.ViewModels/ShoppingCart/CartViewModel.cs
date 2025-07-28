@@ -2,9 +2,9 @@
 {
     using PizzaApp.Web.ViewModels.Address;
 
-    public class ShoppingCartViewModel
+    public class CartViewModel
     {
-        public ShoppingCartItemsViewModel Items { get; set; } = null!;
+        public CartItemsViewModel Items { get; set; } = null!;
 
         public OrderDetailsInputModel OrderDetails { get; set; } = null!;
         

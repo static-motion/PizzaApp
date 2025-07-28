@@ -29,5 +29,7 @@
 
         [Comment("Shows if the entity is active.")]
         public bool IsDeleted { get; set; }
+        public IEnumerable<OrderPizzaTopping> OrderPizzaToppings { get; set; } 
+            = new HashSet<OrderPizzaTopping>();
     }
 }

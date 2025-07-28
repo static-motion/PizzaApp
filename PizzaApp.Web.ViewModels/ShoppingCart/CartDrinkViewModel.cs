@@ -1,6 +1,6 @@
 ﻿namespace PizzaApp.Web.ViewModels.ShoppingCart
 {
-    public class ShoppingCartDessertViewModel
+    public class CartDrinkViewModel
     {
         public required int Id { get; set; }
         public required string Name { get; set; }

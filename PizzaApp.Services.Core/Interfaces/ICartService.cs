@@ -5,14 +5,14 @@
     using PizzaApp.Web.ViewModels.Menu;
     using PizzaApp.Web.ViewModels.ShoppingCart;
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     public interface ICartService
     {
         Task<bool> AddItemToCartAsync(OrderItemViewModel orderItem, Guid userId);
         Task<bool> AddPizzaToCartAsync(PizzaCartDto pizzaDto, Guid userId);
-        Task<ShoppingCartViewModel> GetUserCart(Guid userId);
+        Task<CartViewModel> GetUserCart(Guid userId);
         Task<bool> RemoveItemFromCartAsync(int itemId, Guid userId, MenuCategory menuCategory);
+        Task ClearShoppingCart(Guid userId);
     }
 }

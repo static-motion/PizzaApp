@@ -38,23 +38,24 @@ namespace PizzaApp.Web
                 })
                 .AddDefaultUI()
                 .AddRoles<IdentityRole<Guid>>()
-                .AddEntityFrameworkStores<PizzaAppContext>();
+                .AddEntityFrameworkStores<PizzaAppContext>()
+                .AddDefaultTokenProviders();
 
             builder.Services.AddRazorPages(options =>
             {
-                // Customize specific Identity routes
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Login", "/Login");
-                options.Conventions.AddAreaPageRoute("Identity", "/Account/Register", "/Register");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Logout", "/Logout");
+                options.Conventions.AddAreaPageRoute("Identity", "/Account/Register", "/Register");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/Index", "/Profile");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/Email", "/Profile/Email");
+                options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/Orders", "/Profile/Orders");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/Addresses", "/Profile/Addresses");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/PersonalData", "/Profile/PersonalData");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/ChangePassword", "/Profile/ChangePassword");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/DeletePersonalData", "/Profile/DeletePersonalData");
+                options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/ResetAuthenticator", "/Profile/ResetAuthenticator");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/EnableAuthenticator", "/Profile/EnableAuthenticator");
                 options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/TwoFactorAuthentication", "/Profile/TwoFactorAuthentication");
-                options.Conventions.AddAreaPageRoute("Identity", "/Account/Manage/ResetAuthenticator", "/Profile/ResetAuthenticator");
             });
 
             builder.Services.AddControllersWithViews();
@@ -87,8 +88,14 @@ namespace PizzaApp.Web
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllerRoute(
+                name: "areas",
+                pattern: "{area:exists}/{controller=Manage}/{action=Index}/{id?}"
+            );
+            app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            
             app.MapRazorPages();
 
             app.Run();

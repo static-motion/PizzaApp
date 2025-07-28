@@ -12,8 +12,8 @@ using PizzaApp.Data;
 namespace PizzaApp.Data.Migrations
 {
     [DbContext(typeof(PizzaAppContext))]
-    [Migration("20250723133602_UserShoppingCartIdMadeNullable")]
-    partial class UserShoppingCartIdMadeNullable
+    [Migration("20250727170137_RECREATE")]
+    partial class RECREATE
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -104,12 +104,10 @@ namespace PizzaApp.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -145,12 +143,10 @@ namespace PizzaApp.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -485,9 +481,10 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.OrderPizza", b =>
                 {
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
-                        .HasComment("Foreign Key to Orders. Shows which Order this pizza was used in.");
+                        .HasComment("Primary Key for OrderPizza. ");
 
                     b.Property<int>("BasePizzaId")
                         .HasColumnType("int")
@@ -497,9 +494,9 @@ namespace PizzaApp.Data.Migrations
                         .HasColumnType("int")
                         .HasComment("Dough used for this specific order pizza");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int")
-                        .HasComment("Primary Key for OrderPizza. ");
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasComment("Foreign Key to Orders. Shows which Order this pizza was used in.");
 
                     b.Property<decimal>("PricePerItemAtPurchase")
                         .HasColumnType("decimal(8,2)")
@@ -513,11 +510,13 @@ namespace PizzaApp.Data.Migrations
                         .HasColumnType("int")
                         .HasComment("Sauce used for this specific order Pizza. Can be null.");
 
-                    b.HasKey("OrderId", "BasePizzaId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BasePizzaId");
 
                     b.HasIndex("DoughId");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("SauceId");
 
@@ -529,19 +528,13 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.OrderPizzaTopping", b =>
                 {
-                    b.Property<int>("OrderPizzaId")
-                        .HasColumnType("int")
+                    b.Property<Guid>("OrderPizzaId")
+                        .HasColumnType("uniqueidentifier")
                         .HasComment("Foreign Key to OrderPizzas, part of composite Primary Key.");
 
                     b.Property<int>("ToppingId")
                         .HasColumnType("int")
                         .HasComment("Foreign Key to Toppings, part of composite Primary Key.");
-
-                    b.Property<int>("OrderPizzaBasePizzaId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("OrderPizzaOrderId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("PriceAtPurchase")
                         .HasColumnType("decimal(8,2)")
@@ -550,8 +543,6 @@ namespace PizzaApp.Data.Migrations
                     b.HasKey("OrderPizzaId", "ToppingId");
 
                     b.HasIndex("ToppingId");
-
-                    b.HasIndex("OrderPizzaOrderId", "OrderPizzaBasePizzaId");
 
                     b.ToTable("OrderPizzaTopping", t =>
                         {
@@ -581,8 +572,8 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.ShoppingCartDessert", b =>
                 {
-                    b.Property<int>("ShoppingCartId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("DessertId")
                         .HasColumnType("int");
@@ -592,7 +583,7 @@ namespace PizzaApp.Data.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(1);
 
-                    b.HasKey("ShoppingCartId", "DessertId");
+                    b.HasKey("UserId", "DessertId");
 
                     b.HasIndex("DessertId");
 
@@ -601,8 +592,8 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.ShoppingCartDrink", b =>
                 {
-                    b.Property<int>("ShoppingCartId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("DrinkId")
                         .HasColumnType("int");
@@ -612,7 +603,7 @@ namespace PizzaApp.Data.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(1);
 
-                    b.HasKey("ShoppingCartId", "DrinkId");
+                    b.HasKey("UserId", "DrinkId");
 
                     b.HasIndex("DrinkId");
 
@@ -650,6 +641,9 @@ namespace PizzaApp.Data.Migrations
                         .HasColumnType("int")
                         .HasComment("Foreign Key to Addresses - location where the order was supposed to be delivered.");
 
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2")
                         .HasComment("Date and time at which the order was created.");
@@ -657,6 +651,10 @@ namespace PizzaApp.Data.Migrations
                     b.Property<int>("OrderStatus")
                         .HasColumnType("int")
                         .HasComment("Current status of the order.");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(8, 2)
@@ -811,22 +809,6 @@ namespace PizzaApp.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("PizzaApp.Data.Models.ShoppingCart", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ShoppingCarts");
-                });
-
             modelBuilder.Entity("PizzaApp.Data.Models.ShoppingCartPizza", b =>
                 {
                     b.Property<int>("Id")
@@ -841,15 +823,9 @@ namespace PizzaApp.Data.Migrations
                         .HasComment("Foreign Key to base Pizza");
 
                     b.Property<string>("PizzaComponentsJson")
-                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)")
                         .HasComment("JSON serialized pizza data");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(8, 2)
-                        .HasColumnType("decimal(8,2)")
-                        .HasComment("Calculated price including customizations");
 
                     b.Property<int>("Quantity")
                         .ValueGeneratedOnAdd()
@@ -857,14 +833,15 @@ namespace PizzaApp.Data.Migrations
                         .HasDefaultValue(1)
                         .HasComment("Quantity of this item in cart");
 
-                    b.Property<int>("ShoppingCartId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasComment("Foreign Key to User. Indicates whose shopping cart this pizza is in.");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BasePizzaId");
 
-                    b.HasIndex("ShoppingCartId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("ShoppingCartsPizzas", t =>
                         {
@@ -1110,9 +1087,6 @@ namespace PizzaApp.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ShoppingCartId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -1129,10 +1103,6 @@ namespace PizzaApp.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("ShoppingCartId")
-                        .IsUnique()
-                        .HasFilter("[ShoppingCartId] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", null, t =>
                         {
@@ -1273,17 +1243,19 @@ namespace PizzaApp.Data.Migrations
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.OrderPizzaTopping", b =>
                 {
-                    b.HasOne("PizzaApp.Data.Models.Topping", "Topping")
-                        .WithMany()
-                        .HasForeignKey("ToppingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("PizzaApp.Data.Models.MappingEntities.OrderPizza", "OrderPizza")
+                        .WithMany("Toppings")
+                        .HasForeignKey("OrderPizzaId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PizzaApp.Data.Models.MappingEntities.OrderPizza", null)
-                        .WithMany("Toppings")
-                        .HasForeignKey("OrderPizzaOrderId", "OrderPizzaBasePizzaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("PizzaApp.Data.Models.Topping", "Topping")
+                        .WithMany("OrderPizzaToppings")
+                        .HasForeignKey("ToppingId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("OrderPizza");
 
                     b.Navigation("Topping");
                 });
@@ -1315,15 +1287,15 @@ namespace PizzaApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PizzaApp.Data.Models.ShoppingCart", "ShoppingCart")
-                        .WithMany("Desserts")
-                        .HasForeignKey("ShoppingCartId")
+                    b.HasOne("PizzaApp.Data.Models.User", "User")
+                        .WithMany("ShoppingCartDesserts")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Dessert");
 
-                    b.Navigation("ShoppingCart");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.ShoppingCartDrink", b =>
@@ -1334,15 +1306,15 @@ namespace PizzaApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PizzaApp.Data.Models.ShoppingCart", "ShoppingCart")
-                        .WithMany("Drinks")
-                        .HasForeignKey("ShoppingCartId")
+                    b.HasOne("PizzaApp.Data.Models.User", "User")
+                        .WithMany("ShoppingCartDrinks")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Drink");
 
-                    b.Navigation("ShoppingCart");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PizzaApp.Data.Models.MappingEntities.UserPizza", b =>
@@ -1416,15 +1388,15 @@ namespace PizzaApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PizzaApp.Data.Models.ShoppingCart", "ShoppingCart")
-                        .WithMany("Pizzas")
-                        .HasForeignKey("ShoppingCartId")
+                    b.HasOne("PizzaApp.Data.Models.User", "User")
+                        .WithMany("ShoppingCartPizzas")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("BasePizza");
 
-                    b.Navigation("ShoppingCart");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PizzaApp.Data.Models.Topping", b =>
@@ -1436,16 +1408,6 @@ namespace PizzaApp.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("ToppingCategory");
-                });
-
-            modelBuilder.Entity("PizzaApp.Data.Models.User", b =>
-                {
-                    b.HasOne("PizzaApp.Data.Models.ShoppingCart", "ShoppingCart")
-                        .WithOne("User")
-                        .HasForeignKey("PizzaApp.Data.Models.User", "ShoppingCartId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("ShoppingCart");
                 });
 
             modelBuilder.Entity("PizzaApp.Data.Models.Address", b =>
@@ -1506,20 +1468,10 @@ namespace PizzaApp.Data.Migrations
                     b.Navigation("SauceOrders");
                 });
 
-            modelBuilder.Entity("PizzaApp.Data.Models.ShoppingCart", b =>
-                {
-                    b.Navigation("Desserts");
-
-                    b.Navigation("Drinks");
-
-                    b.Navigation("Pizzas");
-
-                    b.Navigation("User")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("PizzaApp.Data.Models.Topping", b =>
                 {
+                    b.Navigation("OrderPizzaToppings");
+
                     b.Navigation("PizzasToppings");
                 });
 
@@ -1537,6 +1489,12 @@ namespace PizzaApp.Data.Migrations
                     b.Navigation("FavoritePizzas");
 
                     b.Navigation("OrderHistory");
+
+                    b.Navigation("ShoppingCartDesserts");
+
+                    b.Navigation("ShoppingCartDrinks");
+
+                    b.Navigation("ShoppingCartPizzas");
                 });
 #pragma warning restore 612, 618
         }

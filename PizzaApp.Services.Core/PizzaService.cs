@@ -118,6 +118,7 @@
                 DoughId = pizza.DoughId,
                 SauceId = pizza.SauceId,
                 CreatorUserId = userId,
+                PizzaType = pizza.PizzaType
             };
 
             foreach (Topping topping in toppings)

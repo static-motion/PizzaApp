@@ -8,7 +8,7 @@
     {
         public void Configure(EntityTypeBuilder<OrderPizza> entity)
         {
-            entity.HasKey(e => new { e.OrderId, e.BasePizzaId });
+            entity.HasKey(e => e.Id);
 
             entity
                 .HasOne(e => e.Order)
@@ -31,7 +31,7 @@
                 .Property(e => e.PricePerItemAtPurchase)
                 .HasColumnType("decimal(8,2)")
                 .IsRequired()
-                .HasSentinel(0);
+                .HasSentinel(0m);
 
 
             entity

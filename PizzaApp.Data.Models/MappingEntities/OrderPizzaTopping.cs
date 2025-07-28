@@ -6,7 +6,9 @@
     public class OrderPizzaTopping
     {
         [Comment("Foreign Key to OrderPizzas, part of composite Primary Key.")]
-        public int OrderPizzaId { get; set; }
+        public Guid OrderPizzaId { get; set; }
+
+        public OrderPizza OrderPizza { get; set; } = null!;
 
         [Comment("Foreign Key to Toppings, part of composite Primary Key.")]
         public int ToppingId { get; set; }

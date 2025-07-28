@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PizzaApp.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Recreate : Migration
+    public partial class RECREATE : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,6 +26,32 @@ namespace PizzaApp.Data.Migrations
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                },
+                comment: "The general public website user. This entity has addresses, created pizzas, favorited pizzas and order associated with it.");
 
             migrationBuilder.CreateTable(
                 name: "Desserts",
@@ -98,19 +124,6 @@ namespace PizzaApp.Data.Migrations
                 comment: "All the sauces offered.");
 
             migrationBuilder.CreateTable(
-                name: "ShoppingCarts",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ShoppingCarts", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ToppingCategories",
                 columns: table => new
                 {
@@ -145,113 +158,6 @@ namespace PizzaApp.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ShoppingCartId = table.Column<int>(type: "int", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_ShoppingCarts_ShoppingCartId",
-                        column: x => x.ShoppingCartId,
-                        principalTable: "ShoppingCarts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                },
-                comment: "The general public website user. This entity has addresses, created pizzas, favorited pizzas and order associated with it.");
-
-            migrationBuilder.CreateTable(
-                name: "ShoppingCartsDesserts",
-                columns: table => new
-                {
-                    ShoppingCartId = table.Column<int>(type: "int", nullable: false),
-                    DessertId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 1)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ShoppingCartsDesserts", x => new { x.ShoppingCartId, x.DessertId });
-                    table.ForeignKey(
-                        name: "FK_ShoppingCartsDesserts_Desserts_DessertId",
-                        column: x => x.DessertId,
-                        principalTable: "Desserts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ShoppingCartsDesserts_ShoppingCarts_ShoppingCartId",
-                        column: x => x.ShoppingCartId,
-                        principalTable: "ShoppingCarts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ShoppingCartsDrinks",
-                columns: table => new
-                {
-                    ShoppingCartId = table.Column<int>(type: "int", nullable: false),
-                    DrinkId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 1)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ShoppingCartsDrinks", x => new { x.ShoppingCartId, x.DrinkId });
-                    table.ForeignKey(
-                        name: "FK_ShoppingCartsDrinks_Drinks_DrinkId",
-                        column: x => x.DrinkId,
-                        principalTable: "Drinks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ShoppingCartsDrinks_ShoppingCarts_ShoppingCartId",
-                        column: x => x.ShoppingCartId,
-                        principalTable: "ShoppingCarts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Toppings",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false, comment: "Primary Key unique identifier")
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ToppingCategoryId = table.Column<int>(type: "int", nullable: false, comment: "Foreign key to topping categories, shows which category the topping belongs to (meats, veggies etc.)"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, comment: "Name of the pizza topping"),
-                    Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false, comment: "A short description of the pizza topping."),
-                    Price = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false, comment: "Current price of the pizza topping"),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, comment: "Shows if the entity is active.")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Toppings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Toppings_ToppingCategories_ToppingCategoryId",
-                        column: x => x.ToppingCategoryId,
-                        principalTable: "ToppingCategories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                },
-                comment: "All the toppings offered.");
 
             migrationBuilder.CreateTable(
                 name: "Addresses",
@@ -302,8 +208,8 @@ namespace PizzaApp.Data.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -347,8 +253,8 @@ namespace PizzaApp.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -358,6 +264,56 @@ namespace PizzaApp.Data.Migrations
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ShoppingCartsDesserts",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DessertId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 1)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShoppingCartsDesserts", x => new { x.UserId, x.DessertId });
+                    table.ForeignKey(
+                        name: "FK_ShoppingCartsDesserts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ShoppingCartsDesserts_Desserts_DessertId",
+                        column: x => x.DessertId,
+                        principalTable: "Desserts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ShoppingCartsDrinks",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DrinkId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 1)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShoppingCartsDrinks", x => new { x.UserId, x.DrinkId });
+                    table.ForeignKey(
+                        name: "FK_ShoppingCartsDrinks_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ShoppingCartsDrinks_Drinks_DrinkId",
+                        column: x => x.DrinkId,
+                        principalTable: "Drinks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -374,7 +330,6 @@ namespace PizzaApp.Data.Migrations
                     SauceId = table.Column<int>(type: "int", nullable: true, comment: "The sauce used on the pizza. Can be null."),
                     ImageUrl = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true, comment: "URL of the image of the pizza."),
                     CreatorUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Foreign Key to User who created the pizza."),
-                    BasePizzaId = table.Column<int>(type: "int", nullable: true),
                     PizzaType = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, comment: "Shows if the pizza has been soft deleted.")
                 },
@@ -394,17 +349,36 @@ namespace PizzaApp.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Pizzas_Pizzas_BasePizzaId",
-                        column: x => x.BasePizzaId,
-                        principalTable: "Pizzas",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Pizzas_Sauces_SauceId",
                         column: x => x.SauceId,
                         principalTable: "Sauces",
                         principalColumn: "Id");
                 },
                 comment: "All pizzas offered - both admin and user created.");
+
+            migrationBuilder.CreateTable(
+                name: "Toppings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false, comment: "Primary Key unique identifier")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ToppingCategoryId = table.Column<int>(type: "int", nullable: false, comment: "Foreign key to topping categories, shows which category the topping belongs to (meats, veggies etc.)"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, comment: "Name of the pizza topping"),
+                    Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false, comment: "A short description of the pizza topping."),
+                    Price = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false, comment: "Current price of the pizza topping"),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, comment: "Shows if the entity is active.")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Toppings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Toppings_ToppingCategories_ToppingCategoryId",
+                        column: x => x.ToppingCategoryId,
+                        principalTable: "ToppingCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "All the toppings offered.");
 
             migrationBuilder.CreateTable(
                 name: "Orders",
@@ -415,6 +389,8 @@ namespace PizzaApp.Data.Migrations
                     OrderStatus = table.Column<int>(type: "int", nullable: false, comment: "Current status of the order."),
                     Price = table.Column<decimal>(type: "decimal(8,2)", precision: 8, scale: 2, nullable: false, comment: "Price of the order."),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Date and time at which the order was created."),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key to Addresses - location where the order was supposed to be delivered.")
                 },
                 constraints: table =>
@@ -436,54 +412,33 @@ namespace PizzaApp.Data.Migrations
                 comment: "All the users' orders in the database.");
 
             migrationBuilder.CreateTable(
-                name: "PizzasToppings",
-                columns: table => new
-                {
-                    PizzaId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key to Pizzas, part of composite Primary Key."),
-                    ToppingId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key to Toppings, part of composite Primary Key.")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PizzasToppings", x => new { x.ToppingId, x.PizzaId });
-                    table.ForeignKey(
-                        name: "FK_PizzasToppings_Pizzas_PizzaId",
-                        column: x => x.PizzaId,
-                        principalTable: "Pizzas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PizzasToppings_Toppings_ToppingId",
-                        column: x => x.ToppingId,
-                        principalTable: "Toppings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                },
-                comment: "A many-to-many mapping entity between Pizza and Toppings, used to show which toppings are contained in which pizzas.");
-
-            migrationBuilder.CreateTable(
                 name: "ShoppingCartsPizzas",
                 columns: table => new
                 {
-                    ShoppingCartId = table.Column<int>(type: "int", nullable: false),
-                    PizzaId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 1)
+                    Id = table.Column<int>(type: "int", nullable: false, comment: "Primary Key unique identifier")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BasePizzaId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key to base Pizza"),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Foreign Key to User. Indicates whose shopping cart this pizza is in."),
+                    Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 1, comment: "Quantity of this item in cart"),
+                    PizzaComponentsJson = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true, comment: "JSON serialized pizza data")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShoppingCartsPizzas", x => new { x.ShoppingCartId, x.PizzaId });
+                    table.PrimaryKey("PK_ShoppingCartsPizzas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ShoppingCartsPizzas_Pizzas_PizzaId",
-                        column: x => x.PizzaId,
+                        name: "FK_ShoppingCartsPizzas_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ShoppingCartsPizzas_Pizzas_BasePizzaId",
+                        column: x => x.BasePizzaId,
                         principalTable: "Pizzas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ShoppingCartsPizzas_ShoppingCarts_ShoppingCartId",
-                        column: x => x.ShoppingCartId,
-                        principalTable: "ShoppingCarts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Restrict);
+                },
+                comment: "Items in user's shopping cart");
 
             migrationBuilder.CreateTable(
                 name: "UsersPizzas",
@@ -509,6 +464,31 @@ namespace PizzaApp.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 },
                 comment: "A many-to-many mapping entity between User and Pizza, showing pizza entities which have been marked as favorite by users");
+
+            migrationBuilder.CreateTable(
+                name: "PizzasToppings",
+                columns: table => new
+                {
+                    PizzaId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key to Pizzas, part of composite Primary Key."),
+                    ToppingId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key to Toppings, part of composite Primary Key.")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PizzasToppings", x => new { x.ToppingId, x.PizzaId });
+                    table.ForeignKey(
+                        name: "FK_PizzasToppings_Pizzas_PizzaId",
+                        column: x => x.PizzaId,
+                        principalTable: "Pizzas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PizzasToppings_Toppings_ToppingId",
+                        column: x => x.ToppingId,
+                        principalTable: "Toppings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "A many-to-many mapping entity between Pizza and Toppings, used to show which toppings are contained in which pizzas.");
 
             migrationBuilder.CreateTable(
                 name: "OrdersDesserts",
@@ -568,14 +548,22 @@ namespace PizzaApp.Data.Migrations
                 name: "OrdersPizzas",
                 columns: table => new
                 {
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Foreign Key to Orders, part of composite Primary Key."),
-                    PizzaId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key to Pizzas, part of composite Primary Key."),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary Key for OrderPizza. "),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Foreign Key to Orders. Shows which Order this pizza was used in."),
+                    BasePizzaId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key to Pizzas. This points to the original pizza the OrderPizza was based on."),
                     Quantity = table.Column<int>(type: "int", nullable: false, comment: "Quantity of pizzas in the order."),
-                    PricePerItemAtPurchase = table.Column<decimal>(type: "decimal(8,2)", nullable: false, comment: "Price of the pizza at the time of purchase, used for total price calculations.")
+                    PricePerItemAtPurchase = table.Column<decimal>(type: "decimal(8,2)", nullable: false, comment: "Price of the pizza at the time of purchase, used for total price calculations."),
+                    DoughId = table.Column<int>(type: "int", nullable: false, comment: "Dough used for this specific order pizza"),
+                    SauceId = table.Column<int>(type: "int", nullable: true, comment: "Sauce used for this specific order Pizza. Can be null.")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrdersPizzas", x => new { x.OrderId, x.PizzaId });
+                    table.PrimaryKey("PK_OrdersPizzas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrdersPizzas_Doughs_DoughId",
+                        column: x => x.DoughId,
+                        principalTable: "Doughs",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_OrdersPizzas_Orders_OrderId",
                         column: x => x.OrderId,
@@ -583,13 +571,44 @@ namespace PizzaApp.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrdersPizzas_Pizzas_PizzaId",
-                        column: x => x.PizzaId,
+                        name: "FK_OrdersPizzas_Pizzas_BasePizzaId",
+                        column: x => x.BasePizzaId,
                         principalTable: "Pizzas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrdersPizzas_Sauces_SauceId",
+                        column: x => x.SauceId,
+                        principalTable: "Sauces",
+                        principalColumn: "Id");
                 },
-                comment: "A many-to-many mapping entity used to show which pizzas appear in which orders.");
+                comment: "A many-to-many mapping entity used to show which pizzas appear in which orders. ");
+
+            migrationBuilder.CreateTable(
+                name: "OrderPizzaTopping",
+                columns: table => new
+                {
+                    OrderPizzaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Foreign Key to OrderPizzas, part of composite Primary Key."),
+                    ToppingId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key to Toppings, part of composite Primary Key."),
+                    PriceAtPurchase = table.Column<decimal>(type: "decimal(8,2)", nullable: false, comment: "Price of the topping at the time of purchase")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderPizzaTopping", x => new { x.OrderPizzaId, x.ToppingId });
+                    table.ForeignKey(
+                        name: "FK_OrderPizzaTopping_OrdersPizzas_OrderPizzaId",
+                        column: x => x.OrderPizzaId,
+                        principalTable: "OrdersPizzas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrderPizzaTopping_Toppings_ToppingId",
+                        column: x => x.ToppingId,
+                        principalTable: "Toppings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                },
+                comment: "Toppings for a specific pizza in an order");
 
             migrationBuilder.InsertData(
                 table: "Desserts",
@@ -701,17 +720,16 @@ namespace PizzaApp.Data.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_ShoppingCartId",
-                table: "AspNetUsers",
-                column: "ShoppingCartId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderPizzaTopping_ToppingId",
+                table: "OrderPizzaTopping",
+                column: "ToppingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_AddressId",
@@ -734,14 +752,24 @@ namespace PizzaApp.Data.Migrations
                 column: "DrinkId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrdersPizzas_PizzaId",
+                name: "IX_OrdersPizzas_BasePizzaId",
                 table: "OrdersPizzas",
-                column: "PizzaId");
+                column: "BasePizzaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pizzas_BasePizzaId",
-                table: "Pizzas",
-                column: "BasePizzaId");
+                name: "IX_OrdersPizzas_DoughId",
+                table: "OrdersPizzas",
+                column: "DoughId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrdersPizzas_OrderId",
+                table: "OrdersPizzas",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrdersPizzas_SauceId",
+                table: "OrdersPizzas",
+                column: "SauceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pizzas_CreatorUserId",
@@ -774,9 +802,14 @@ namespace PizzaApp.Data.Migrations
                 column: "DrinkId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShoppingCartsPizzas_PizzaId",
+                name: "IX_ShoppingCartsPizzas_BasePizzaId",
                 table: "ShoppingCartsPizzas",
-                column: "PizzaId");
+                column: "BasePizzaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShoppingCartsPizzas_UserId",
+                table: "ShoppingCartsPizzas",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Toppings_ToppingCategoryId",
@@ -808,13 +841,13 @@ namespace PizzaApp.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "OrderPizzaTopping");
+
+            migrationBuilder.DropTable(
                 name: "OrdersDesserts");
 
             migrationBuilder.DropTable(
                 name: "OrdersDrinks");
-
-            migrationBuilder.DropTable(
-                name: "OrdersPizzas");
 
             migrationBuilder.DropTable(
                 name: "PizzasToppings");
@@ -835,7 +868,7 @@ namespace PizzaApp.Data.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "OrdersPizzas");
 
             migrationBuilder.DropTable(
                 name: "Toppings");
@@ -847,13 +880,16 @@ namespace PizzaApp.Data.Migrations
                 name: "Drinks");
 
             migrationBuilder.DropTable(
+                name: "Orders");
+
+            migrationBuilder.DropTable(
                 name: "Pizzas");
 
             migrationBuilder.DropTable(
-                name: "Addresses");
+                name: "ToppingCategories");
 
             migrationBuilder.DropTable(
-                name: "ToppingCategories");
+                name: "Addresses");
 
             migrationBuilder.DropTable(
                 name: "Doughs");
@@ -863,9 +899,6 @@ namespace PizzaApp.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "ShoppingCarts");
         }
     }
 }

@@ -22,7 +22,7 @@
                     <a asp-area="Identity" asp-page="/Account/Manage/Addresses">Addresses</a>
                 </li>
                 <li>
-                    <a asp-controller="Account" asp-action="Orders">Orders</a>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Orders">Orders</a>
                 </li>
                 <li>
                     <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">

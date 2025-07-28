@@ -1,13 +1,11 @@
 namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
 {
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels.Address;
-    using System.Security.Claims;
 
-    public class AddressesModel : PageModel
+    public class AddressesModel : PageModelBase
     {
         // TODO: Use UserService to access addresses.
         private readonly IUserService _userService;
@@ -69,12 +67,6 @@ namespace PizzaApp.Web.Areas.Identity.Pages.Account.Manage
                 new() { Text = "Varna", Value = "Varna" },
                 new() { Text = "Sofia", Value = "Sofia" },
             ];
-        }
-
-        private Guid GetUserId()
-        {
-            string? userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Guid.TryParse(userId, out Guid guidId) ? guidId : throw new Exception("User ID not found");
         }
     }
 }

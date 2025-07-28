@@ -2,7 +2,6 @@
 {
     using Microsoft.Extensions.DependencyInjection;
     using System.Reflection;
-
     using static PizzaApp.Web.Infrastructure.Common.ErrorMessages;
     public static class ServiceCollectionExtensions
     {
@@ -36,7 +35,7 @@
             // builder.Services.AddScoped<IWatchlistService, WatchlistService>();
         }
 
-        public static void AddRepositories(this IServiceCollection services, Assembly assembly)
+        public static IServiceCollection AddRepositories(this IServiceCollection services, Assembly assembly)
         {
             Type[] repositoryClasses = assembly.GetTypes()
                 .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Repository"))
@@ -55,7 +54,8 @@
                     throw new InvalidOperationException(string.Format(NoSuitableInterfaceFound, repositoryClass.Name));
                 }
             }
-        }
 
+            return services;
+        }
     }
 }

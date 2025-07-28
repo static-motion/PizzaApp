@@ -102,8 +102,10 @@ nav.navbar > div.container-fluid {
 }
 
 .account-dropdown-menu > li > a {
+    display: inline-block;
     text-decoration: none;
     color: black;
+    width: 100%;
 }
 
 #btn-logout {

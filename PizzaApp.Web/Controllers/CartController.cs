@@ -9,10 +9,12 @@
     public class CartController :  BaseController
     {
         private readonly ICartService _cartService;
+        private readonly IOrderService _orderService;
 
-        public CartController(ICartService cartService)
+        public CartController(ICartService cartService, IOrderService orderService)
         {
             this._cartService = cartService;
+            this._orderService = orderService;
         }
 
         [HttpGet]
@@ -20,7 +22,7 @@
         {
             Guid? userId = this.GetUserId();
 
-            ShoppingCartViewModel shoppingCart =
+            CartViewModel shoppingCart =
                 await this._cartService.GetUserCart(userId!.Value);
 
             return this.View("IndexAlt", shoppingCart);
@@ -47,7 +49,9 @@
             }
 
             Guid? userId = this.GetUserId();
-            throw new NotImplementedException();
+            await this._orderService.PlaceOrderAsync(orderDetails, userId!.Value);
+
+            return this.RedirectToAction(nameof(Index));
         }
     }
 }

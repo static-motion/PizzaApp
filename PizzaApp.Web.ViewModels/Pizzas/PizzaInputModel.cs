@@ -1,5 +1,6 @@
 ﻿namespace PizzaApp.Web.ViewModels.Pizzas
 {
+    using PizzaApp.GCommon.Enums;
     using System.ComponentModel.DataAnnotations;
 
     using static PizzaApp.GCommon.EntityConstraints.Pizza;
@@ -18,5 +19,7 @@
         public int DoughId { get; set; }
 
         public int? SauceId { get; set; }
+
+        public PizzaType PizzaType { get; set; } = PizzaType.CustomerPizza;
     }
 }

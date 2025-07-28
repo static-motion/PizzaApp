@@ -1,0 +1,123 @@
+﻿@page
+@model YourApp.Pages.PreviousOrdersModel
+@{
+    ViewData["Title"] = "Previous Orders";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">@ViewData["Title"]</h2>
+
+    @if (!Model.Orders.Any())
+    {
+        <div class="text-center">
+            <p>You have no previous orders.</p>
+            <a asp-controller="Menu" asp-action="Index" class="btn btn-primary">Browse our menu!</a>
+        </div>
+    }
+    else
+    {
+        <div class="accordion" id="ordersAccordion">
+            @foreach (var (order, index) in Model.Orders.Select((value, i) => (value, i)))
+            {
+                var pizzaItems = order.Pizzas.Select(p => $"{p.Name} - {p.Quantity}x");
+                var drinkItems = order.Drinks.Select(d => $"{d.Name} - {d.Quantity}x");
+                var dessertItems = order.Desserts.Select(d => $"{d.Name} - {d.Quantity}x");
+                var allItemsSummary = string.Join(", ", pizzaItems.Concat(drinkItems).Concat(dessertItems));
+                var collapseId = $"collapse-{index}";
+                var headerId = $"header-{index}";
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="@headerId">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                            <div class="w-100 d-flex justify-content-between align-items-center pe-3">
+                                <span>
+                                    <strong>Order from:</strong> @order.CreatedOn.ToString("g")
+                                </span>
+                                <span class="badge bg-primary rounded-pill">@order.OrderStatus</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headerId" data-bs-parent="#ordersAccordion">
+                        <div class="accordion-body">
+                            <p><strong>Order Summary:</strong> @allItemsSummary</p>
+
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Item Name & Quantity</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (order.Pizzas.Any())
+                                    {
+                                        <tr>
+                                            <th colspan="2" class="text-center table-secondary">Pizzas</th>
+                                        </tr>
+                                        @foreach (var pizza in order.Pizzas)
+                                        {
+                                            <tr>
+                                                <td><strong>@pizza.Name</strong> (x @pizza.Quantity)</td>
+                                                <td>
+                                                    <ul class="list-unstyled mb-0">
+                                                        <li><strong>Dough:</strong> @pizza.DoughName</li>
+                                                        @if (!string.IsNullOrEmpty(pizza.SauceName))
+                                                        {
+                                                            <li><strong>Sauce:</strong> @pizza.SauceName</li>
+                                                        }
+                                                        @if (pizza.Toppings.Any())
+                                                        {
+                                                            <li>
+                                                                <strong>Toppings:</strong>
+                                                                <ul class="list-unstyled ms-3">
+                                                                    @foreach (var category in pizza.Toppings)
+                                                                    {
+                                                                        <li>
+                                                                            <strong>@category.Key:</strong> @string.Join(", ", category.Value)
+                                                                        </li>
+                                                                    }
+                                                                </ul>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+                                    @if (order.Drinks.Any())
+                                    {
+                                        <tr>
+                                            <th colspan="2" class="text-center table-secondary">Drinks</th>
+                                        </tr>
+                                        @foreach (var drink in order.Drinks)
+                                        {
+                                            <tr>
+                                                <td>@drink.Name</td>
+                                                <td>Quantity: @drink.Quantity</td>
+                                            </tr>
+                                        }
+                                    }
+
+                                    @if (order.Desserts.Any())
+                                    {
+                                        <tr>
+                                            <th colspan="2" class="text-center table-secondary">Desserts</th>
+                                        </tr>
+                                        @foreach (var dessert in order.Desserts)
+                                        {
+                                            <tr>
+                                                <td>@dessert.Name</td>
+                                                <td>Quantity: @dessert.Quantity</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -5,30 +5,30 @@
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    public interface IRepository<TEntity, TKey>
+    public interface IRepository<IEntity, TKey>
     {
-        Task AddAsync(TEntity item);
+        Task AddAsync(IEntity item);
 
-        Task AddRangeAsync(IEnumerable<TEntity> items);
+        Task AddRangeAsync(IEnumerable<IEntity> items);
 
-        Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<IEntity?> FirstOrDefaultAsync(Expression<Func<IEntity, bool>> predicate);
 
-        Task<IEnumerable<TEntity>> GetAllAsync(bool asNoTracking = false);
+        Task<IEnumerable<IEntity>> GetAllAsync(bool asNoTracking = false);
 
-        Task<IEnumerable<TEntity>> GetRangeByIdsAsync(IEnumerable<TKey> ids);
+        Task<IEnumerable<IEntity>> GetRangeByIdsAsync(IEnumerable<TKey> ids);
 
-        ValueTask<TEntity?> GetByIdAsync(TKey id);
+        ValueTask<IEntity?> GetByIdAsync(TKey id);
 
-        bool HardDelete(TEntity entity);
+        bool HardDelete(IEntity entity);
 
         Task SaveChangesAsync();
 
-        Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<IEntity?> SingleOrDefaultAsync(Expression<Func<IEntity, bool>> predicate);
 
-        Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<bool> ExistsAsync(Expression<Func<IEntity, bool>> predicate);
 
-        bool SoftDelete(TEntity entity);
+        bool SoftDelete(IEntity entity);
 
-        bool Update(TEntity item);
+        bool Update(IEntity item);
     }
 }

@@ -9,12 +9,10 @@
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-        private readonly IUserRepository _cartRepository;
         public UserSeedingService(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, IUserRepository cartRepository)
         {
             this._userManager = userManager;
             this._roleManager = roleManager;
-            this._cartRepository = cartRepository;
         }
 
 
@@ -32,7 +30,9 @@
             User? admin = await this._userManager.FindByEmailAsync(adminEmail);
 
             if (admin is not null)
-                return; // await this._userManager.DeleteAsync(admin);
+            {
+                return;
+            }
             admin = new()
             {
                 Email = adminEmail,
@@ -40,6 +40,7 @@
                 EmailConfirmed = true,
             };
             IdentityResult result = await this._userManager.CreateAsync(admin, adminPassword);
+            await this._userManager.AddToRoleAsync(admin, "Admin");
             if (!result.Succeeded)
             {
                 // TODO: handle
