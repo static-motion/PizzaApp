@@ -13,7 +13,7 @@
 
         Task<IEntity?> FirstOrDefaultAsync(Expression<Func<IEntity, bool>> predicate);
 
-        Task<IEnumerable<IEntity>> GetAllAsync(bool asNoTracking = false);
+        Task<IEnumerable<IEntity>> GetAllAsync(bool asNoTracking = false, bool ignoreQueryFilters = false);
 
         Task<IEnumerable<IEntity>> GetRangeByIdsAsync(IEnumerable<TKey> ids);
 

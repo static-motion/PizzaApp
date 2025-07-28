@@ -1,0 +1,68 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/PizzaApp.Web.styles.css" asp-append-version="true" />
+    <script src="https://kit.fontawesome.com/94d35039c6.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Pizza Admin</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="adminNavbar">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <!-- Items dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="itemsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Items
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="itemsDropdown">
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Manage" asp-action="Pizzas">Pizzas</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Manage" asp-action="Doughs">Doughs</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Manage" asp-action="Sauces">Sauces</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Manage" asp-action="Toppings">Toppings</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Manage" asp-action="ToppingCategories">Topping Categories</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Orders link -->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Orders" asp-action="Index">Orders</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        @RenderBody()
+    </main>
+
+    <footer class="text-center mt-5 mb-3 text-muted">
+        &copy; @DateTime.Now.Year - Pizza Admin Panel
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("Styles", required: false)
+    
+</body>
+</html>
+

@@ -43,12 +43,16 @@
             return this.DbSet.FirstOrDefaultAsync(predicate);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync(bool asNoTracking = false)
+        public async Task<IEnumerable<TEntity>> GetAllAsync(bool asNoTracking = false, bool ignoreQueryFilters = false)
         {
             var query = this.DbSet.AsQueryable();
             if (asNoTracking)
             {
                 query.AsNoTracking();
+            }
+            if (ignoreQueryFilters)
+            {
+                query.IgnoreQueryFilters();
             }
             return await this.DbSet.ToArrayAsync();
         }

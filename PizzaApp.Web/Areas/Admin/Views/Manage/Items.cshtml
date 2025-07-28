@@ -1,0 +1,65 @@
+﻿@using PizzaApp.Web.ViewModels.Admin
+@model AdminItemsOverviewViewModel
+
+@{
+    ViewData["Title"] = Model.Category;
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Items</h2>
+
+<table class="table table-bordered table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Is Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@Model.Category</td>
+                <td>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input toggle-active"
+                               type="checkbox"
+                               data-id="@item.Id"
+                               @(item.IsActive ? "checked" : "") />
+                    </div>
+                </td>
+                <td>
+                    <a asp-action="@Model.Category" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.toggle-active').forEach(switchEl => {
+            switchEl.addEventListener('change', function () {
+                const itemId = this.getAttribute('data-id');
+                const isActive = this.checked;
+
+                fetch('/Admin/Manage/@Model.Category/ToggleActive', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({ id: itemId, isActive: isActive })
+                }).then(response => {
+                    if (!response.ok) {
+                        alert('Failed to update status.');
+                        this.checked = !isActive;
+                    }
+                });
+            });
+        });
+    </script>
+}
