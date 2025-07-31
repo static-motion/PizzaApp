@@ -16,10 +16,10 @@
         public ToppingCategory ToppingCategory { get; set; } = null!;
 
         [Comment("Name of the pizza topping")]
-        public required string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [Comment("A short description of the pizza topping.")]
-        public required string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         [Comment("Current price of the pizza topping")]
         public decimal Price { get; set; }

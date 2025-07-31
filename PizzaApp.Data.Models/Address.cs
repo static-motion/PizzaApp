@@ -10,10 +10,10 @@
         public int Id { get; set; }
 
         [Comment("The city where the address is located at.")]
-        public required string City { get; set; }
+        public string City { get; set; } = null!;
 
         [Comment("First address line.")]
-        public required string AddressLine1 { get; set; }
+        public string AddressLine1 { get; set; } = null!;
 
         [Comment("Second address line. Can be null.")]
         public string? AddressLine2 { get; set; }

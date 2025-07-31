@@ -229,7 +229,8 @@
         private async Task<IEnumerable<CartPizzaViewModel>> GetAllPizzasInCart(User user)
         {
             IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
-                .GetAllWithToppingsAsync(asNoTracking: true);
+                .DisableTracking()
+                .GetAllWithToppingsAsync();
 
             Dictionary<int, Dough> doughsById = await GetEntityLookup(this._doughRepository);
             Dictionary<int, Sauce> saucesLookup = await GetEntityLookup(this._sauceRepository);

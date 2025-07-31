@@ -11,10 +11,10 @@
         public int Id { get; set; }
 
         [Comment("Dough type")]
-        public required string Type { get; set; }
+        public string Type { get; set; } = null!;
 
         [Comment("Dough description")]
-        public required string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         [Comment("Dough price")]
         public decimal Price { get; set; }

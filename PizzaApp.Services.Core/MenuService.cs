@@ -8,7 +8,6 @@
     using PizzaApp.Web.ViewModels.Menu;
     using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.Net.Http.Headers;
     using System.Threading.Tasks;
 
     public class MenuService : IMenuService
@@ -16,25 +15,19 @@
         private readonly IPizzaRepository _pizzaRepository;
         private readonly IDrinkRepository _drinkRepository;
         private readonly IDessertRepository _dessertRepository;
-        private readonly ISauceRepository _sauceRepository;
-        private readonly IDoughRepository _doughRepository;
-        private readonly IToppingCategoryRepository _toppingRepository;
+        private readonly IPizzaIngredientsService _pizzaIngredientsService;
 
         private Dictionary<MenuCategory, Func<Task<IEnumerable<MenuItemViewModel>>>> _menuCategoryMethodLookup;
 
         public MenuService(IPizzaRepository pizzaRepository, 
             IDrinkRepository drinkRepository, 
             IDessertRepository dessertRepository,
-            ISauceRepository sauceRepository,
-            IDoughRepository doughRepository,
-            IToppingCategoryRepository toppingRepository)
+            IPizzaIngredientsService pizzaIngredientsService)
         {
             this._pizzaRepository = pizzaRepository;
             this._drinkRepository = drinkRepository;
             this._dessertRepository = dessertRepository;
-            this._sauceRepository = sauceRepository;
-            this._doughRepository = doughRepository;
-            this._toppingRepository = toppingRepository;
+            this._pizzaIngredientsService = pizzaIngredientsService;
 
             // new menu categories should be added here
             // TODO: add pasta, salads and whatver else I can think of
@@ -121,9 +114,9 @@
             if (pizzaDetails is null)
                 return null;
 
-            IReadOnlyList<ToppingCategoryViewModel> allToppingsByCategories = await this.GetAllCategoriesWithToppingsAsync();
-            IReadOnlyList<DoughViewModel> allDoughs = await this.GetAllDoughsAsync();
-            IReadOnlyList<SauceViewModel> allSauces = await this.GetAllSaucesAsync();
+            IReadOnlyList<ToppingCategoryViewModel> allToppingsByCategories = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync();
+            IReadOnlyList<DoughViewModel> allDoughs = await this._pizzaIngredientsService.GetAllDoughsAsync();
+            IReadOnlyList<SauceViewModel> allSauces = await this._pizzaIngredientsService.GetAllSaucesAsync();
 
             // create the model
             OrderPizzaViewModel orderPizzaView = new()
@@ -160,52 +153,6 @@
                 SelectedToppingIds = pizza.Toppings.Select(t => t.ToppingId).ToList()
             };
         
-        }
-
-        private async Task<List<SauceViewModel>> GetAllSaucesAsync()
-        {
-            IEnumerable<Sauce> allSauces = await this._sauceRepository.GetAllAsync(asNoTracking: true);
-                
-                return allSauces.Select(s => new SauceViewModel
-                {
-                    Id = s.Id,
-                    Name = s.Type,
-                    Price = s.Price
-                })
-                .ToList();
-        }
-
-        private async Task<List<DoughViewModel>> GetAllDoughsAsync()
-        {
-            IEnumerable<Dough> allDoughs = await this._doughRepository.GetAllAsync(asNoTracking: true);
-
-            return allDoughs
-                .Select(d => new DoughViewModel
-                {
-                    Id = d.Id,
-                    Name = d.Type,
-                    Price = d.Price
-                })
-                .ToList();
-        }
-
-        private async Task<List<ToppingCategoryViewModel>> GetAllCategoriesWithToppingsAsync()
-        {
-            IEnumerable<ToppingCategory> allToppingCategories = await this._toppingRepository
-                .GetAllWithToppingsAsync(asNoTracking: true);
-            
-            return allToppingCategories
-                .Select(tc => new ToppingCategoryViewModel
-                {
-                    Id = tc.Id,
-                    Name = tc.Name,
-                    Toppings = tc.Toppings.Select(t => new ToppingViewModel
-                    {
-                        Id = t.Id,
-                        Name = t.Name,
-                        Price = t.Price
-                    }).ToList()
-                }).ToList();
         }
 
         public async Task<OrderItemViewModel?> GetOrderItemDetailsAsync(int id, MenuCategory? category)

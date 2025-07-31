@@ -1,6 +1,6 @@
 ﻿namespace PizzaApp.Web.ViewModels.Admin
 {
-    public class ItemViewModel
+    public class MenuItemViewModel
     {
         public int Id { get; set; }
 

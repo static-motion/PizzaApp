@@ -42,7 +42,7 @@
                                             }
                                         </div>
                                         <div class="col-2 text-center">@pizza.Quantity</div>
-                                        <div class="col-2 text-end fw-bold">$@(pizza.Price* pizza.Quantity)</div>
+                                        <div class="col-2 text-end fw-bold">$@(pizza.Price * pizza.Quantity)</div>
                                         <div class="col-2 text-end">
                                             <form asp-controller="Cart" asp-action="RemoveItem" method="post">
                                                 <input type="hidden" name="itemId" value="@pizza.Id" />

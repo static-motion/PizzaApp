@@ -6,7 +6,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public class OrderRepository : BaseRepository<Order, Guid>, IOrderRepository
+    public class OrderRepository : BaseRepository<Order, Guid, OrderRepository>, IOrderRepository
     {
         public OrderRepository(PizzaAppContext dbContext) : base(dbContext)
         {
@@ -14,7 +14,7 @@
 
         public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(Guid userId)
         {
-            return await this.DbSet.Where(o => o.UserId == userId)
+            IQueryable<Order> query = this.DbSet.Where(o => o.UserId == userId)
                 .Include(o => o.OrderPizzas)
                     .ThenInclude(op => op.Toppings)
                 .Include(o => o.OrderPizzas)
@@ -22,8 +22,10 @@
                 .Include(o => o.OrderDeserts)
                     .ThenInclude(od => od.Dessert)
                 .Include(o => o.OrderDrinks)
-                    .ThenInclude(od => od.Drink)
-                .ToListAsync();
+                    .ThenInclude(od => od.Drink);
+
+            query = this.ApplyConfiguration(query);
+            return await query.ToListAsync();
         }
     }
 }

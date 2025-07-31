@@ -1,0 +1,36 @@
+﻿@using PizzaApp.Web.ViewModels.Admin
+@model EditDoughInputModel
+
+@{
+    ViewData["Title"] = Model.Type;
+}
+<a class="btn btn-success btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+<form asp-action="EditPizza" method="post" class="container" name="pizza-form">
+    <input type="hidden" asp-for="Id" value="@Model.Id" />
+    <div class="mb-3">
+        <label asp-for="Type" class="form-label">Dough Type</label>
+        <input asp-for="Type" class="form-control" />
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="@Model.IsActive" type="radio" value="@false" class="form-check-input" id="enable" />
+        <label class="form-check-label" for="enable">Enable</label>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="@Model.IsActive" type="radio" value="@true" class="form-check-input" id="disable" />
+        <label class="form-check-label text-danger" for="enable">Disable</label>
+    </div>
+    <button type="submit" class="btn btn-danger">Save Changes</button>
+</form>
+
+@section Styles {
+    <link href="~/css/Menu/pizza-details.css" rel="stylesheet" type="text/css" />
+}
+
+@section Scripts {
+}

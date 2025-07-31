@@ -42,11 +42,9 @@
 
             IEnumerable<MenuItemViewModel> menuItems 
                 = await this._menuService.GetAllMenuItemsForCategoryAsync(categoryEnum.Value);
-            
 
             MenuCategoryViewModel menuView = new()
             {
-                Category = categoryEnum.Value, // not necessary for now, might clean up later TODO
                 Items = menuItems,
                 AllCategories = CategoryNames
             };
@@ -64,7 +62,8 @@
 
             if (categoryEnum == MenuCategory.Pizzas)
             {
-                OrderPizzaViewModel? orderPizzaViewModel = await this._menuService.GetPizzaDetailsByIdAsync(id);
+                OrderPizzaViewModel? orderPizzaViewModel 
+                    = await this._menuService.GetPizzaDetailsByIdAsync(id);
 
                 if (orderPizzaViewModel is null)
                     return this.NotFound();
@@ -72,7 +71,8 @@
                 return this.View("PizzaDetails", orderPizzaViewModel);
             }
 
-            OrderItemViewModel? orderItem = await this._menuService.GetOrderItemDetailsAsync(id, categoryEnum);
+            OrderItemViewModel? orderItem 
+                = await this._menuService.GetOrderItemDetailsAsync(id, categoryEnum);
 
             if (orderItem is null)
                 return this.NotFound();

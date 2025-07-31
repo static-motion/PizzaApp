@@ -47,7 +47,8 @@
             List<OrderViewModel> orderViewModels = new List<OrderViewModel>();
 
             IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
-                .GetAllWithToppingsAsync(asNoTracking: true);
+                .DisableTracking()
+                .GetAllWithToppingsAsync();
 
             Dictionary<int, Dough> doughLookup = await GetEntityLookup(this._doughRepository);
             Dictionary<int, Sauce> sauceLookup = await GetEntityLookup(this._sauceRepository);
@@ -163,7 +164,8 @@
         {
             List<OrderPizza> orderPizzas = new();
             IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
-                .GetAllWithToppingsAsync(asNoTracking: true);
+                .DisableTracking()
+                .GetAllWithToppingsAsync();
 
             Dictionary<int, Dough> doughsLookup = await GetEntityLookup(this._doughRepository);
             Dictionary<int, Sauce> saucesLookup = await GetEntityLookup(this._sauceRepository);

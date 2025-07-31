@@ -5,25 +5,27 @@
     using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels;
-    using PizzaApp.Web.ViewModels.Menu;
     using PizzaApp.Web.ViewModels.Pizzas;
 
     public class PizzaService : IPizzaService
     {
         private readonly IPizzaRepository _pizzaRepository;
-        private readonly IToppingCategoryRepository _toppingRepository;
+        private readonly IToppingCategoryRepository _toppingCategoryRepository;
         private readonly IDoughRepository _doughRepository;
         private readonly ISauceRepository _sauceRepository;
+        private readonly IToppingRepository _toppingRepository;
 
         public PizzaService(IPizzaRepository pizzaRepository, 
             IToppingCategoryRepository toppingCategoryRepository,
             IDoughRepository doughRepository,
-            ISauceRepository sauceRepository)
+            ISauceRepository sauceRepository,
+            IToppingRepository toppingRepository)
         {
             this._pizzaRepository = pizzaRepository;
-            this._toppingRepository = toppingCategoryRepository;
+            this._toppingCategoryRepository = toppingCategoryRepository;
             this._doughRepository = doughRepository;
             this._sauceRepository = sauceRepository;
+            this._toppingRepository = toppingRepository;
         }
 
         public async Task<PizzaIngredientsViewModel> GetAllIngredientsAsync()
@@ -46,8 +48,9 @@
         // TODO: the same method is used in MenuService. Refactor to a common service?
         private async Task<List<ToppingCategoryViewModel>> GetAllCategoriesWithToppingsAsync()
         {
-            IEnumerable<ToppingCategory> allToppingCategories = await this._toppingRepository
-                .GetAllWithToppingsAsync(asNoTracking: true);
+            IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
+                .DisableTracking()
+                .GetAllWithToppingsAsync();
 
             return allToppingCategories
                 .Select(tc => new ToppingCategoryViewModel
@@ -65,7 +68,9 @@
 
         private async Task<List<SauceViewModel>> GetAllSaucesAsync()
         {
-            IEnumerable<Sauce> allSauces = await this._sauceRepository.GetAllAsync(asNoTracking: true);
+            IEnumerable<Sauce> allSauces = await this._sauceRepository
+                .DisableTracking()
+                .GetAllAsync();
 
             return allSauces.Select(s => new SauceViewModel
             {
@@ -78,7 +83,9 @@
 
         private async Task<List<DoughViewModel>> GetAllDoughsAsync()
         {
-            IEnumerable<Dough> allDoughs = await this._doughRepository.GetAllAsync(asNoTracking: true);
+            IEnumerable<Dough> allDoughs = await this._doughRepository
+                .DisableTracking()
+                .GetAllAsync();
 
             return allDoughs
                 .Select(d => new DoughViewModel
@@ -92,7 +99,8 @@
 
         public async Task<bool> CreatePizzaAsync(PizzaInputModel pizza, IEnumerable<int> selectedToppingIds, Guid userId)
         {
-            IEnumerable<Topping> toppings = await this._toppingRepository.GetAllToppingsFromRangeAsync(selectedToppingIds);
+            IEnumerable<Topping> toppings = await this._toppingRepository
+                .GetAllToppingsFromRangeAsync(selectedToppingIds);
             
             bool doughExists = await this._doughRepository.ExistsAsync(d => d.Id == pizza.DoughId);
             bool sauceExists = await this._sauceRepository.ExistsAsync(s => s.Id == pizza.SauceId);

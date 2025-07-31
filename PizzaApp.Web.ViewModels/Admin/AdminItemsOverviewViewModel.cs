@@ -7,6 +7,6 @@
     {
         public ManagementCategory Category { get; set; }
 
-        public IEnumerable<ItemViewModel> Items { get; set; } = new List<ItemViewModel>();
+        public IEnumerable<MenuItemViewModel> Items { get; set; } = new List<MenuItemViewModel>();
     }
 }

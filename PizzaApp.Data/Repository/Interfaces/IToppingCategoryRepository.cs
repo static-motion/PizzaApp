@@ -3,9 +3,9 @@
     using PizzaApp.Data.Models;
     using System.Collections.Generic;
 
-    public interface IToppingCategoryRepository : IRepository<ToppingCategory, int>
+    public interface IToppingCategoryRepository : IRepository<ToppingCategory, int, ToppingCategoryRepository>
     {
-        Task<IEnumerable<Topping>> GetAllToppingsFromRangeAsync(IEnumerable<int> selectedToppingIds);
-        public Task<IEnumerable<ToppingCategory>> GetAllWithToppingsAsync(bool asNoTracking = false);
+        
+        public Task<IEnumerable<ToppingCategory>> GetAllWithToppingsAsync();
     }
 }

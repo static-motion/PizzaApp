@@ -2,10 +2,10 @@
 {
     public enum ManagementCategory
     {
-        Pizzas = 1,
-        Doughs,
-        Sauces,
-        Toppings,
-        ToppingCategories
+        Pizza = 1,
+        Dough,
+        Sauce,
+        Topping,
+        ToppingCategory
     }
 }

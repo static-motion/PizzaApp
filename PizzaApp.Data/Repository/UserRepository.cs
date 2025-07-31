@@ -5,7 +5,7 @@
     using PizzaApp.Data.Repository.Interfaces;
     using System.Threading.Tasks;
 
-    public class UserRepository : BaseRepository<User, Guid>, IUserRepository
+    public class UserRepository : BaseRepository<User, Guid, UserRepository>, IUserRepository
     {
         public UserRepository(PizzaAppContext dbContext) : base(dbContext)
         {
@@ -17,15 +17,19 @@
             query = IncludeShoppingCart(query)
                 .Include(u => u.Addresses);
 
+            query = this.ApplyConfiguration(query);
+
             return query.FirstOrDefaultAsync();
         }
 
         public async Task<User?> GetUserWithAddressesAsync(Guid userId)
         {
-            return await this.DbContext.Users
+            IQueryable<User> query = this.DbContext.Users
                 .Where(u => u.Id == userId)
-                .Include(u => u.Addresses)
-                .FirstOrDefaultAsync();
+                .Include(u => u.Addresses);
+
+            query = this.ApplyConfiguration(query);
+            return await query.FirstOrDefaultAsync();
         }
 
         public Task<User?> GetUserWithShoppingCartAsync(Guid userId)
@@ -34,6 +38,7 @@
                 .Where(u => u.Id == userId);
 
             query = IncludeShoppingCart(query);
+            query = this.ApplyConfiguration(query);
 
             return query.FirstOrDefaultAsync();
         }

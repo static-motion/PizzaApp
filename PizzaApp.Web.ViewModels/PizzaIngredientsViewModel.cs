@@ -1,7 +1,5 @@
 ﻿namespace PizzaApp.Web.ViewModels
 {
-    using PizzaApp.Web.ViewModels.Menu;
-
     public class PizzaIngredientsViewModel
     {
         public IReadOnlyList<ToppingCategoryViewModel> ToppingCategories { get; set; } = null!;

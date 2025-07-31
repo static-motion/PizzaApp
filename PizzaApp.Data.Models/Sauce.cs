@@ -11,10 +11,10 @@
         public int Id { get; set; }
 
         [Comment("Sauce type (tomato, pesto etc.)")]
-        public required string Type { get; set; }
+        public string Type { get; set; } = null!;
 
         [Comment("Short sauce description")]
-        public required string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         [Comment("Current sauce price")]
         public decimal Price { get; set; }

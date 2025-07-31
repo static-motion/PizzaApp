@@ -11,8 +11,8 @@
         public int Id { get; set; }
 
         [Comment("Name of the drink.")]
-        public required string Name { get; set; }
-
+        public string Name { get; set; } = null!;
+            
         [Comment("Short description of the drink.")]
         public string? Description { get; set; }
 

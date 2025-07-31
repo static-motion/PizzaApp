@@ -50,6 +50,7 @@
 
             Guid? userId = this.GetUserId();
             await this._orderService.PlaceOrderAsync(orderDetails, userId!.Value);
+            await this._cartService.ClearShoppingCart(userId!.Value);
 
             return this.RedirectToAction(nameof(Index));
         }

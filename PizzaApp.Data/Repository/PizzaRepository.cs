@@ -6,7 +6,7 @@
     using System.Collections.Generic;
     using GCommon.Enums;
 
-    public class PizzaRepository : BaseRepository<Pizza, int>, IPizzaRepository
+    public class PizzaRepository : BaseRepository<Pizza, int, PizzaRepository>, IPizzaRepository
     {
         public PizzaRepository(PizzaAppContext dbContext) 
             : base(dbContext)
@@ -15,17 +15,41 @@
 
         public async Task<ICollection<Pizza>> GetAllBasePizzasAsync()
         {
-            return await this.DbSet.Where(p => p.PizzaType == PizzaType.BasePizza)
-                .ToListAsync();
+            IQueryable<Pizza> query = this.DbSet.Where(p => p.PizzaType == PizzaType.BasePizza);
+            query = this.ApplyConfiguration(query);
+
+            return await query.ToListAsync();
         }
 
-        public Task<Pizza?> GetByIdWithIngredientsAsync(int id)
+        public async Task<ICollection<Pizza>> GetAllBasePizzasWithIngredientsAsync()
         {
-            return this.DbSet.Include(p => p.Dough)
+            IQueryable<Pizza> query = this.DbSet
+                .Where(p => p.PizzaType == PizzaType.BasePizza)
+                .Include(p => p.Dough)
                 .Include(p => p.Sauce)
                 .Include(p => p.Toppings)
-                    .ThenInclude(pt => pt.Topping)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                    .ThenInclude(pt => pt.Topping); 
+
+            query = this.ApplyConfiguration(query);
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<Pizza?> GetByIdWithIngredientsAsync(int id)
+        {
+            IQueryable<Pizza> query = this.DbSet.Include(p => p.Dough)
+                .Include(p => p.Sauce)
+                .Include(p => p.Toppings)
+                    .ThenInclude(pt => pt.Topping);
+
+            query = this.ApplyConfiguration(query);
+
+            return await query.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        public IQueryable<Pizza> GetAllBasePizzasAsync(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

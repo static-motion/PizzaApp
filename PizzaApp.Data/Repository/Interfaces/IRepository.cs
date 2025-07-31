@@ -1,34 +1,45 @@
 ﻿namespace PizzaApp.Data.Repository.Interfaces
 {
+    using PizzaApp.Data.Models.Interfaces;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    public interface IRepository<IEntity, TKey>
+    public interface IRepository<TEntity, TKey, TRepository> 
+        where TEntity : class, IEntity<TKey>, new()
+        where TKey : notnull
+        where TRepository : BaseRepository<TEntity, TKey, TRepository>
     {
-        Task AddAsync(IEntity item);
+        Task AddAsync(TEntity item);
 
-        Task AddRangeAsync(IEnumerable<IEntity> items);
+        Task AddRangeAsync(IEnumerable<TEntity> items);
 
-        Task<IEntity?> FirstOrDefaultAsync(Expression<Func<IEntity, bool>> predicate);
+        Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
 
-        Task<IEnumerable<IEntity>> GetAllAsync(bool asNoTracking = false, bool ignoreQueryFilters = false);
+        Task<IEnumerable<TEntity>> GetAllAsync();
 
-        Task<IEnumerable<IEntity>> GetRangeByIdsAsync(IEnumerable<TKey> ids);
+        Task<IEnumerable<TEntity>> GetRangeByIdsAsync(IEnumerable<TKey> ids);
 
-        ValueTask<IEntity?> GetByIdAsync(TKey id);
+        Task<TEntity?> GetByIdAsync(TKey id);
 
-        bool HardDelete(IEntity entity);
+        bool HardDelete(TEntity entity);
 
         Task SaveChangesAsync();
 
-        Task<IEntity?> SingleOrDefaultAsync(Expression<Func<IEntity, bool>> predicate);
+        Task<TEntity?> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
 
-        Task<bool> ExistsAsync(Expression<Func<IEntity, bool>> predicate);
+        Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
 
-        bool SoftDelete(IEntity entity);
+        bool SoftDelete(TEntity entity);
 
-        bool Update(IEntity item);
+        bool Update(TEntity item);
+
+        //IQueryable<TEntity> ApplyConfiguration(IQueryable<TEntity> query);
+
+        TRepository DisableTracking();
+
+        TRepository IgnoreFiltering();
     }
 }

@@ -1,11 +1,18 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using PizzaApp.Data.Models
+@using static PizzaApp.GCommon.Constants
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
 @if (SignInManager.IsSignedIn(User))
 {
     <ul class="navbar-nav">
+        @if (User.IsInRole(AdminRole))
+        {
+            <li class="nav-item navbar-nav-item">
+                <a class="nav-link text-dark btn btn-danger" asp-area="Admin" asp-controller="Manage" asp-action="Index">Admin Area</a>
+            </li>
+        }
         <li class="nav-item navbar-nav-item">
             <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index"><i class="fa-solid fa-cart-shopping fa-xl"></i> Cart</a>
         </li>

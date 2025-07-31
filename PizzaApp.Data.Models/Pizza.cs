@@ -12,7 +12,7 @@
         public int Id { get; set; }
 
         [Comment("Name of the pizza as given by its creator (User)")]
-        public required string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [Comment("Short pizza description")]
         public string? Description { get; set; }

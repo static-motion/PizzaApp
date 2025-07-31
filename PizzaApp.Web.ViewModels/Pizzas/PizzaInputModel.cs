@@ -20,6 +20,6 @@
 
         public int? SauceId { get; set; }
 
-        public PizzaType PizzaType { get; set; } = PizzaType.CustomerPizza;
+        public virtual PizzaType PizzaType => PizzaType.CustomerPizza;
     }
 }

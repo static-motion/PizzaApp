@@ -6,28 +6,17 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public class ToppingCategoryRepository : BaseRepository<ToppingCategory, int>, IToppingCategoryRepository
+    public class ToppingCategoryRepository : BaseRepository<ToppingCategory, int, ToppingCategoryRepository>, IToppingCategoryRepository
     {
         public ToppingCategoryRepository(PizzaAppContext dbContext) : base(dbContext)
         {
         }
 
-        public async Task<IEnumerable<Topping>> GetAllToppingsFromRangeAsync(IEnumerable<int> selectedToppingIds)
+        public async Task<IEnumerable<ToppingCategory>> GetAllWithToppingsAsync()
         {
-            return await this.DbSet
-                .SelectMany(t => t.Toppings)
-                .Where(tc => selectedToppingIds.Contains(tc.Id))
-                .ToListAsync();
-        }
+            IQueryable<ToppingCategory> query = this.DbSet.Include(tc => tc.Toppings);
 
-        public async Task<IEnumerable<ToppingCategory>> GetAllWithToppingsAsync(bool asNoTracking = false)
-        {
-            var query = this.DbSet.Include(tc => tc.Toppings);
-
-            if (asNoTracking)
-            {
-                query.AsNoTracking();
-            }
+            query = this.ApplyConfiguration(query);
 
             return await query.ToArrayAsync();
         }

@@ -3,10 +3,11 @@
 
 @{
     ViewData["Title"] = Model.Category;
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    string editCategory = $"Edit{Model.Category}";
+    string headerText = $"{Model.Category}s";
 }
 
-<h2>Items</h2>
+<h2>@headerText</h2>
 
 <table class="table table-bordered table-striped align-middle">
     <thead class="table-dark">
@@ -24,15 +25,24 @@
                 <td>@item.Name</td>
                 <td>@Model.Category</td>
                 <td>
-                    <div class="form-check form-switch">
+                    @* <div class="form-check form-switch">
                         <input class="form-check-input toggle-active"
                                type="checkbox"
+                               disabled
                                data-id="@item.Id"
                                @(item.IsActive ? "checked" : "") />
-                    </div>
+                    </div> *@
+                    @if(item.IsActive)
+                    {
+                        <i class="fa-solid fa-check fa-2xl"></i>
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-xmark fa-2xl"></i>
+                    }
                 </td>
                 <td>
-                    <a asp-action="@Model.Category" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-action=@editCategory asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>
                 </td>
             </tr>
         }
@@ -40,7 +50,7 @@
 </table>
 
 @section Scripts {
-    <script>
+    @* <script>
         document.querySelectorAll('.toggle-active').forEach(switchEl => {
             switchEl.addEventListener('change', function () {
                 const itemId = this.getAttribute('data-id');
@@ -61,5 +71,5 @@
                 });
             });
         });
-    </script>
+    </script> *@
 }

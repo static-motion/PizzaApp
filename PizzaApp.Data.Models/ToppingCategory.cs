@@ -10,7 +10,7 @@
         public int Id { get; set; }
 
         [Comment("Topping type name")]
-        public required string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         // All the topics from a certain category - (meats, vegetables etc.)
         public ICollection<Topping> Toppings { get; set; }
