@@ -142,6 +142,27 @@
         }
 
         [HttpGet]
+        public async Task<IActionResult> EditToppingCategory(int id)
+        {
+            EditToppingCategoryInputModel model
+                = await this._menuManagementService.GetToppingCategoryDetailsByIdAsync(id);
+
+            return this.View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditToppingCategory(EditToppingCategoryInputModel inputModel)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                //TODO:
+            }
+
+            await this._menuManagementService.EditToppingCategoryAsync(inputModel);
+            return this.RedirectToAction(nameof(EditToppingCategory), new { id = inputModel.Id });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> EditPizza(int id)
         {
             EditAdminPizzaViewWrapper? pizza = await this._menuManagementService.GetPizzaDetailsByIdAsync(id);

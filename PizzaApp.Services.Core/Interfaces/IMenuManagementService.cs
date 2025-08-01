@@ -9,10 +9,12 @@
         Task EditPizzaAsync(AdminPizzaInputModel pizza);
         Task EditSauceAsync(EditSauceInputModel inputSauce);
         Task EditToppingAsync(EditToppingInputModel inputTopping);
+        Task EditToppingCategoryAsync(EditToppingCategoryInputModel inputModel);
         public Task<IEnumerable<MenuItemViewModel>> GetAllItemsFromCategory(ManagementCategory category);
         Task<EditDoughInputModel> GetDoughDetailsByIdAsync(int id);
         Task<EditAdminPizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id);
         Task<EditSauceInputModel> GetSauceDetailsByIdAsync(int id);
+        Task<EditToppingCategoryInputModel> GetToppingCategoryDetailsByIdAsync(int id);
         Task<EditToppingViewWrapper> GetToppingDetailsByIdAsync(int id);
     }
 }

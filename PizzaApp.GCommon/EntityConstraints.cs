@@ -2,9 +2,10 @@
 {
     public static class EntityConstraints
     {
-        public static class ToppingType
+        public static class ToppingCategory
         {
             public const int NameMaxLength = 50;
+            public const int NameMinLength = 2;
         }
 
         public static class Topping

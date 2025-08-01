@@ -1,0 +1,31 @@
+﻿@using PizzaApp.Web.ViewModels.Admin
+@model EditToppingCategoryInputModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+<a class="btn btn-success btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+<form asp-action="EditToppingCategory" method="post" class="container" name="topping-category-form">
+    <input type="hidden" asp-for="Id" value="@Model.Id" />
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="IsDeleted" type="radio" value="@false" class="form-check-input" id="enable" />
+        <label class="form-check-label" for="enable">Enable</label>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="IsDeleted" type="radio" value="@true" class="form-check-input" id="disable" />
+        <label class="form-check-label text-danger" for="enable">Disable</label>
+    </div>
+    <button type="submit" class="btn btn-danger">Save Changes</button>
+</form>
+
+@section Styles {
+    <link href="~/css/Menu/pizza-details.css" rel="stylesheet" type="text/css" />
+}
+
+@section Scripts {
+}

@@ -135,7 +135,6 @@
             {
                 BasePizzaId = pizzaDto.PizzaId,
                 Quantity = pizzaDto.Quantity,
-                // Price = 10m, // TODO: Calculate price based on components
                 User = user,
                 UserId = user.Id,
             };
@@ -263,7 +262,7 @@
                     Id = pizza.Id,
                     Name = basePizza.Name,
                     DoughName = dough?.Type ?? "Unknown Dough",
-                    SauceName = sauce?.Type,
+                    SauceName = sauce?.Type ?? "No Sauce",
                     Quantity = pizza.Quantity
                 };
 

@@ -36,8 +36,6 @@
 
         bool Update(TEntity item);
 
-        //IQueryable<TEntity> ApplyConfiguration(IQueryable<TEntity> query);
-
         TRepository DisableTracking();
 
         TRepository IgnoreFiltering();

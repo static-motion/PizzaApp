@@ -21,7 +21,7 @@
         private readonly IToppingRepository _toppingRepository;
         private readonly IToppingCategoryRepository _toppingCategoryRepository;
 
-        private Dictionary<ManagementCategory, Func<Task<IEnumerable<MenuItemViewModel>>>> _categoryItemFetchers;
+        private readonly Dictionary<ManagementCategory, Func<Task<IEnumerable<MenuItemViewModel>>>> _categoryItemFetchers;
 
         public MenuManagementService(IPizzaRepository pizzaRepository,
             IPizzaIngredientsService pizzaIngredientsService,
@@ -122,7 +122,7 @@
                 return null;
 
             IReadOnlyList<ToppingCategoryViewWrapper> allToppingsByCategories 
-                = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync();
+                = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync(ignoreFiltering: true, disableTracking: true);
             IReadOnlyList<DoughViewModel> allDoughs 
                 = await this._pizzaIngredientsService.GetAllDoughsAsync(ignoreFiltering: true, disableTracking: true);
             IReadOnlyList<SauceViewModel> allSauces 
@@ -146,10 +146,11 @@
         private async Task<AdminPizzaInputModel?> GetPizzaDetailsViewModelByIdAsync(int id)
         {
             Pizza? pizza = await this._pizzaRepository
+                .DisableTracking()
                 .IgnoreFiltering()
                 .GetByIdWithIngredientsAsync(id);
             if (pizza is null)
-                return null; // TODO: Throw exception instead
+                return null; // TODO: change method signature and throw exception instead
 
             return new AdminPizzaInputModel
             {
@@ -171,8 +172,12 @@
         private async Task<IEnumerable<MenuItemViewModel>> GetAllPizzas()
         {
             IEnumerable<Pizza> pizzas = await this._pizzaRepository
+                .DisableTracking()
                 .IgnoreFiltering()
                 .GetAllBasePizzasWithIngredientsAsync();
+
+            var firstSauce = pizzas.First().Sauce;
+            var allMatch = pizzas.All(p => ReferenceEquals(p.Sauce, firstSauce));
 
             return pizzas.Select(p => new MenuItemViewModel
             {
@@ -181,7 +186,7 @@
                 IsActive = p.IsDeleted == false // the pizza must be active
                     && (p.Sauce == null || p.Sauce.IsDeleted == false) // the sauce must be either not set or active
                     && p.Dough.IsDeleted == false // the dough must be active
-                    && p.Toppings.All(t => t.Topping.IsDeleted == false) // all toppings must be active
+                    && p.Toppings.All(t => t.Topping.IsDeleted == false && t.Topping.ToppingCategory.IsDeleted == false) // all toppings must be active
             });
 
         }
@@ -334,6 +339,37 @@
 
             this._toppingRepository.Update(topping);
             await this._toppingRepository.SaveChangesAsync();
+        }
+
+        public async Task<EditToppingCategoryInputModel> GetToppingCategoryDetailsByIdAsync(int id)
+        {
+            ToppingCategory? category = await this._toppingCategoryRepository
+                .DisableTracking()
+                .IgnoreFiltering()
+                .GetByIdAsync(id)
+            ?? throw new InvalidOperationException();
+
+            return new EditToppingCategoryInputModel
+            {
+                Id = category.Id,
+                Name = category.Name,
+                IsDeleted = category.IsDeleted,
+            };
+        }
+
+        public async Task EditToppingCategoryAsync(EditToppingCategoryInputModel inputModel)
+        {
+            ToppingCategory? toppingCategory
+                = await this._toppingCategoryRepository
+                            .IgnoreFiltering()
+                            .GetByIdAsync(inputModel.Id)
+            ?? throw new InvalidOperationException(); // TODO
+
+            toppingCategory.Name = inputModel.Name;
+            toppingCategory.IsDeleted = inputModel.IsDeleted;
+
+            this._toppingCategoryRepository.Update(toppingCategory);
+            await this._toppingCategoryRepository.SaveChangesAsync();
         }
     }
 }

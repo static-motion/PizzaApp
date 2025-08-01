@@ -28,7 +28,8 @@
                 .Include(p => p.Dough)
                 .Include(p => p.Sauce)
                 .Include(p => p.Toppings)
-                    .ThenInclude(pt => pt.Topping); 
+                    .ThenInclude(pt => pt.Topping)
+                    .ThenInclude(t => t.ToppingCategory); 
 
             query = this.ApplyConfiguration(query);
 
