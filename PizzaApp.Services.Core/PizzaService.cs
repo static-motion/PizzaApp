@@ -28,14 +28,14 @@
             this._toppingRepository = toppingRepository;
         }
 
-        public async Task<PizzaIngredientsViewModel> GetAllIngredientsAsync()
+        public async Task<PizzaIngredientsViewWrapper> GetAllIngredientsAsync()
         {
-            IReadOnlyList<ToppingCategoryViewModel> allToppingsByCategories = await this.GetAllCategoriesWithToppingsAsync();
+            IReadOnlyList<ToppingCategoryViewWrapper> allToppingsByCategories = await this.GetAllCategoriesWithToppingsAsync();
             IReadOnlyList<DoughViewModel> allDoughs = await this.GetAllDoughsAsync();
             IReadOnlyList<SauceViewModel> allSauces = await this.GetAllSaucesAsync();
 
             // create the model
-            PizzaIngredientsViewModel ingredients = new()
+            PizzaIngredientsViewWrapper ingredients = new()
             {
                 ToppingCategories = allToppingsByCategories,
                 Doughs = allDoughs,
@@ -46,14 +46,14 @@
         }
 
         // TODO: the same method is used in MenuService. Refactor to a common service?
-        private async Task<List<ToppingCategoryViewModel>> GetAllCategoriesWithToppingsAsync()
+        private async Task<List<ToppingCategoryViewWrapper>> GetAllCategoriesWithToppingsAsync()
         {
             IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
                 .DisableTracking()
                 .GetAllWithToppingsAsync();
 
             return allToppingCategories
-                .Select(tc => new ToppingCategoryViewModel
+                .Select(tc => new ToppingCategoryViewWrapper
                 {
                     Id = tc.Id,
                     Name = tc.Name,

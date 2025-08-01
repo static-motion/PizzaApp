@@ -8,6 +8,6 @@
     public interface IPizzaService
     {
         Task<bool> CreatePizzaAsync(PizzaInputModel pizza, IEnumerable<int> selectedToppingIds, Guid userId);
-        Task<PizzaIngredientsViewModel> GetAllIngredientsAsync();
+        Task<PizzaIngredientsViewWrapper> GetAllIngredientsAsync();
     }
 }

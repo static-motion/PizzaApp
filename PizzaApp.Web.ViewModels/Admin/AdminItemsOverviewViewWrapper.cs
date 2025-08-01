@@ -3,7 +3,7 @@
     using PizzaApp.GCommon.Enums;
     using System.Collections.Generic;
 
-    public class AdminItemsOverviewViewModel
+    public class AdminItemsOverviewViewWrapper
     {
         public ManagementCategory Category { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace PizzaApp.Web.ViewModels
 {
-    public class ToppingCategoryViewModel
+    public class ToppingCategoryViewWrapper
     {
         public int Id { get; set; }
 

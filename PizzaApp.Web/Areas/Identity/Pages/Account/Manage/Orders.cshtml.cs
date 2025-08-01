@@ -13,7 +13,7 @@ namespace YourApp.Pages
         {
             this._orderService = orderService;
         }
-        public IEnumerable<OrderViewModel> Orders { get; private set; } = new List<OrderViewModel>();
+        public IEnumerable<OrderViewWrapper> Orders { get; private set; } = new List<OrderViewWrapper>();
         public async Task<IActionResult> OnGetAsync()
         {
             this.Orders = (await this._orderService.GetOrdersAsync(this.GetUserId()))

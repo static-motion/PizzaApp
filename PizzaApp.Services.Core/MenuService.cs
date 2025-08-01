@@ -106,7 +106,7 @@
             return menuItems;
         }
 
-        public async Task<OrderPizzaViewModel?> GetPizzaDetailsByIdAsync(int id)
+        public async Task<OrderPizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id)
         {
             PizzaDetailsViewModel? pizzaDetails = await this.GetPizzaDetailsViewModelByIdAsync(id);
 
@@ -114,15 +114,15 @@
             if (pizzaDetails is null)
                 return null;
 
-            IReadOnlyList<ToppingCategoryViewModel> allToppingsByCategories = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync();
+            IReadOnlyList<ToppingCategoryViewWrapper> allToppingsByCategories = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync();
             IReadOnlyList<DoughViewModel> allDoughs = await this._pizzaIngredientsService.GetAllDoughsAsync(disableTracking: true);
             IReadOnlyList<SauceViewModel> allSauces = await this._pizzaIngredientsService.GetAllSaucesAsync(disableTracking: true);
 
             // create the model
-            OrderPizzaViewModel orderPizzaView = new()
+            OrderPizzaViewWrapper orderPizzaView = new()
             {
                 Pizza = pizzaDetails,
-                Ingredients = new PizzaIngredientsViewModel
+                Ingredients = new PizzaIngredientsViewWrapper
                 {
                     ToppingCategories = allToppingsByCategories,
                     Doughs = allDoughs,

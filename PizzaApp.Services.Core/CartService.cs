@@ -163,7 +163,7 @@
         }
 
         //TODO: The current cart index view doesn't use all properties from the view models. Fix when possible.
-        public async Task<CartViewModel> GetUserCart(Guid userId)
+        public async Task<CartViewWrapper> GetUserCart(Guid userId)
         {
             User? user = await this._userRepository.GetUserWithAddressesAndCartAsync(userId)
                 ?? throw new InvalidOperationException(UserNotFound);
@@ -172,7 +172,7 @@
             IEnumerable<CartDrinkViewModel> drinksInCart = GetAllDrinksInCart(user);
             IEnumerable<CartDessertViewModel> dessertsInCart = GetAllDessertsInCart(user);
 
-            CartItemsViewModel cartItems = new()
+            CartItemsViewWrapper cartItems = new()
             {
                 Pizzas = pizzasInCart,
                 Drinks = drinksInCart,
@@ -187,7 +187,7 @@
                     AddressLine2 = a.AddressLine2,
                 });
 
-            CartViewModel shoppingCart = new()
+            CartViewWrapper shoppingCart = new()
             {
                 Items = cartItems,
                 Addresses = addresses,

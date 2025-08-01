@@ -1,9 +1,8 @@
 ﻿namespace PizzaApp.Web.ViewModels.Orders
 {
     using PizzaApp.GCommon.Enums;
-    using PizzaApp.Web.ViewModels.Address;
 
-    public class OrderViewModel
+    public class OrderViewWrapper
     {
         public OrderStatus OrderStatus { get; set; }
 

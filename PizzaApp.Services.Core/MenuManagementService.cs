@@ -10,6 +10,8 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    //TODO: Refactor into multiple management services
+    //and use service composition
     public class MenuManagementService : IMenuManagementService
     {
         private readonly IPizzaRepository _pizzaRepository;
@@ -111,7 +113,7 @@
             return await this._categoryItemFetchers[category]();
         }
 
-        public async Task<EditAdminPizzaInputModel?> GetPizzaDetailsByIdAsync(int id)
+        public async Task<EditAdminPizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id)
         {
             AdminPizzaInputModel? pizzaDetails = await this.GetPizzaDetailsViewModelByIdAsync(id);
 
@@ -119,7 +121,7 @@
             if (pizzaDetails is null)
                 return null;
 
-            IReadOnlyList<ToppingCategoryViewModel> allToppingsByCategories 
+            IReadOnlyList<ToppingCategoryViewWrapper> allToppingsByCategories 
                 = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync();
             IReadOnlyList<DoughViewModel> allDoughs 
                 = await this._pizzaIngredientsService.GetAllDoughsAsync(ignoreFiltering: true, disableTracking: true);
@@ -127,10 +129,10 @@
                 = await this._pizzaIngredientsService.GetAllSaucesAsync(ignoreFiltering: true, disableTracking: true);
 
             // create the model
-            EditAdminPizzaInputModel managePizzaView = new()
+            EditAdminPizzaViewWrapper managePizzaView = new()
             {
                 Pizza = pizzaDetails,
-                Ingredients = new PizzaIngredientsViewModel
+                Ingredients = new PizzaIngredientsViewWrapper
                 {
                     ToppingCategories = allToppingsByCategories,
                     Doughs = allDoughs,
@@ -184,22 +186,22 @@
 
         }
 
-        public async Task EditPizzaAsync(AdminPizzaInputModel pizza)
+        public async Task EditPizzaAsync(AdminPizzaInputModel inputModel)
         {
-            Pizza? pizzaToEdit = await this._pizzaRepository.IgnoreFiltering().GetByIdWithIngredientsAsync(pizza.Id);
+            Pizza? pizzaToEdit = await this._pizzaRepository.IgnoreFiltering().GetByIdWithIngredientsAsync(inputModel.Id);
 
             if (pizzaToEdit is null)
             {
                 throw new InvalidOperationException(); // TODO: Add error message
             }
 
-            pizzaToEdit.DoughId = pizza.Id;
-            pizzaToEdit.Name = pizza.Name;
-            pizzaToEdit.SauceId = pizza.SauceId;
-            pizzaToEdit.Description = pizza.Description;
-            pizzaToEdit.ImageUrl = pizza.ImageUrl;
-            pizzaToEdit.IsDeleted = pizza.IsDeleted;
-            pizzaToEdit.Toppings = pizza.SelectedToppingIds
+            pizzaToEdit.Name = inputModel.Name;
+            pizzaToEdit.DoughId = inputModel.DoughId;
+            pizzaToEdit.SauceId = inputModel.SauceId;
+            pizzaToEdit.Description = inputModel.Description;
+            pizzaToEdit.ImageUrl = inputModel.ImageUrl;
+            pizzaToEdit.IsDeleted = inputModel.IsDeleted;
+            pizzaToEdit.Toppings = inputModel.SelectedToppingIds
                                         .Select(id => new PizzaTopping()
                                         {
                                             ToppingId = id
@@ -274,6 +276,64 @@
                 Type = sauce.Type,
                 Price = sauce.Price
             };
+        }
+
+        public async Task<EditToppingViewWrapper> GetToppingDetailsByIdAsync(int id)
+        {
+            Topping? topping = await this._toppingRepository
+                .IgnoreFiltering()
+                .DisableTracking()
+                .GetByIdAsync(id)
+            ?? throw new InvalidOperationException(); //TODO:
+
+            IEnumerable<ToppingCategory> toppingCategories
+                = await this._toppingCategoryRepository
+                            .DisableTracking()
+                            .IgnoreFiltering()
+                            .GetAllAsync();
+
+            return new EditToppingViewWrapper
+            {
+                AllCategories = toppingCategories.Select(tc => new ToppingCategorySelectViewModel
+                {
+                    Id = tc.Id,
+                    Name = tc.Name,
+                    IsActive = tc.IsDeleted == false
+                }),
+                ToppingInputModel = new EditToppingInputModel
+                { 
+                    Id = topping.Id,
+                    Description = topping.Description,
+                    Name = topping.Name,
+                    ToppingCategoryId = topping.ToppingCategoryId,
+                    IsDeleted = topping.IsDeleted,
+                    Price = topping.Price
+                }
+            };
+        }
+
+        public async Task EditToppingAsync(EditToppingInputModel inputTopping)
+        {
+            Topping? topping = await this._toppingRepository
+                .IgnoreFiltering()
+                .GetByIdAsync(inputTopping.Id)
+            ?? throw new InvalidOperationException();
+
+            bool categoryExists = await this._toppingCategoryRepository
+                .IgnoreFiltering()
+                .ExistsAsync(tc => tc.Id == inputTopping.ToppingCategoryId);
+
+            if (!categoryExists)
+                throw new InvalidOperationException();
+
+            topping.Name = inputTopping.Name;
+            topping.Description = inputTopping.Description;
+            topping.IsDeleted = inputTopping.IsDeleted;
+            topping.Price = inputTopping.Price;
+            topping.ToppingCategoryId = inputTopping.ToppingCategoryId;
+
+            this._toppingRepository.Update(topping);
+            await this._toppingRepository.SaveChangesAsync();
         }
     }
 }

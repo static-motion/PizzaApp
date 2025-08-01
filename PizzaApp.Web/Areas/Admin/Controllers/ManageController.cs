@@ -23,7 +23,7 @@
         {
             ManagementCategory category = ManagementCategory.Pizza;
 
-            AdminItemsOverviewViewModel view = await this.CreateItemsOverviewModel(category);
+            AdminItemsOverviewViewWrapper view = await this.CreateItemsOverviewModel(category);
 
             return this.View("Items", view);
         }
@@ -33,7 +33,7 @@
         {
             ManagementCategory category = ManagementCategory.Dough;
 
-            AdminItemsOverviewViewModel view = await this.CreateItemsOverviewModel(category);
+            AdminItemsOverviewViewWrapper view = await this.CreateItemsOverviewModel(category);
 
             return this.View("Items", view);
         }
@@ -65,7 +65,7 @@
         {
             ManagementCategory category = ManagementCategory.Sauce;
 
-            AdminItemsOverviewViewModel view = await this.CreateItemsOverviewModel(category);
+            AdminItemsOverviewViewWrapper view = await this.CreateItemsOverviewModel(category);
             
 
             return this.View("Items", view);
@@ -98,9 +98,37 @@
         {
             ManagementCategory category = ManagementCategory.Topping;
 
-            AdminItemsOverviewViewModel view = await this.CreateItemsOverviewModel(category);
+            AdminItemsOverviewViewWrapper view = await this.CreateItemsOverviewModel(category);
 
             return this.View("Items", view);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditTopping(int id)
+        {
+            EditToppingViewWrapper toppingView 
+                = await this._menuManagementService
+                            .GetToppingDetailsByIdAsync(id);
+
+            return this.View(toppingView);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditTopping(EditToppingViewWrapper toppingViewWrapper)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                // TODO:
+            }
+
+            EditToppingInputModel toppingInputModel = toppingViewWrapper.ToppingInputModel;
+
+            //return this.RedirectToAction(nameof(EditTopping), new { id = toppingInputModel.Id });
+
+            await this._menuManagementService.EditToppingAsync(toppingInputModel);
+
+            return this.RedirectToAction(nameof(EditTopping), new { id = toppingInputModel.Id });
+
         }
 
         [HttpGet]
@@ -108,7 +136,7 @@
         {
             ManagementCategory category = ManagementCategory.ToppingCategory;
 
-            AdminItemsOverviewViewModel view = await this.CreateItemsOverviewModel(category);
+            AdminItemsOverviewViewWrapper view = await this.CreateItemsOverviewModel(category);
 
             return this.View("Items", view);
         }
@@ -116,7 +144,7 @@
         [HttpGet]
         public async Task<IActionResult> EditPizza(int id)
         {
-            EditAdminPizzaInputModel? pizza = await this._menuManagementService.GetPizzaDetailsByIdAsync(id);
+            EditAdminPizzaViewWrapper? pizza = await this._menuManagementService.GetPizzaDetailsByIdAsync(id);
 
             if (pizza is null)
             {
@@ -127,19 +155,20 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditPizza(AdminPizzaInputModel pizza)
+        public async Task<IActionResult> EditPizza(EditAdminPizzaViewWrapper pizzaViewWrapper)
         {
             // TODO:
+            AdminPizzaInputModel pizza = pizzaViewWrapper.Pizza;
             await this._menuManagementService.EditPizzaAsync(pizza);
             return this.RedirectToAction(nameof(EditPizza), new { id =  pizza.Id });
         }
 
-        private async Task<AdminItemsOverviewViewModel> CreateItemsOverviewModel(ManagementCategory category)
+        private async Task<AdminItemsOverviewViewWrapper> CreateItemsOverviewModel(ManagementCategory category)
         {
             IEnumerable<MenuItemViewModel> toppings = await this._menuManagementService
                             .GetAllItemsFromCategory(category);
 
-            AdminItemsOverviewViewModel view = new()
+            AdminItemsOverviewViewWrapper view = new()
             {
                 Category = category,
                 Items = toppings

@@ -43,7 +43,7 @@
             IEnumerable<MenuItemViewModel> menuItems 
                 = await this._menuService.GetAllMenuItemsForCategoryAsync(categoryEnum.Value);
 
-            MenuCategoryViewModel menuView = new()
+            MenuCategoryViewWrapper menuView = new()
             {
                 Items = menuItems,
                 AllCategories = CategoryNames
@@ -62,7 +62,7 @@
 
             if (categoryEnum == MenuCategory.Pizzas)
             {
-                OrderPizzaViewModel? orderPizzaViewModel 
+                OrderPizzaViewWrapper? orderPizzaViewModel 
                     = await this._menuService.GetPizzaDetailsByIdAsync(id);
 
                 if (orderPizzaViewModel is null)
@@ -80,7 +80,7 @@
             return this.View("ItemDetails", orderItem);
         }
         [HttpPost]
-        public async Task<IActionResult> AddPizzaToCart(OrderPizzaViewModel? orderPizzaViewModel)
+        public async Task<IActionResult> AddPizzaToCart(OrderPizzaViewWrapper? orderPizzaViewModel)
         {
             if (orderPizzaViewModel is null)
             {

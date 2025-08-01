@@ -1,6 +1,6 @@
 ﻿namespace PizzaApp.Web.ViewModels.Menu
 {
-    public class MenuCategoryViewModel
+    public class MenuCategoryViewWrapper
     {
         public IEnumerable<MenuItemViewModel> Items { get; set; } = new List<MenuItemViewModel>();
 

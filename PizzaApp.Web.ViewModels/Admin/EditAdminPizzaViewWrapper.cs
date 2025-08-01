@@ -1,8 +1,8 @@
 ﻿namespace PizzaApp.Web.ViewModels.Admin
 {
-    public class EditAdminPizzaInputModel
+    public class EditAdminPizzaViewWrapper
     {
-        public PizzaIngredientsViewModel Ingredients { get; set; } = null!;
+        public PizzaIngredientsViewWrapper Ingredients { get; set; } = null!;
         public AdminPizzaInputModel Pizza { get; set; } = null!;
     }
 }

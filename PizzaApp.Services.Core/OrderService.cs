@@ -35,16 +35,16 @@
             this._toppingCategoryRepository = toppingCategoryRepository;
             this._userRepository = userRepository;
         }
-        public async Task<IEnumerable<OrderViewModel>> GetOrdersAsync(Guid userId)
+        public async Task<IEnumerable<OrderViewWrapper>> GetOrdersAsync(Guid userId)
         {
             IEnumerable<Order> orders = await this._orderRepository.GetOrdersByUserIdAsync(userId);
 
             if (orders == null || !orders.Any())
             {
-                return Enumerable.Empty<OrderViewModel>();
+                return Enumerable.Empty<OrderViewWrapper>();
             }
 
-            List<OrderViewModel> orderViewModels = new List<OrderViewModel>();
+            List<OrderViewWrapper> orderViewModels = new List<OrderViewWrapper>();
 
             IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
                 .DisableTracking()
@@ -55,7 +55,7 @@
 
             foreach (Order order in orders)
             {
-                OrderViewModel orderView = BuildOrderViewModel(allToppingCategories, doughLookup, sauceLookup, order);
+                OrderViewWrapper orderView = BuildOrderViewModel(allToppingCategories, doughLookup, sauceLookup, order);
                 orderViewModels.Add(orderView);
             }
 
@@ -63,9 +63,9 @@
         }
 
         
-        private static OrderViewModel BuildOrderViewModel(IEnumerable<ToppingCategory> allToppingCategories, Dictionary<int, Dough> doughLookup, Dictionary<int, Sauce> sauceLookup, Order order)
+        private static OrderViewWrapper BuildOrderViewModel(IEnumerable<ToppingCategory> allToppingCategories, Dictionary<int, Dough> doughLookup, Dictionary<int, Sauce> sauceLookup, Order order)
         {
-            return new OrderViewModel
+            return new OrderViewWrapper
             {
                 CreatedOn = order.CreatedOn,
                 OrderStatus = order.OrderStatus,

@@ -64,7 +64,7 @@
                 .ToList();
         }
 
-        public async Task<IReadOnlyList<ToppingCategoryViewModel>> GetAllCategoriesWithToppingsAsync(bool ignoreFiltering = false, bool disableTracking = false)
+        public async Task<IReadOnlyList<ToppingCategoryViewWrapper>> GetAllCategoriesWithToppingsAsync(bool ignoreFiltering = false, bool disableTracking = false)
         {
             if (ignoreFiltering)
                 this._toppingRepository.IgnoreFiltering();
@@ -77,7 +77,7 @@
                 .GetAllWithToppingsAsync();
 
             return allToppingCategories
-                .Select(tc => new ToppingCategoryViewModel
+                .Select(tc => new ToppingCategoryViewWrapper
                 {
                     Id = tc.Id,
                     Name = tc.Name,

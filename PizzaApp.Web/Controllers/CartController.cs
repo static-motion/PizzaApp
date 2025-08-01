@@ -22,7 +22,7 @@
         {
             Guid? userId = this.GetUserId();
 
-            CartViewModel shoppingCart =
+            CartViewWrapper shoppingCart =
                 await this._cartService.GetUserCart(userId!.Value);
 
             return this.View("IndexAlt", shoppingCart);

@@ -1,6 +1,6 @@
 ﻿namespace PizzaApp.Web.ViewModels.ShoppingCart
 {
-    public class CartItemsViewModel
+    public class CartItemsViewWrapper
     {
         public IEnumerable<CartPizzaViewModel> Pizzas { get; set; } 
             = new List<CartPizzaViewModel>();

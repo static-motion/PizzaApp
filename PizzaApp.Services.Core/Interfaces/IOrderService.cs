@@ -5,7 +5,7 @@
 
     public interface IOrderService
     {
-        public Task<IEnumerable<OrderViewModel>> GetOrdersAsync(Guid userId);
+        public Task<IEnumerable<OrderViewWrapper>> GetOrdersAsync(Guid userId);
         Task PlaceOrderAsync(OrderDetailsInputModel orderDetails, Guid userId);
     }
 }

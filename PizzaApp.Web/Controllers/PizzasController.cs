@@ -13,7 +13,7 @@
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create(CreatePizzaViewModel createPizza)
+        public async Task<IActionResult> Create(CreatePizzaViewWrapper createPizza)
         {
 
             createPizza = new()
@@ -25,7 +25,7 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(CreatePizzaViewModel createdPizza)
+        public async Task<IActionResult> Add(CreatePizzaViewWrapper createdPizza)
         {
             if (!this.ModelState.IsValid || createdPizza.Pizza is null)
                 return this.RedirectToAction(nameof(Create), createdPizza);
