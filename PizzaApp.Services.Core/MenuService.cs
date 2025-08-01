@@ -115,8 +115,8 @@
                 return null;
 
             IReadOnlyList<ToppingCategoryViewModel> allToppingsByCategories = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync();
-            IReadOnlyList<DoughViewModel> allDoughs = await this._pizzaIngredientsService.GetAllDoughsAsync();
-            IReadOnlyList<SauceViewModel> allSauces = await this._pizzaIngredientsService.GetAllSaucesAsync();
+            IReadOnlyList<DoughViewModel> allDoughs = await this._pizzaIngredientsService.GetAllDoughsAsync(disableTracking: true);
+            IReadOnlyList<SauceViewModel> allSauces = await this._pizzaIngredientsService.GetAllSaucesAsync(disableTracking: true);
 
             // create the model
             OrderPizzaViewModel orderPizzaView = new()

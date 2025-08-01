@@ -1,14 +1,14 @@
 ﻿@using PizzaApp.Web.ViewModels.Admin
-@model EditDoughInputModel
+@model EditSauceInputModel
 
 @{
     ViewData["Title"] = Model.Type;
 }
 <a class="btn btn-success btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
-<form asp-action="EditDough" method="post" class="container" name="dough-form">
+<form asp-action="EditSauce" method="post" class="container" name="sauce-form">
     <input type="hidden" asp-for="Id" value="@Model.Id" />
     <div class="mb-3">
-        <label asp-for="Type" class="form-label">Dough Type</label>
+        <label asp-for="Type" class="form-label">Sauce Type</label>
         <input asp-for="Type" class="form-control" />
         <span asp-validation-for="Type" class="text-danger"></span>
     </div>

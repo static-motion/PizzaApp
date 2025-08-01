@@ -4,8 +4,8 @@
 
     public interface IPizzaIngredientsService
     {
-        Task<IReadOnlyList<ToppingCategoryViewModel>> GetAllCategoriesWithToppingsAsync();
-        Task<IReadOnlyList<DoughViewModel>> GetAllDoughsAsync();
-        Task<IReadOnlyList<SauceViewModel>> GetAllSaucesAsync();
+        Task<IReadOnlyList<ToppingCategoryViewModel>> GetAllCategoriesWithToppingsAsync(bool ignoreFiltering = false, bool disableTracking = false);
+        Task<IReadOnlyList<DoughViewModel>> GetAllDoughsAsync(bool ignoreFiltering = false, bool disableTracking = false);
+        Task<IReadOnlyList<SauceViewModel>> GetAllSaucesAsync(bool ignoreFiltering = false, bool disableTracking = false);
     }
 }

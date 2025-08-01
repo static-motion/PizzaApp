@@ -38,7 +38,8 @@
                 .HasData(GenerateToppingsSeed());
 
             entity
-                .HasQueryFilter(e => e.IsDeleted == false);
+                .HasQueryFilter(e => e.IsDeleted == false
+                    && e.ToppingCategory.IsDeleted == false);
         }
 
         private static IEnumerable<Topping> GenerateToppingsSeed()

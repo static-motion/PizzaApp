@@ -8,13 +8,10 @@
     public class ManageController : BaseAdminController
     {
         private readonly IMenuManagementService _menuManagementService;
-        private readonly IMenuService _menuService;
 
-        public ManageController(IMenuManagementService menuManagementService,
-            IMenuService menuService)
+        public ManageController(IMenuManagementService menuManagementService)
         {
             this._menuManagementService = menuManagementService;
-            this._menuService = menuService;
         }
         public IActionResult Index()
         {
@@ -44,9 +41,23 @@
         [HttpGet]
         public async Task<IActionResult> EditDough(int id)
         {
-            EditDoughInputModel model = await this._menuManagementService.GetDoughDetailsByIdAsync(id);
+            EditDoughInputModel model = await this._menuManagementService
+                .GetDoughDetailsByIdAsync(id);
 
             return this.View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditDough(EditDoughInputModel inputDough)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                // TODO:
+            }
+
+            await this._menuManagementService.EditDoughAsync(inputDough);
+
+            return this.RedirectToAction(nameof(EditDough), new { id = inputDough.Id });
         }
 
         [HttpGet]
@@ -58,6 +69,28 @@
             
 
             return this.View("Items", view);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditSauce(int id)
+        {
+
+            EditSauceInputModel sauce = await this._menuManagementService.GetSauceDetailsByIdAsync(id);
+
+            return this.View(sauce);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditSauce(EditSauceInputModel inputSauce)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                // TODO:
+            }
+
+            await this._menuManagementService.EditSauceAsync(inputSauce);
+
+            return this.RedirectToAction(nameof(EditSauce), new { id = inputSauce.Id });
         }
 
         [HttpGet]
@@ -80,19 +113,6 @@
             return this.View("Items", view);
         }
 
-        private async Task<AdminItemsOverviewViewModel> CreateItemsOverviewModel(ManagementCategory category)
-        {
-            IEnumerable<MenuItemViewModel> toppings = await this._menuManagementService
-                            .GetAllItemsFromCategory(category);
-
-            AdminItemsOverviewViewModel view = new()
-            {
-                Category = category,
-                Items = toppings
-            };
-            return view;
-        }
-
         [HttpGet]
         public async Task<IActionResult> EditPizza(int id)
         {
@@ -109,8 +129,22 @@
         [HttpPost]
         public async Task<IActionResult> EditPizza(AdminPizzaInputModel pizza)
         {
+            // TODO:
             await this._menuManagementService.EditPizzaAsync(pizza);
             return this.RedirectToAction(nameof(EditPizza), new { id =  pizza.Id });
+        }
+
+        private async Task<AdminItemsOverviewViewModel> CreateItemsOverviewModel(ManagementCategory category)
+        {
+            IEnumerable<MenuItemViewModel> toppings = await this._menuManagementService
+                            .GetAllItemsFromCategory(category);
+
+            AdminItemsOverviewViewModel view = new()
+            {
+                Category = category,
+                Items = toppings
+            };
+            return view;
         }
     }
 }

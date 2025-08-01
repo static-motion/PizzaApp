@@ -1,8 +1,8 @@
 ﻿namespace PizzaApp.Web.ViewModels.Admin
 {
     using System.ComponentModel.DataAnnotations;
-    using static PizzaApp.GCommon.EntityConstraints.Dough;
-    public class EditDoughInputModel
+    using static PizzaApp.GCommon.EntityConstraints.Sauce;
+    public class EditSauceInputModel
     {
         public int Id { get; set; }
 

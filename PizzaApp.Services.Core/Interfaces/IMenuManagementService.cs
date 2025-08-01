@@ -5,9 +5,12 @@
 
     public interface IMenuManagementService
     {
+        Task EditDoughAsync(EditDoughInputModel model);
         Task EditPizzaAsync(AdminPizzaInputModel pizza);
+        Task EditSauceAsync(EditSauceInputModel inputSauce);
         public Task<IEnumerable<MenuItemViewModel>> GetAllItemsFromCategory(ManagementCategory category);
         Task<EditDoughInputModel> GetDoughDetailsByIdAsync(int id);
         Task<EditAdminPizzaInputModel?> GetPizzaDetailsByIdAsync(int id);
+        Task<EditSauceInputModel> GetSauceDetailsByIdAsync(int id);
     }
 }

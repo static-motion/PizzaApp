@@ -36,7 +36,7 @@
                 <select asp-for="Pizza.DoughId" class="form-select">
                     @foreach (var dough in Model.Ingredients.Doughs)
                     {
-                        <option data-price="@dough.Price" value="@dough.Id">@dough.Name</option>
+                        <option class=@(dough.IsActive ? "" : "text-danger") data-price="@dough.Price" value="@dough.Id">@dough.Name</option>
                     }
                 </select>
             </div>
@@ -48,7 +48,7 @@
                     <option value="">Select sauce</option>
                     @foreach (var sauce in Model.Ingredients.Sauces)
                     {
-                        <option data-price="@sauce.Price" value="@sauce.Id">@sauce.Name</option>
+                        <option class=@(sauce.IsActive ? "" : "text-danger") data-price="@sauce.Price" value="@sauce.Id">@sauce.Name</option>
                     }
                 </select>
             </div>
@@ -79,7 +79,7 @@
                                        id="topping_@topping.Id"
                                        data-price="@topping.Price"
                                        checked=@Model.Pizza.SelectedToppingIds.Contains(topping.Id) />
-                                <label class="form-check-label" for="topping_@topping.Id">
+                                <label class="form-check-label  @(topping.IsActive ? "" : "text-danger")" for="topping_@topping.Id">
                                     @topping.Name (@topping.Price.ToString("C"))
                                 </label>
                             </div>

@@ -122,9 +122,9 @@
             IReadOnlyList<ToppingCategoryViewModel> allToppingsByCategories 
                 = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync();
             IReadOnlyList<DoughViewModel> allDoughs 
-                = await this._pizzaIngredientsService.GetAllDoughsAsync();
+                = await this._pizzaIngredientsService.GetAllDoughsAsync(ignoreFiltering: true, disableTracking: true);
             IReadOnlyList<SauceViewModel> allSauces 
-                = await this._pizzaIngredientsService.GetAllSaucesAsync();
+                = await this._pizzaIngredientsService.GetAllSaucesAsync(ignoreFiltering: true, disableTracking: true);
 
             // create the model
             EditAdminPizzaInputModel managePizzaView = new()
@@ -222,7 +222,57 @@
                 Description = dough.Description,
                 Price = dough.Price,
                 Type = dough.Type,
-                IsActive = dough.IsDeleted == false
+                IsDeleted = dough.IsDeleted
+            };
+        }
+
+        public async Task EditDoughAsync(EditDoughInputModel model)
+        {
+            Dough? dough = await this._doughRepository
+                .IgnoreFiltering()
+                .GetByIdAsync(model.Id)
+                ?? throw new InvalidOperationException(); //TODO: Add exception message
+
+            dough.Type = model.Type;
+            dough.Price = model.Price;
+            dough.Description = model.Description;
+            dough.IsDeleted = model.IsDeleted;
+
+            this._doughRepository.Update(dough);
+            await this._doughRepository.SaveChangesAsync();
+        }
+
+        public async Task EditSauceAsync(EditSauceInputModel inputSauce)
+        {
+            Sauce? sauce = await this._sauceRepository
+                .IgnoreFiltering()
+                .GetByIdAsync(inputSauce.Id)
+                ?? throw new InvalidOperationException(); //TODO: Add exception message
+
+            sauce.Type = inputSauce.Type;
+            sauce.Price = inputSauce.Price;
+            sauce.Description = inputSauce.Description;
+            sauce.IsDeleted = inputSauce.IsDeleted;
+
+            this._sauceRepository.Update(sauce);
+            await this._sauceRepository.SaveChangesAsync();
+        }
+
+        public async Task<EditSauceInputModel> GetSauceDetailsByIdAsync(int id)
+        {
+            Sauce? sauce = await this._sauceRepository
+                .IgnoreFiltering()
+                .DisableTracking()
+                .GetByIdAsync(id)
+            ?? throw new InvalidOperationException();
+
+            return new EditSauceInputModel
+            {
+                Id = sauce.Id,
+                Description = sauce.Description,
+                IsDeleted = sauce.IsDeleted,
+                Type = sauce.Type,
+                Price = sauce.Price
             };
         }
     }
