@@ -100,7 +100,9 @@
         public async Task<bool> CreatePizzaAsync(PizzaInputModel pizza, IEnumerable<int> selectedToppingIds, Guid userId)
         {
             IEnumerable<Topping> toppings = await this._toppingRepository
-                .GetAllToppingsFromRangeAsync(selectedToppingIds);
+                .DisableTracking()
+                .GetRangeByIdsAsync(selectedToppingIds);
+                //.GetAllToppingsFromRangeAsync(selectedToppingIds);
             
             bool doughExists = await this._doughRepository.ExistsAsync(d => d.Id == pizza.DoughId);
             bool sauceExists = await this._sauceRepository.ExistsAsync(s => s.Id == pizza.SauceId);

@@ -10,7 +10,7 @@
         Task EditSauceAsync(EditSauceInputModel inputSauce);
         Task EditToppingAsync(EditToppingInputModel inputTopping);
         Task EditToppingCategoryAsync(EditToppingCategoryInputModel inputModel);
-        public Task<IEnumerable<MenuItemViewModel>> GetAllItemsFromCategory(ManagementCategory category);
+        public Task<AdminItemsOverviewViewWrapper> GetItemsFromCategory(ManagementCategory category, int page, int pageSize);
         Task<EditDoughInputModel> GetDoughDetailsByIdAsync(int id);
         Task<EditAdminPizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id);
         Task<EditSauceInputModel> GetSauceDetailsByIdAsync(int id);

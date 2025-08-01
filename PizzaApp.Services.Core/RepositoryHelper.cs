@@ -4,7 +4,7 @@
     using PizzaApp.Data.Repository;
     using PizzaApp.Data.Repository.Interfaces;
 
-    public static class LookupHelper
+    public static class RepositoryHelper
     {
         public static async Task<Dictionary<TKey, TEntity>> GetEntityLookup<TKey, TEntity, TRepository>(IRepository<TEntity, TKey, TRepository> repository)
             where TKey : notnull 

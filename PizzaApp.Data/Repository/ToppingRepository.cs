@@ -20,5 +20,18 @@
             query = this.ApplyConfiguration(query);
             return await query.ToListAsync();
         }
+
+        public async Task<IEnumerable<Topping>> TakeWithCategoriesAsync(int take, int skip = 0)
+        {
+            IQueryable<Topping> query = this.DbSet
+                .AsQueryable()
+                .Include(t => t.ToppingCategory)
+                .Skip(skip)
+                .Take(take);
+
+            query = this.ApplyConfiguration(query);
+
+            return await query.ToListAsync();
+        }
     }
 }

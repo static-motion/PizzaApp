@@ -39,5 +39,7 @@
         TRepository DisableTracking();
 
         TRepository IgnoreFiltering();
+        Task<IEnumerable<TEntity>> TakeAsync(int take, int skip = 0);
+        Task<int> TotalEntityCountAsync();
     }
 }

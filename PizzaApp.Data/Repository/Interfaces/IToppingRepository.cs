@@ -5,5 +5,7 @@
     public interface IToppingRepository : IRepository<Topping, int, ToppingRepository>
     {
         Task<IEnumerable<Topping>> GetAllToppingsFromRangeAsync(IEnumerable<int> selectedToppingIds);
+
+        Task<IEnumerable<Topping>> TakeWithCategoriesAsync(int take, int skip = 0);
     }
 }

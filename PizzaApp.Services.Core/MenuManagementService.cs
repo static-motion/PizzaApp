@@ -21,7 +21,7 @@
         private readonly IToppingRepository _toppingRepository;
         private readonly IToppingCategoryRepository _toppingCategoryRepository;
 
-        private readonly Dictionary<ManagementCategory, Func<Task<IEnumerable<MenuItemViewModel>>>> _categoryItemFetchers;
+        private readonly Dictionary<ManagementCategory, Func<int, int, Task<(int, IEnumerable<MenuItemViewModel>)>>> _categoryItemFetchers;
 
         public MenuManagementService(IPizzaRepository pizzaRepository,
             IPizzaIngredientsService pizzaIngredientsService,
@@ -40,77 +40,121 @@
 
             _categoryItemFetchers = new()
             {
-                [ManagementCategory.Pizza] = this.GetAllPizzas,
-                [ManagementCategory.Dough] = this.GetAllDoughs,
-                [ManagementCategory.Sauce] = this.GetAllSauces,
-                [ManagementCategory.Topping] = this.GetAllToppings,
-                [ManagementCategory.ToppingCategory] = this.GetAllToppingCategories
+                [ManagementCategory.Pizza] = this.GetPizzasForPageAsync,
+                [ManagementCategory.Dough] = this.GetDoughsForPageAsync,
+                [ManagementCategory.Sauce] = this.GetSaucesForPageAsync,
+                [ManagementCategory.Topping] = this.GetToppingsForPageAsync,
+                [ManagementCategory.ToppingCategory] = this.GetToppingCategoriesForPageAsync
             };
         }
 
-        private async Task<IEnumerable<MenuItemViewModel>> GetAllToppingCategories()
+        private async Task<(int, IEnumerable<MenuItemViewModel>)> GetToppingCategoriesForPageAsync(int page, int pageSize)
         {
-            IEnumerable<ToppingCategory> toppingCategories = await this._toppingCategoryRepository
+            int totalItems = await this._toppingCategoryRepository.TotalEntityCountAsync();
+
+            IEnumerable<ToppingCategory> pagedToppingCategories = await this._toppingCategoryRepository
                 .DisableTracking()
                 .IgnoreFiltering()
-                .GetAllAsync();
+                .TakeAsync(skip: (page - 1) * pageSize, take: pageSize);
 
-            return toppingCategories.Select(d => new MenuItemViewModel
+            
+
+            return (totalItems, pagedToppingCategories.Select(d => new MenuItemViewModel
             {
                 Id = d.Id,
                 IsActive = !d.IsDeleted,
                 Name = d.Name
-            });
+            }));
         }
 
-        private async Task<IEnumerable<MenuItemViewModel>> GetAllToppings()
+        private async Task<(int, IEnumerable<MenuItemViewModel>)> GetToppingsForPageAsync(int page, int pageSize)
         {
+            int totalItems = await this._toppingRepository.TotalEntityCountAsync();
+
             IEnumerable<Topping> toppings = await this._toppingRepository
                 .DisableTracking()
                 .IgnoreFiltering()
-                .GetAllAsync();
+                .TakeWithCategoriesAsync(skip: (page - 1) * pageSize, take: pageSize);
 
-            return toppings.Select(d => new MenuItemViewModel
+            return (totalItems, toppings.Select(d => new MenuItemViewModel
             {
                 Id = d.Id,
-                IsActive = !d.IsDeleted,
+                IsActive = d.IsDeleted == false 
+                        && d.ToppingCategory.IsDeleted == false,
                 Name = d.Name
-            });
+            }));
         }
 
-        private async Task<IEnumerable<MenuItemViewModel>> GetAllDoughs()
+        private async Task<(int, IEnumerable<MenuItemViewModel>)> GetDoughsForPageAsync(int page, int pageSize)
         {
+            int doughsCount = await this._doughRepository.TotalEntityCountAsync();
+
             IEnumerable<Dough> doughs = await this._doughRepository
                 .DisableTracking()
                 .IgnoreFiltering()
-                .GetAllAsync();
+                .TakeAsync(skip: (page - 1) * pageSize, take: pageSize);
 
-            return doughs.Select(d => new MenuItemViewModel
+            return (doughsCount, doughs.Select(d => new MenuItemViewModel
             {
                 Id = d.Id,
-                IsActive = !d.IsDeleted,
+                IsActive = d.IsDeleted == false,
                 Name = d.Type
-            });
+            }));
         }
 
-        private async Task<IEnumerable<MenuItemViewModel>> GetAllSauces()
+        private async Task<(int, IEnumerable<MenuItemViewModel>)> GetSaucesForPageAsync(int page, int pageSize)
         {
+            int saucesCount = await this._sauceRepository.TotalEntityCountAsync();
+
             IEnumerable<Sauce> sauces = await this._sauceRepository
                 .DisableTracking()
                 .IgnoreFiltering()
-                .GetAllAsync();
+                .TakeAsync(skip: (page - 1) * pageSize, take: pageSize);
 
-            return sauces.Select(d => new MenuItemViewModel
+            return (saucesCount, sauces.Select(d => new MenuItemViewModel
             {
                 Id = d.Id,
-                IsActive = !d.IsDeleted,
+                IsActive = d.IsDeleted == false,
                 Name = d.Type
-            });
+            }));
         }
 
-        public async Task<IEnumerable<MenuItemViewModel>> GetAllItemsFromCategory(ManagementCategory category)
+        private async Task<(int, IEnumerable<MenuItemViewModel>)> GetPizzasForPageAsync(int page, int pageSize)
         {
-            return await this._categoryItemFetchers[category]();
+            int pizzasCount = await this._sauceRepository.TotalEntityCountAsync();
+
+            IEnumerable<Pizza> pizzas = await this._pizzaRepository
+                .DisableTracking()
+                .IgnoreFiltering()
+                .TakeBasePizzasWithIngredientsAsync(skip: (page - 1) * pageSize, take: pageSize);
+
+            return (pizzasCount, pizzas.Select(p => new MenuItemViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                IsActive = p.IsDeleted == false // the pizza must be active
+                    && (p.Sauce == null || p.Sauce.IsDeleted == false) // the sauce must be either not set or active
+                    && p.Dough.IsDeleted == false // the dough must be active
+                    && p.Toppings.All(t => t.Topping.IsDeleted == false && t.Topping.ToppingCategory.IsDeleted == false) // all toppings must be active
+            }));
+
+        }
+
+        public async Task<AdminItemsOverviewViewWrapper> GetItemsFromCategory(ManagementCategory category, int page, int pageSize)
+        {
+            (int totalItems, IEnumerable<MenuItemViewModel> items) = await this._categoryItemFetchers[category](page, pageSize);
+            int pageCount = totalItems / pageSize;
+
+            if (totalItems % pageSize != 0)
+                pageCount++;
+
+            return new AdminItemsOverviewViewWrapper()
+            {
+                Category = category,
+                CurrentPage = page,
+                Items = items,
+                TotalPages = pageCount
+            };
         }
 
         public async Task<EditAdminPizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id)
@@ -166,28 +210,6 @@
                 SelectedToppingIds = pizza.Toppings.Select(t => t.ToppingId).ToHashSet(),
                 IsDeleted = pizza.IsDeleted,
             };
-
-        }
-
-        private async Task<IEnumerable<MenuItemViewModel>> GetAllPizzas()
-        {
-            IEnumerable<Pizza> pizzas = await this._pizzaRepository
-                .DisableTracking()
-                .IgnoreFiltering()
-                .GetAllBasePizzasWithIngredientsAsync();
-
-            var firstSauce = pizzas.First().Sauce;
-            var allMatch = pizzas.All(p => ReferenceEquals(p.Sauce, firstSauce));
-
-            return pizzas.Select(p => new MenuItemViewModel
-            {
-                Id = p.Id,
-                Name = p.Name,
-                IsActive = p.IsDeleted == false // the pizza must be active
-                    && (p.Sauce == null || p.Sauce.IsDeleted == false) // the sauce must be either not set or active
-                    && p.Dough.IsDeleted == false // the dough must be active
-                    && p.Toppings.All(t => t.Topping.IsDeleted == false && t.Topping.ToppingCategory.IsDeleted == false) // all toppings must be active
-            });
 
         }
 

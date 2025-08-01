@@ -21,7 +21,7 @@
             return await query.ToListAsync();
         }
 
-        public async Task<ICollection<Pizza>> GetAllBasePizzasWithIngredientsAsync()
+        public async Task<ICollection<Pizza>> TakeBasePizzasWithIngredientsAsync(int take, int skip = 0)
         {
             IQueryable<Pizza> query = this.DbSet
                 .Where(p => p.PizzaType == PizzaType.BasePizza)
@@ -29,7 +29,9 @@
                 .Include(p => p.Sauce)
                 .Include(p => p.Toppings)
                     .ThenInclude(pt => pt.Topping)
-                    .ThenInclude(t => t.ToppingCategory); 
+                    .ThenInclude(t => t.ToppingCategory)
+                .Skip(skip)
+                .Take(take); 
 
             query = this.ApplyConfiguration(query);
 

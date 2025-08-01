@@ -14,7 +14,7 @@
     using System.Collections.Generic;
 
     using static PizzaApp.Services.Common.ExceptionMessages;
-    using static PizzaApp.Services.Core.LookupHelper;
+    using static PizzaApp.Services.Core.RepositoryHelper;
 
     public class CartService : ICartService
     {

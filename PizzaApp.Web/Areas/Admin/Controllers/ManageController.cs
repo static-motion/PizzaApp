@@ -7,6 +7,7 @@
 
     public class ManageController : BaseAdminController
     {
+        private const int PageSize = 10;
         private readonly IMenuManagementService _menuManagementService;
 
         public ManageController(IMenuManagementService menuManagementService)
@@ -19,21 +20,23 @@
         }
 
         [HttpGet]
-        public async Task<IActionResult> Pizzas()
+        public async Task<IActionResult> Pizzas(int page = 1)
         {
             ManagementCategory category = ManagementCategory.Pizza;
 
-            AdminItemsOverviewViewWrapper view = await this.CreateItemsOverviewModel(category);
+            AdminItemsOverviewViewWrapper view 
+                = await this._menuManagementService.GetItemsFromCategory(category, page, PageSize);
 
             return this.View("Items", view);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Doughs()
+        public async Task<IActionResult> Doughs(int page = 1)
         {
             ManagementCategory category = ManagementCategory.Dough;
 
-            AdminItemsOverviewViewWrapper view = await this.CreateItemsOverviewModel(category);
+            AdminItemsOverviewViewWrapper view
+                = await this._menuManagementService.GetItemsFromCategory(category, page, PageSize);
 
             return this.View("Items", view);
         }
@@ -61,12 +64,13 @@
         }
 
         [HttpGet]
-        public async Task<IActionResult> Sauces()
+        public async Task<IActionResult> Sauces(int page = 1)
         {
             ManagementCategory category = ManagementCategory.Sauce;
 
-            AdminItemsOverviewViewWrapper view = await this.CreateItemsOverviewModel(category);
-            
+            AdminItemsOverviewViewWrapper view
+                = await this._menuManagementService.GetItemsFromCategory(category, page, PageSize);
+
 
             return this.View("Items", view);
         }
@@ -94,11 +98,12 @@
         }
 
         [HttpGet]
-        public async Task<IActionResult> Toppings()
+        public async Task<IActionResult> Toppings(int page = 1)
         {
             ManagementCategory category = ManagementCategory.Topping;
 
-            AdminItemsOverviewViewWrapper view = await this.CreateItemsOverviewModel(category);
+            AdminItemsOverviewViewWrapper view 
+                = await this._menuManagementService.GetItemsFromCategory(category, page, PageSize);
 
             return this.View("Items", view);
         }
@@ -132,11 +137,12 @@
         }
 
         [HttpGet]
-        public async Task<IActionResult> ToppingCategories()
+        public async Task<IActionResult> ToppingCategories(int page = 1)
         {
             ManagementCategory category = ManagementCategory.ToppingCategory;
 
-            AdminItemsOverviewViewWrapper view = await this.CreateItemsOverviewModel(category);
+            AdminItemsOverviewViewWrapper view
+                = await this._menuManagementService.GetItemsFromCategory(category, page, PageSize);
 
             return this.View("Items", view);
         }
@@ -182,19 +188,6 @@
             AdminPizzaInputModel pizza = pizzaViewWrapper.Pizza;
             await this._menuManagementService.EditPizzaAsync(pizza);
             return this.RedirectToAction(nameof(EditPizza), new { id =  pizza.Id });
-        }
-
-        private async Task<AdminItemsOverviewViewWrapper> CreateItemsOverviewModel(ManagementCategory category)
-        {
-            IEnumerable<MenuItemViewModel> toppings = await this._menuManagementService
-                            .GetAllItemsFromCategory(category);
-
-            AdminItemsOverviewViewWrapper view = new()
-            {
-                Category = category,
-                Items = toppings
-            };
-            return view;
         }
     }
 }

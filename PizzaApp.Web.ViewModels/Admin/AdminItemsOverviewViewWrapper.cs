@@ -5,6 +5,10 @@
 
     public class AdminItemsOverviewViewWrapper
     {
+        public int CurrentPage { get; set; }
+
+        public int TotalPages { get; set; } 
+
         public ManagementCategory Category { get; set; }
 
         public IEnumerable<MenuItemViewModel> Items { get; set; } = new List<MenuItemViewModel>();

@@ -156,7 +156,19 @@
         {
             IQueryable<TEntity> query = this.DbSet.AsQueryable();
             query = this.ApplyConfiguration(query);
-            return await query.ToArrayAsync();
+            return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<TEntity>>TakeAsync(int take, int skip = 0)
+        {
+            IQueryable<TEntity> query = this.DbSet.Skip(skip).Take(take);
+            query = this.ApplyConfiguration(query);
+            return await query.ToListAsync();
+        }
+
+        public async Task<int> TotalEntityCountAsync()
+        {
+            return await this.DbSet.CountAsync();
         }
 
         /// <summary>
@@ -216,7 +228,7 @@
             EntityEntry changeTrackerEntry = this.DbSet.Update(item);
             return changeTrackerEntry.State == EntityState.Modified;
         }
-
+        
         /// <summary>
         /// Asynchronously checks if any entity in the DbSet satisfies a specified condition. 
         /// This method always performs a no-tracking query.

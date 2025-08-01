@@ -12,7 +12,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    using static PizzaApp.Services.Core.LookupHelper;
+    using static PizzaApp.Services.Core.RepositoryHelper;
     using static PizzaApp.Services.Common.ExceptionMessages;
 
     public class OrderService : IOrderService
