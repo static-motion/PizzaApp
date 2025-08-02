@@ -41,7 +41,7 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> PlaceOrder(OrderDetailsInputModel orderDetails)
+        public async Task<IActionResult> PlaceOrder(CartViewWrapper cart)
         {
             if (!this.ModelState.IsValid) // TODO: handle better lol
             {
@@ -49,7 +49,7 @@
             }
 
             Guid? userId = this.GetUserId();
-            await this._orderService.PlaceOrderAsync(orderDetails, userId!.Value);
+            await this._orderService.PlaceOrderAsync(cart.OrderDetails, userId!.Value);
             await this._cartService.ClearShoppingCart(userId!.Value);
 
             return this.RedirectToAction(nameof(Index));

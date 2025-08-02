@@ -5,11 +5,9 @@
 
     public interface IMenuService
     {
-        public Task<IEnumerable<MenuItemViewModel>> GetAllDessertsForMenuAsync();
-        public Task<IEnumerable<MenuItemViewModel>> GetAllDrinksForMenuAsync();
-        public Task<IEnumerable<MenuItemViewModel>> GetAllPizzasForMenuAsync();
         public Task<IReadOnlyCollection<MenuItemViewModel>> GetAllMenuItemsForCategoryAsync(MenuCategory category);
-        public Task<OrderPizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id);
-        public Task<OrderItemViewModel?> GetOrderItemDetailsAsync(int id, MenuCategory? categoryEnum);
+        public Task<PizzaDetailsViewWrapper> GetPizzaDetailsByIdAsync(int id);
+        Task<MenuItemDetailsViewModel> GetDrinkDetailsById(int id);
+        Task<MenuItemDetailsViewModel> GetDessertDetailsById(int id);
     }
 }

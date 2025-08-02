@@ -2,7 +2,7 @@
 {
     using PizzaApp.GCommon.Enums;
     using PizzaApp.Web.ViewModels.Pizzas;
-    public class AdminPizzaInputModel : PizzaInputModel
+    public class BasePizzaInputModel : PizzaInputModel
     {
         public int Id { get; set; }
 

@@ -6,7 +6,7 @@
     public interface IMenuManagementService
     {
         Task EditDoughAsync(EditDoughInputModel model);
-        Task EditPizzaAsync(AdminPizzaInputModel pizza);
+        Task EditPizzaAsync(BasePizzaInputModel pizza);
         Task EditSauceAsync(EditSauceInputModel inputSauce);
         Task EditToppingAsync(EditToppingInputModel inputTopping);
         Task EditToppingCategoryAsync(EditToppingCategoryInputModel inputModel);

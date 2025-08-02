@@ -135,7 +135,8 @@
                 IsActive = p.IsDeleted == false // the pizza must be active
                     && (p.Sauce == null || p.Sauce.IsDeleted == false) // the sauce must be either not set or active
                     && p.Dough.IsDeleted == false // the dough must be active
-                    && p.Toppings.All(t => t.Topping.IsDeleted == false && t.Topping.ToppingCategory.IsDeleted == false) // all toppings must be active
+                    && p.Toppings.All(t => t.Topping.IsDeleted == false 
+                    && t.Topping.ToppingCategory.IsDeleted == false) // all toppings must be active
             }));
 
         }
@@ -159,7 +160,7 @@
 
         public async Task<EditAdminPizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id)
         {
-            AdminPizzaInputModel? pizzaDetails = await this.GetPizzaDetailsViewModelByIdAsync(id);
+            BasePizzaInputModel? pizzaDetails = await this.GetPizzaDetailsViewModelByIdAsync(id);
 
             // return early if pizza does not exist
             if (pizzaDetails is null)
@@ -187,7 +188,7 @@
             return managePizzaView;
         }
 
-        private async Task<AdminPizzaInputModel?> GetPizzaDetailsViewModelByIdAsync(int id)
+        private async Task<BasePizzaInputModel?> GetPizzaDetailsViewModelByIdAsync(int id)
         {
             Pizza? pizza = await this._pizzaRepository
                 .DisableTracking()
@@ -196,7 +197,7 @@
             if (pizza is null)
                 return null; // TODO: change method signature and throw exception instead
 
-            return new AdminPizzaInputModel
+            return new BasePizzaInputModel
             {
                 Id = pizza.Id,
                 Name = pizza.Name,
@@ -213,7 +214,7 @@
 
         }
 
-        public async Task EditPizzaAsync(AdminPizzaInputModel inputModel)
+        public async Task EditPizzaAsync(BasePizzaInputModel inputModel)
         {
             Pizza? pizzaToEdit = await this._pizzaRepository.IgnoreFiltering().GetByIdWithIngredientsAsync(inputModel.Id);
 

@@ -185,7 +185,7 @@
         public async Task<IActionResult> EditPizza(EditAdminPizzaViewWrapper pizzaViewWrapper)
         {
             // TODO:
-            AdminPizzaInputModel pizza = pizzaViewWrapper.Pizza;
+            BasePizzaInputModel pizza = pizzaViewWrapper.Pizza;
             await this._menuManagementService.EditPizzaAsync(pizza);
             return this.RedirectToAction(nameof(EditPizza), new { id =  pizza.Id });
         }

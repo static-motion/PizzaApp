@@ -5,7 +5,7 @@
     public class OrderDetailsInputModel
     {
         [Required]
-        public int AddressId { get; set; }
+        public int? AddressId { get; set; }
 
         [Phone]
         [Required(ErrorMessage = "Phone number is required.")]

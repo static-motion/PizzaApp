@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Identity;
     using PizzaApp.Data.Models;
     using PizzaApp.Data.Repository.Interfaces;
+    using PizzaApp.Services.Common.Exceptions;
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels.Address;
 
@@ -22,7 +23,7 @@
         public async Task AddAddressAsync(Guid userId, AddressInputModel input)
         {
             User? user = await this._userRepository.GetByIdAsync(userId) 
-                ?? throw new ArgumentException("User not found");
+                ?? throw new ItemNotFoundException(UserNotFoundMessage, userId);
 
             user.Addresses.Add(new Address
             {
@@ -34,13 +35,13 @@
             await this._userRepository.SaveChangesAsync();
         }
 
-        public async Task DeleteAddressAsync(Guid userId, int id)
+        public async Task DeleteAddressAsync(Guid userId, int addressId)
         {
             User? user = await this._userRepository.GetUserWithAddressesAsync(userId)
-                ?? throw new ArgumentException(AddressNotFound);
+                ?? throw new ItemNotFoundException(UserNotFoundMessage, userId);
 
-            Address? address = user.Addresses.FirstOrDefault(a => a.Id == id)
-                ?? throw new ArgumentException(AddressNotFound);
+            Address? address = user.Addresses.FirstOrDefault(a => a.Id == addressId)
+                ?? throw new ItemNotFoundException(AddressNotFoundMessage, addressId);
 
             address.IsDeleted = true;
             await this._userRepository.SaveChangesAsync();

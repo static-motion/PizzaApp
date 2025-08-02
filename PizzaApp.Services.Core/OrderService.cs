@@ -37,7 +37,10 @@
         }
         public async Task<IEnumerable<OrderViewWrapper>> GetOrdersAsync(Guid userId)
         {
-            IEnumerable<Order> orders = await this._orderRepository.GetOrdersByUserIdAsync(userId);
+            IEnumerable<Order> orders = await this._orderRepository
+                .IgnoreFiltering()
+                .DisableTracking()
+                .GetOrdersByUserIdAsync(userId);
 
             if (orders == null || !orders.Any())
             {
@@ -47,11 +50,12 @@
             List<OrderViewWrapper> orderViewModels = new List<OrderViewWrapper>();
 
             IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
+                .IgnoreFiltering()
                 .DisableTracking()
                 .GetAllWithToppingsAsync();
 
-            Dictionary<int, Dough> doughLookup = await GetEntityLookup(this._doughRepository);
-            Dictionary<int, Sauce> sauceLookup = await GetEntityLookup(this._sauceRepository);
+            Dictionary<int, Dough> doughLookup = await GetEntityLookup(this._doughRepository, ignoreFiltering: true);
+            Dictionary<int, Sauce> sauceLookup = await GetEntityLookup(this._sauceRepository, ignoreFiltering: true);
 
             foreach (Order order in orders)
             {
@@ -100,8 +104,8 @@
         public async Task PlaceOrderAsync(OrderDetailsInputModel orderDetails, Guid userId)
         {
             User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId)
-                ?? throw new InvalidOperationException(UserNotFound); // TODO: Get user with addresses to validate
-                                                                      // that the user is trying to order to an address they own
+                ?? throw new InvalidOperationException(UserNotFoundMessage); // TODO: Get user with addresses to validate
+                                                                             // that the user is trying to order to an address they own
 
             if (user.ShoppingCartPizzas.Count == 0
                 && user.ShoppingCartDrinks.Count == 0
@@ -131,7 +135,7 @@
                 UserId = user.Id,
                 User = user,
                 PhoneNumber = orderDetails.PhoneNumber, // TODO: handle phone number validation
-                AddressId = orderDetails.AddressId,
+                AddressId = orderDetails.AddressId!.Value, 
                 Comment = orderDetails.Comment,
                 CreatedOn = DateTime.UtcNow,
                 OrderStatus = OrderStatus.Received,

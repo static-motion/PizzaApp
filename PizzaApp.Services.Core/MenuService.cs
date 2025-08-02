@@ -6,9 +6,12 @@
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels;
     using PizzaApp.Web.ViewModels.Menu;
+    using PizzaApp.Services.Common.Exceptions;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Threading.Tasks;
+
+    using static PizzaApp.Services.Common.ExceptionMessages;
 
     public class MenuService : IMenuService
     {
@@ -39,7 +42,7 @@
             };
         }
 
-        public async Task<IEnumerable<MenuItemViewModel>> GetAllPizzasForMenuAsync()
+        private async Task<IEnumerable<MenuItemViewModel>> GetAllPizzasForMenuAsync()
         {
             IEnumerable<Pizza> allPizzas = await this._pizzaRepository.GetAllBasePizzasAsync();
             
@@ -54,7 +57,7 @@
                 });
         }
 
-        public async Task<IEnumerable<MenuItemViewModel>> GetAllDrinksForMenuAsync()
+        private async Task<IEnumerable<MenuItemViewModel>> GetAllDrinksForMenuAsync()
         {
             IEnumerable<Drink> allDrinks = await this._drinkRepository.GetAllAsync();
             
@@ -69,7 +72,7 @@
                 });
         }
 
-        public async Task<IEnumerable<MenuItemViewModel>> GetAllDessertsForMenuAsync()
+        private async Task<IEnumerable<MenuItemViewModel>> GetAllDessertsForMenuAsync()
         {
             IEnumerable<Dessert> allDesserts = await this._dessertRepository.GetAllAsync();
 
@@ -90,9 +93,8 @@
 
             // check if the category exists in the lookup
             if (!this._menuCategoryMethodLookup.TryGetValue(category, out var method))
-            {
-                return [];
-            }
+                throw new MenuCategoryNotImplementedException
+                    (MenuCategoryNotImplementedMessage, category.ToString());
 
             // invoke the method to get the menu items
             menuItems = (await method()).ToImmutableList();
@@ -106,20 +108,21 @@
             return menuItems;
         }
 
-        public async Task<OrderPizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id)
+        public async Task<PizzaDetailsViewWrapper> GetPizzaDetailsByIdAsync(int id)
         {
-            PizzaDetailsViewModel? pizzaDetails = await this.GetPizzaDetailsViewModelByIdAsync(id);
+            CustomizePizzaInputModel pizzaDetails = await this.GetPizzaDetailsViewModelByIdAsync(id)
+                ?? throw new ItemNotFoundException(PizzaNotFoundMessage, id);
 
-            // return early if pizza does not exist
-            if (pizzaDetails is null)
-                return null;
+            IReadOnlyList<ToppingCategoryViewWrapper> allToppingsByCategories 
+                = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync();
 
-            IReadOnlyList<ToppingCategoryViewWrapper> allToppingsByCategories = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync();
-            IReadOnlyList<DoughViewModel> allDoughs = await this._pizzaIngredientsService.GetAllDoughsAsync(disableTracking: true);
-            IReadOnlyList<SauceViewModel> allSauces = await this._pizzaIngredientsService.GetAllSaucesAsync(disableTracking: true);
+            IReadOnlyList<DoughViewModel> allDoughs 
+                = await this._pizzaIngredientsService.GetAllDoughsAsync(disableTracking: true);
 
-            // create the model
-            OrderPizzaViewWrapper orderPizzaView = new()
+            IReadOnlyList<SauceViewModel> allSauces 
+                = await this._pizzaIngredientsService.GetAllSaucesAsync(disableTracking: true);
+
+            PizzaDetailsViewWrapper orderPizzaView = new()
             {
                 Pizza = pizzaDetails,
                 Ingredients = new PizzaIngredientsViewWrapper
@@ -133,13 +136,17 @@
             return orderPizzaView;
         }
 
-        private async Task<PizzaDetailsViewModel?> GetPizzaDetailsViewModelByIdAsync(int id)
+        private async Task<CustomizePizzaInputModel?> GetPizzaDetailsViewModelByIdAsync(int id)
         {
-            Pizza? pizza = await this._pizzaRepository.GetByIdWithIngredientsAsync(id);
+            Pizza? pizza = await this._pizzaRepository
+                                     .DisableTracking()
+                                     .GetByIdWithIngredientsAsync(id);
+            
+            
             if (pizza is null)
                 return null;
 
-            return new PizzaDetailsViewModel
+            return new CustomizePizzaInputModel
             {
                 Id = pizza.Id,
                 Name = pizza.Name,
@@ -155,24 +162,12 @@
         
         }
 
-        public async Task<OrderItemViewModel?> GetOrderItemDetailsAsync(int id, MenuCategory? category)
+        public async Task<MenuItemDetailsViewModel> GetDrinkDetailsById(int id)
         {
-            return category switch
-            {
-                MenuCategory.Drinks => await this.GetDrinkById(id),
-                MenuCategory.Desserts => await this.GetDessertById(id),
-                _ => null
-            };
-        }
+            Drink drink = await this._drinkRepository.GetByIdAsync(id) 
+                ?? throw new ItemNotFoundException(DrinkNotFoundMessage, id);
 
-        private async Task<OrderItemViewModel?> GetDrinkById(int id)
-        {
-            Drink? drink = await this._drinkRepository.GetByIdAsync(id);
-
-            if (drink is null)
-                return null;
-
-            return new OrderItemViewModel()
+            return new MenuItemDetailsViewModel()
             {
                 Id = drink.Id,
                 Name = drink.Name,
@@ -183,14 +178,12 @@
             };
         }
 
-        private async Task<OrderItemViewModel?> GetDessertById(int id)
+        public async Task<MenuItemDetailsViewModel> GetDessertDetailsById(int id)
         {
-            Dessert? dessert = await this._dessertRepository.GetByIdAsync(id);
+            Dessert dessert = await this._dessertRepository.GetByIdAsync(id)
+                ?? throw new ItemNotFoundException(DessertNotFoundMessage, id);
 
-            if (dessert is null)
-                return null;
-
-            return new OrderItemViewModel()
+            return new MenuItemDetailsViewModel()
             {
                 Id = dessert.Id,
                 Name = dessert.Name,

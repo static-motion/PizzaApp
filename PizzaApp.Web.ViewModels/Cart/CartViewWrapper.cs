@@ -4,7 +4,7 @@
 
     public class CartViewWrapper
     {
-        public CartItemsViewWrapper Items { get; set; } = null!;
+        public CartItemsViewWrapper? Items { get; set; }
 
         public OrderDetailsInputModel OrderDetails { get; set; } = null!;
         

@@ -6,6 +6,7 @@
     using PizzaApp.GCommon.Enums;
     using PizzaApp.GCommon.Extensions;
     using PizzaApp.Services.Common.Dtos;
+    using PizzaApp.Services.Common.Exceptions;
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels.Menu;
 
@@ -35,74 +36,125 @@
         [AllowAnonymous]
         public async Task<IActionResult> Category(string category)
         {
-            MenuCategory? categoryEnum = MenuCategoryExtensions.FromString(category);
-
-            if (categoryEnum is null)
-                return this.NotFound();
-
-            IEnumerable<MenuItemViewModel> menuItems 
-                = await this._menuService.GetAllMenuItemsForCategoryAsync(categoryEnum.Value);
-
-            MenuCategoryViewWrapper menuView = new()
+            try
             {
-                Items = menuItems,
-                AllCategories = CategoryNames
-            };
+                MenuCategory? categoryEnum = MenuCategoryExtensions.FromString(category);
 
-            return this.View(menuView);
+                if (categoryEnum is null)
+                    return this.NotFound();
+
+                IEnumerable<MenuItemViewModel> menuItems
+                    = await this._menuService.GetAllMenuItemsForCategoryAsync(categoryEnum.Value);
+
+                MenuCategoryViewWrapper menuView = new()
+                {
+                    Items = menuItems,
+                    AllCategories = CategoryNames
+                };
+
+                return this.View(menuView);
+            }
+            catch (MenuCategoryNotImplementedException)
+            {
+                return this.BadRequest(); //TODO: Log message
+            }
+            catch (Exception)
+            {
+                return this.BadRequest();
+            }
         }
 
-        [HttpGet("/Menu/{category}/{id:int}")]
-        public async Task<IActionResult> ItemDetails(int id, string category)
+        [HttpGet]
+        public async Task<IActionResult> Pizzas(int id)
         {
-            MenuCategory? categoryEnum = MenuCategoryExtensions.FromString(category);
-
-            if (categoryEnum is null)
-                return this.NotFound();
-
-            if (categoryEnum == MenuCategory.Pizzas)
+            try
             {
-                OrderPizzaViewWrapper? orderPizzaViewModel 
+                PizzaDetailsViewWrapper orderPizzaViewModel
                     = await this._menuService.GetPizzaDetailsByIdAsync(id);
-
-                if (orderPizzaViewModel is null)
-                    return this.NotFound();
 
                 return this.View("PizzaDetails", orderPizzaViewModel);
             }
-
-            OrderItemViewModel? orderItem 
-                = await this._menuService.GetOrderItemDetailsAsync(id, categoryEnum);
-
-            if (orderItem is null)
+            catch (ItemNotFoundException)
+            {
                 return this.NotFound();
-
-            return this.View("ItemDetails", orderItem);
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(); // TODO: Log
+            }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Drinks(int id)
+        {
+            try
+            {
+                MenuItemDetailsViewModel orderItem
+                    = await this._menuService.GetDrinkDetailsById(id);
+                return this.View("ItemDetails", orderItem);
+            }
+            catch (ItemNotFoundException)
+            {
+                return this.NotFound();
+            }
+            catch (Exception)
+            {
+                return this.BadRequest();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Desserts(int id)
+        {
+            try
+            {
+                MenuItemDetailsViewModel orderItem
+                    = await this._menuService.GetDessertDetailsById(id);
+                return this.View("ItemDetails", orderItem);
+            }
+            catch (ItemNotFoundException)
+            {
+                return this.NotFound();
+            }
+            catch (Exception)
+            {
+                return this.BadRequest();
+            }
+        }
+
         [HttpPost]
-        public async Task<IActionResult> AddPizzaToCart(OrderPizzaViewWrapper? orderPizzaViewModel)
+        public async Task<IActionResult> AddPizzaToCart(PizzaDetailsViewWrapper? orderPizzaViewModel)
         {
             if (orderPizzaViewModel is null)
             {
                 // TODO: Handle better
                 return this.BadRequest("Invalid pizza details.");
             }
+            if (!this.ModelState.IsValid)
+            {
+                return this.BadRequest(); // TODO:
+            }
+
             Guid? userId = this.GetUserId();
 
+            CustomizePizzaInputModel input = orderPizzaViewModel.Pizza;
+            
             PizzaCartDto pizzaDto = new()
             {
-                PizzaId = orderPizzaViewModel.Pizza.Id,
-                DoughId = orderPizzaViewModel.Pizza.DoughId,
-                SauceId = orderPizzaViewModel.Pizza.SauceId,
-                SelectedToppingsIds = orderPizzaViewModel.SelectedToppingIds,
-                Quantity = orderPizzaViewModel.Pizza.Quantity
+                PizzaId = input.Id,
+                DoughId = input.DoughId,
+                SauceId = input.SauceId,
+                SelectedToppingsIds = input.SelectedToppingIds.ToArray(),
+                Quantity = input.Quantity
             };
-            bool addedToCart = await this._cartService.AddPizzaToCartAsync(pizzaDto, userId!.Value);
+            bool addedToCart = await this._cartService
+                .AddPizzaToCartAsync(pizzaDto, userId!.Value);
+
             return this.RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddItemToCart(OrderItemViewModel? orderItem)
+        public async Task<IActionResult> AddItemToCart(MenuItemDetailsViewModel? orderItem)
         {
             if (orderItem is null)
             {
@@ -111,11 +163,14 @@
             }
             if (!this.ModelState.IsValid)
             {
+                return this.BadRequest();
                 // TODO: Handle
             }
             Guid? userId = this.GetUserId(); // TODO: handle null userId
 
-            bool addedToCart = await this._cartService.AddItemToCartAsync(orderItem, userId!.Value);
+            bool addedToCart = await this._cartService
+                .AddItemToCartAsync(orderItem, userId!.Value);
+
             return this.RedirectToAction(nameof(Index));
         }
     }

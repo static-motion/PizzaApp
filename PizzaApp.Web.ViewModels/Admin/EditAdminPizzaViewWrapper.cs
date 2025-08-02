@@ -3,6 +3,6 @@
     public class EditAdminPizzaViewWrapper
     {
         public PizzaIngredientsViewWrapper Ingredients { get; set; } = null!;
-        public AdminPizzaInputModel Pizza { get; set; } = null!;
+        public BasePizzaInputModel Pizza { get; set; } = null!;
     }
 }

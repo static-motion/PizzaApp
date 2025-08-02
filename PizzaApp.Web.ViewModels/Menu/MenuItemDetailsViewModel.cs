@@ -3,7 +3,7 @@
     using PizzaApp.GCommon.Enums;
     using System.ComponentModel.DataAnnotations;
 
-    public class OrderItemViewModel
+    public class MenuItemDetailsViewModel
     {
         [Required]
         public int Id { get; set; }

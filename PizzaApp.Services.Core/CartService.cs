@@ -6,6 +6,7 @@
     using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.GCommon.Enums;
     using PizzaApp.Services.Common.Dtos;
+    using PizzaApp.Services.Common.Exceptions;
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels;
     using PizzaApp.Web.ViewModels.Address;
@@ -43,7 +44,7 @@
             this._dessertRepository = dessertRepository;
         }
 
-        public async Task<bool> AddItemToCartAsync(OrderItemViewModel orderItem, Guid userId)
+        public async Task<bool> AddItemToCartAsync(MenuItemDetailsViewModel orderItem, Guid userId)
         {
             User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId);
 
@@ -62,7 +63,7 @@
             return result;
         }
 
-        private async Task<bool> AddDrinkToCartAsync(OrderItemViewModel item, User user)
+        private async Task<bool> AddDrinkToCartAsync(MenuItemDetailsViewModel item, User user)
         {
             Drink? drink = await this._drinkRepository.GetByIdAsync(item.Id);
 
@@ -87,7 +88,7 @@
             return true;
         }
 
-        private async Task<bool> AddDessertToCartAsync(OrderItemViewModel item, User user)
+        private async Task<bool> AddDessertToCartAsync(MenuItemDetailsViewModel item, User user)
         {
             Dessert? dessert = await this._dessertRepository.GetByIdAsync(item.Id);
 
@@ -165,7 +166,7 @@
         public async Task<CartViewWrapper> GetUserCart(Guid userId)
         {
             User? user = await this._userRepository.GetUserWithAddressesAndCartAsync(userId)
-                ?? throw new InvalidOperationException(UserNotFound);
+                ?? throw new InvalidOperationException(UserNotFoundMessage);
 
             IEnumerable<CartPizzaViewModel> pizzasInCart = await this.GetAllPizzasInCart(user);
             IEnumerable<CartDrinkViewModel> drinksInCart = GetAllDrinksInCart(user);
@@ -192,7 +193,8 @@
                 Addresses = addresses,
                 OrderDetails = new OrderDetailsInputModel()
                 {
-                    PhoneNumber = user.PhoneNumber
+                    PhoneNumber = user.PhoneNumber,
+                    AddressId = addresses.FirstOrDefault()?.Id ?? null,
                 }
             };
 
@@ -212,7 +214,7 @@
                 }).ToList();
         }
 
-        private static IEnumerable<CartDrinkViewModel> GetAllDrinksInCart(User user)
+        private static List<CartDrinkViewModel> GetAllDrinksInCart(User user)
         {
             return user.ShoppingCartDrinks
                 .Select(d => new CartDrinkViewModel
@@ -239,7 +241,7 @@
             foreach (ShoppingCartPizza pizza in user.ShoppingCartPizzas)
             {
                 // load base pizza
-                Pizza? basePizza = await this._pizzaRepository.GetByIdAsync(pizza.BasePizzaId);
+                Pizza? basePizza = await this._pizzaRepository.IgnoreFiltering().GetByIdAsync(pizza.BasePizzaId);
 
                 PizzaComponentsDto components =
                     pizza.GetComponentsFromJson()
@@ -256,46 +258,53 @@
                     saucesLookup[components.SauceId.Value]
                     : null;
 
-                // this is stupid I hate the repository pattern
-                CartPizzaViewModel pizzaViewModel = new()
+                try
                 {
-                    Id = pizza.Id,
-                    Name = basePizza.Name,
-                    DoughName = dough?.Type ?? "Unknown Dough",
-                    SauceName = sauce?.Type ?? "No Sauce",
-                    Quantity = pizza.Quantity
-                };
-
-                foreach (int toppingId in components.SelectedToppings)
-                {
-                    Topping? topping = allToppingCategories.SelectMany(tc => tc.Toppings)
-                        .FirstOrDefault(t => t.Id == toppingId);
-                    if (topping is null)
+                    CartPizzaViewModel pizzaViewModel = new()
                     {
-                        continue; // TODO: handle missing topping
+                        Id = pizza.Id,
+                        Name = basePizza.Name,
+                        DoughName = dough.Type,
+                        SauceName = sauce?.Type ?? "No Sauce",
+                        Quantity = pizza.Quantity
+                    };
+
+                    foreach (int toppingId in components.SelectedToppings)
+                    {
+                        Topping? topping = allToppingCategories.SelectMany(tc => tc.Toppings)
+                            .FirstOrDefault(t => t.Id == toppingId)
+                        ?? throw new DeletedOrInactiveToppingException(DeletedOrInactiveToppingMessage, toppingId);
+                        if (topping is null)
+                        {
+                            continue; // TODO: handle missing topping
+                        }
+
+                        string categoryName = topping.ToppingCategory.Name;
+
+                        if (!pizzaViewModel.Toppings.TryGetValue(categoryName, out List<ToppingViewModel>? categoryItems))
+                        {
+                            categoryItems = new List<ToppingViewModel>();
+                            pizzaViewModel.Toppings.Add(categoryName, categoryItems);
+                        }
+
+                        categoryItems.Add(new ToppingViewModel()
+                        {
+                            Id = topping.Id,
+                            Name = topping.Name,
+                            Price = topping.Price
+                        });
                     }
 
-                    string categoryName = topping.ToppingCategory.Name;
+                    pizzaViewModel.Price = pizzaViewModel.Toppings.Values
+                        .SelectMany(t => t)
+                        .Sum(t => t.Price) + dough.Price + sauce?.Price ?? 0;
 
-                    if (!pizzaViewModel.Toppings.TryGetValue(categoryName, out List<ToppingViewModel>? categoryItems))
-                    {
-                        categoryItems = new List<ToppingViewModel>();
-                        pizzaViewModel.Toppings.Add(categoryName, categoryItems);
-                    }
-
-                    categoryItems.Add(new ToppingViewModel()
-                    {
-                        Id = topping.Id,
-                        Name = topping.Name,
-                        Price = topping.Price
-                    });
+                    pizzasInCart.Add(pizzaViewModel);
                 }
-
-                pizzaViewModel.Price = pizzaViewModel.Toppings.Values
-                    .SelectMany(t => t)
-                    .Sum(t => t.Price) + dough.Price + sauce.Price;
-
-                pizzasInCart.Add(pizzaViewModel);
+                catch (DeletedOrInactiveToppingException)
+                {
+                    continue;
+                }
 
             }
             return pizzasInCart;
@@ -339,7 +348,7 @@
         public async Task ClearShoppingCart(Guid userId)
         {
             User? user = await this._userRepository.GetUserWithAddressesAndCartAsync(userId)
-                ?? throw new InvalidOperationException(UserNotFound);
+                ?? throw new InvalidOperationException(UserNotFoundMessage);
             user.ShoppingCartPizzas.Clear();
             user.ShoppingCartDrinks.Clear();
             user.ShoppingCartDesserts.Clear();
