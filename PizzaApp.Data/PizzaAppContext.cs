@@ -44,6 +44,8 @@
 
         public DbSet<ShoppingCartPizza> ShoppingCartsPizzas { get; set; }
 
+        public bool BypassToppingFilters { get; set; } = false;
+
         public PizzaAppContext(DbContextOptions<PizzaAppContext> options)
             : base(options)
         {
@@ -53,6 +55,14 @@
         { 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Topping>()
+                .HasQueryFilter(e => this.BypassToppingFilters ||
+                    (e.IsDeleted == false && e.ToppingCategory.IsDeleted == false));
+
+            modelBuilder.Entity<ToppingCategory>()
+                .HasQueryFilter(e => this.BypassToppingFilters ||
+                    (e.IsDeleted == false));
         }
     }
 }

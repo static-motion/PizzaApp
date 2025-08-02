@@ -2,6 +2,7 @@
 {
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
+    using PizzaApp.Data.Models;
     using PizzaApp.Data.Models.Interfaces;
     using PizzaApp.Data.Repository.Interfaces;
     using System.Linq.Expressions;
@@ -32,12 +33,12 @@
         /// <summary>
         /// A flag indicating whether global query filters should be ignored for the current query. This flag is reset after ApplyConfiguration is called.
         /// </summary>
-        protected bool IgnoreFilters = false;
+        protected bool ShouldIgnoreFilters = false;
 
         /// <summary>
         /// A flag indicating whether the query should be executed without change tracking. This flag is reset after ApplyConfiguration is called.
         /// </summary>
-        protected bool AsNoTracking = false;
+        protected bool ShouldNotTrack = false;
 
         /// <summary>
         /// Initializes a new instance of the BaseRepository class.
@@ -56,7 +57,7 @@
         /// <returns>The current TRepository instance, allowing for method chaining.</returns>
         public TRepository IgnoreFiltering()
         {
-            IgnoreFilters = true;
+            ShouldIgnoreFilters = true;
             return (TRepository)this;
         }
         /// <summary>
@@ -67,7 +68,7 @@
         /// <returns>The current TRepository instance, allowing for method chaining.</returns>
         public TRepository DisableTracking()
         {
-            AsNoTracking = true;
+            ShouldNotTrack = true;
             return (TRepository)this;
         }
 
@@ -123,7 +124,10 @@
             IQueryable<TEntity> query = this.DbSet.AsQueryable();
             query = this.ApplyConfiguration(query);
 
-            return await query.FirstOrDefaultAsync(predicate);
+            TEntity? result = await query.FirstOrDefaultAsync(predicate);
+            this.DbContext.BypassToppingFilters = false;
+
+            return result;
         }
 
         /// <summary>
@@ -134,15 +138,19 @@
         /// <returns>The configured IQueryable<TEntity>.</returns>
         protected IQueryable<TEntity> ApplyConfiguration(IQueryable<TEntity> query)
         {
-            if (this.AsNoTracking)
+            if (typeof(TEntity) == typeof(Pizza) && !this.ShouldIgnoreFilters)
+            {
+                this.DbContext.BypassToppingFilters = true;
+            }
+            if (this.ShouldNotTrack)
             {
                 query = query.AsNoTracking();
-                this.AsNoTracking = false;
+                this.ShouldNotTrack = false;
             }
-            if (this.IgnoreFilters)
+            if (this.ShouldIgnoreFilters)
             {
                 query = query.IgnoreQueryFilters();
-                this.IgnoreFilters = false;
+                this.ShouldIgnoreFilters = false;
             }
 
             return query;
@@ -156,19 +164,34 @@
         {
             IQueryable<TEntity> query = this.DbSet.AsQueryable();
             query = this.ApplyConfiguration(query);
-            return await query.ToListAsync();
+
+            IEnumerable<TEntity> result = await query.ToListAsync();
+
+            this.DbContext.BypassToppingFilters = false;
+
+            return result;
         }
 
         public async Task<IEnumerable<TEntity>>TakeAsync(int take, int skip = 0)
         {
             IQueryable<TEntity> query = this.DbSet.Skip(skip).Take(take);
             query = this.ApplyConfiguration(query);
-            return await query.ToListAsync();
+
+            IEnumerable<TEntity> result = await query.ToListAsync();
+            this.DbContext.BypassToppingFilters = false;
+
+            return result;
         }
 
         public async Task<int> TotalEntityCountAsync()
         {
-            return await this.DbSet.CountAsync();
+            IQueryable<TEntity> query = this.DbSet.AsQueryable();
+            query = this.ApplyConfiguration(query);
+
+            int result = await query.CountAsync();
+            this.DbContext.BypassToppingFilters = false;
+
+            return result;
         }
 
         /// <summary>
@@ -176,11 +199,14 @@
         /// </summary>
         /// <param name="id">The primary key of the entity to retrieve.</param>
         /// <returns>A Task that represents the asynchronous operation. The task result contains the entity with the specified ID, or null if not found.</returns>
-        public Task<TEntity?> GetByIdAsync(TKey id)
+        public async Task<TEntity?> GetByIdAsync(TKey id)
         {
             IQueryable<TEntity> query = this.DbSet.AsQueryable();
             query = this.ApplyConfiguration(query);
-            return query.FirstOrDefaultAsync(e => e.Id.Equals(id));
+            TEntity? result = await query.FirstOrDefaultAsync(e => e.Id.Equals(id));
+            this.DbContext.BypassToppingFilters = false;
+
+            return result;
         }
 
         /// <summary>
@@ -214,7 +240,11 @@
         {
             IQueryable<TEntity> query = this.DbSet.AsQueryable();
             query = this.ApplyConfiguration(query);
-            return await query.SingleOrDefaultAsync(predicate);
+
+            TEntity? result = await query.SingleOrDefaultAsync(predicate);
+            this.DbContext.BypassToppingFilters = false;
+
+            return result;
         }
 
         /// <summary>
@@ -236,10 +266,15 @@
         /// <param name="predicate">A function to test each element for a condition.</param>
         /// <returns>A Task that represents the asynchronous operation. 
         /// The task result contains true if any entity satisfies the condition, otherwise false.</returns>
-        public Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
+        public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
         {
             IQueryable<TEntity> query = this.DbSet.AsQueryable();
-            return query.AsNoTracking().AnyAsync(predicate);
+            query = this.ApplyConfiguration(query);
+
+            bool result = await query.AsNoTracking().AnyAsync(predicate);
+            this.DbContext.BypassToppingFilters = false;
+
+            return result;
         }
 
         /// <summary>
@@ -255,13 +290,14 @@
         {
             IQueryable<TEntity> query = this.DbSet.AsQueryable();
             query = this.ApplyConfiguration(query);
-            IEnumerable<TEntity> entities = await query.Where(e => ids.Contains(e.Id)).ToListAsync();
-            if (entities.Count() != ids.Count())
+            IEnumerable<TEntity> result = await query.Where(e => ids.Contains(e.Id)).ToListAsync();
+            if (result.Count() != ids.Count())
             {
                 throw new InvalidOperationException("Not all entities were found for the provided IDs.");
             }
+            this.DbContext.BypassToppingFilters = false;
 
-            return entities;
+            return result;
         }
     }
 }

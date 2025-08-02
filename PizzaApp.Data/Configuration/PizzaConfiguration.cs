@@ -56,7 +56,8 @@
                     e.IsDeleted == false // the pizza must be active
                     && (e.Sauce == null || e.Sauce.IsDeleted == false) // the sauce must be either not set or active
                     && e.Dough.IsDeleted == false // the dough must be active
-                    && e.Toppings.All(t => t.Topping.IsDeleted == false) // all toppings must be active
+                    && e.Toppings.All(t => t.Topping.IsDeleted == false // all toppings must be active
+                    && t.Topping.ToppingCategory.IsDeleted == false) // all categories must be active
                 );
         }
     }

@@ -1,10 +1,10 @@
 ﻿namespace PizzaApp.Data.Repository
 {
+    using GCommon.Enums;
     using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data.Models;
     using PizzaApp.Data.Repository.Interfaces;
     using System.Collections.Generic;
-    using GCommon.Enums;
 
     public class PizzaRepository : BaseRepository<Pizza, int, PizzaRepository>, IPizzaRepository
     {
@@ -18,7 +18,10 @@
             IQueryable<Pizza> query = this.DbSet.Where(p => p.PizzaType == PizzaType.BasePizza);
             query = this.ApplyConfiguration(query);
 
-            return await query.ToListAsync();
+            ICollection<Pizza> result = await query.ToListAsync();
+            this.DbContext.BypassToppingFilters = false;
+
+            return result;
         }
 
         public async Task<ICollection<Pizza>> TakeBasePizzasWithIngredientsAsync(int take, int skip = 0)
@@ -35,7 +38,9 @@
 
             query = this.ApplyConfiguration(query);
 
-            return await query.ToListAsync();
+            ICollection<Pizza> result = await query.ToListAsync();
+            this.DbContext.BypassToppingFilters = false;
+            return result;
         }
 
         public async Task<Pizza?> GetByIdWithIngredientsAsync(int id)
@@ -47,12 +52,9 @@
 
             query = this.ApplyConfiguration(query);
 
-            return await query.FirstOrDefaultAsync(p => p.Id == id);
-        }
-
-        public IQueryable<Pizza> GetAllBasePizzasAsync(int id)
-        {
-            throw new NotImplementedException();
+            Pizza? result = await query.FirstOrDefaultAsync(p => p.Id == id);
+            this.DbContext.BypassToppingFilters = false;
+            return result;
         }
     }
 }
