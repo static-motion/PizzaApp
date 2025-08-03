@@ -23,7 +23,7 @@
         public async Task AddAddressAsync(Guid userId, AddressInputModel input)
         {
             User? user = await this._userRepository.GetByIdAsync(userId) 
-                ?? throw new ItemNotFoundException(UserNotFoundMessage, userId);
+                ?? throw new EntityNotFoundException(UserNotFoundMessage, userId);
 
             user.Addresses.Add(new Address
             {
@@ -38,10 +38,10 @@
         public async Task DeleteAddressAsync(Guid userId, int addressId)
         {
             User? user = await this._userRepository.GetUserWithAddressesAsync(userId)
-                ?? throw new ItemNotFoundException(UserNotFoundMessage, userId);
+                ?? throw new EntityNotFoundException(UserNotFoundMessage, userId);
 
             Address? address = user.Addresses.FirstOrDefault(a => a.Id == addressId)
-                ?? throw new ItemNotFoundException(AddressNotFoundMessage, addressId);
+                ?? throw new EntityNotFoundException(AddressNotFoundMessage, addressId);
 
             address.IsDeleted = true;
             await this._userRepository.SaveChangesAsync();

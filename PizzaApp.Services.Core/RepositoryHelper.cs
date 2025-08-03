@@ -9,7 +9,7 @@
         public static async Task<Dictionary<TKey, TEntity>> GetEntityLookup<TKey, TEntity, TRepository>(IRepository<TEntity, TKey, TRepository> repository, bool ignoreFiltering = false)
             where TKey : notnull 
             where TEntity : class, IEntity<TKey>, new()
-            where TRepository : BaseRepository<TEntity, TKey, TRepository>
+            where TRepository : IRepository<TEntity, TKey, TRepository>
         {
             repository.DisableTracking();
 

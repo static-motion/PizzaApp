@@ -44,6 +44,11 @@
             this._dessertRepository = dessertRepository;
         }
 
+        public static async Task RepoTest(IDessertRepository dessertRepository)
+        {
+            var test = await dessertRepository.IgnoreFiltering().GetAllAsync();
+        }
+
         public async Task<bool> AddItemToCartAsync(MenuItemDetailsViewModel orderItem, Guid userId)
         {
             User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId);
@@ -90,7 +95,7 @@
 
         private async Task<bool> AddDessertToCartAsync(MenuItemDetailsViewModel item, User user)
         {
-            Dessert? dessert = await this._dessertRepository.GetByIdAsync(item.Id);
+            Dessert? dessert = await this._dessertRepository.IgnoreFiltering().GetByIdAsync(item.Id);
 
             if (dessert is null)
                 return false;
@@ -116,14 +121,10 @@
         }
 
         // TODO: refactor later
-        public async Task<bool> AddPizzaToCartAsync(PizzaCartDto pizzaDto, Guid userId)
+        public async Task AddPizzaToCartAsync(PizzaCartDto pizzaDto, Guid userId)
         {
-            User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId);
-
-            if (user is null)
-            {
-                return false;
-            }
+            User user = await this._userRepository.GetUserWithShoppingCartAsync(userId)
+                ?? throw new EntityNotFoundException(UserNotFoundMessage, userId.ToString());
 
             PizzaComponentsDto components = new()
             {
@@ -159,7 +160,6 @@
             }
 
             await this._userRepository.SaveChangesAsync();
-            return true;
         }
 
         //TODO: The current cart index view doesn't use all properties from the view models. Fix when possible.
@@ -233,30 +233,45 @@
                 .DisableTracking()
                 .GetAllWithToppingsAsync();
 
-            Dictionary<int, Dough> doughsById = await GetEntityLookup(this._doughRepository);
-            Dictionary<int, Sauce> saucesLookup = await GetEntityLookup(this._sauceRepository);
+            Dictionary<int, Dough> doughsLookup = await GetEntityLookup(this._doughRepository);
+            Dictionary<int, Sauce> saucesLookup = await GetEntityLookup(this._sauceRepository, ignoreFiltering: true);
 
             List<CartPizzaViewModel> pizzasInCart = new();
 
             foreach (ShoppingCartPizza pizza in user.ShoppingCartPizzas)
             {
                 // load base pizza
-                Pizza? basePizza = await this._pizzaRepository.IgnoreFiltering().GetByIdAsync(pizza.BasePizzaId);
+                Pizza basePizza = await this._pizzaRepository
+                    .DisableTracking()
+                    .IgnoreFiltering()
+                    .GetByIdAsync(pizza.BasePizzaId)
+                    ?? throw new EntityNotFoundException(PizzaNotFoundMessage, pizza.BasePizzaId);
 
-                PizzaComponentsDto components =
-                    pizza.GetComponentsFromJson()
-                    ?? throw new InvalidOperationException("Pizza components not found or invalid.");
+                PizzaComponentsDto components = pizza.GetComponentsFromJson()
+                    ?? throw new InvalidOperationException("Pizza components not found or invalid."); //TODO: handle more gracefully
+                
 
-                if (basePizza is null)
-                {
-                    throw new InvalidOperationException($"Base pizza with ID {pizza.BasePizzaId} not found.");
-                }
                 // load dough and sauce
-                Dough dough = doughsById[components.DoughId]; //TODO:
+                if (!doughsLookup.TryGetValue(components.DoughId, out Dough? dough))
+                {
+                    continue;
+                }
 
-                Sauce? sauce = components.SauceId.HasValue ?
-                    saucesLookup[components.SauceId.Value]
-                    : null;
+                Sauce? sauce = null;
+                // this is done because selecting a sauce for the pizza is not mandatory.
+                // we need to differenciate between when a user has not picked a sauce and
+                // when the sauce has been disabled (IsDeleted = true)
+                // if SauceId doesn't have a value we can conclude that the user has not picked a sauce.
+                if (components.SauceId.HasValue) // if the SauceId has value
+                {                                // we try to get it from the lookup dictionary
+                    if (!saucesLookup.TryGetValue(components.SauceId.Value, out sauce)) 
+                    {
+                        continue;// if we end up here this means
+                                 // that the sauce has been filtered out by the query filter
+                                 // due to IsDeleted = true. We skip building the cart pizza
+                                 // with the inactive sauce
+                    }
+                }
 
                 try
                 {
@@ -265,19 +280,16 @@
                         Id = pizza.Id,
                         Name = basePizza.Name,
                         DoughName = dough.Type,
-                        SauceName = sauce?.Type ?? "No Sauce",
+                        SauceName = sauce?.Type ?? "No", 
                         Quantity = pizza.Quantity
                     };
 
                     foreach (int toppingId in components.SelectedToppings)
                     {
                         Topping? topping = allToppingCategories.SelectMany(tc => tc.Toppings)
-                            .FirstOrDefault(t => t.Id == toppingId)
-                        ?? throw new DeletedOrInactiveToppingException(DeletedOrInactiveToppingMessage, toppingId);
-                        if (topping is null)
-                        {
-                            continue; // TODO: handle missing topping
-                        }
+                            .FirstOrDefault(t => t.Id == toppingId)                     
+                        ?? throw new DeletedOrInactiveToppingException(DeletedOrInactiveToppingMessage, toppingId); //skip pizza because one or more
+                                                                                                                    //of the toppings is inactive
 
                         string categoryName = topping.ToppingCategory.Name;
 
@@ -295,9 +307,10 @@
                         });
                     }
 
-                    pizzaViewModel.Price = pizzaViewModel.Toppings.Values
+                    decimal toppingsTotalPrice = pizzaViewModel.Toppings.Values
                         .SelectMany(t => t)
-                        .Sum(t => t.Price) + dough.Price + sauce?.Price ?? 0;
+                        .Sum(t => t.Price);
+                    pizzaViewModel.Price = toppingsTotalPrice + dough.Price + (sauce?.Price ?? 0);
 
                     pizzasInCart.Add(pizzaViewModel);
                 }
@@ -338,7 +351,8 @@
                     user.ShoppingCartDesserts.Remove(dessertToRemove);
                     break;
                 default:
-                    return false; // Unsupported category TODO: Throw exception instead for better error handling
+                    throw new MenuCategoryNotImplementedException
+                        (MenuCategoryNotImplementedMessage, menuCategory.ToString());
             }
 
             await this._userRepository.SaveChangesAsync();
@@ -348,10 +362,12 @@
         public async Task ClearShoppingCart(Guid userId)
         {
             User? user = await this._userRepository.GetUserWithAddressesAndCartAsync(userId)
-                ?? throw new InvalidOperationException(UserNotFoundMessage);
+                ?? throw new EntityNotFoundException(UserNotFoundMessage, userId.ToString());
+
             user.ShoppingCartPizzas.Clear();
             user.ShoppingCartDrinks.Clear();
             user.ShoppingCartDesserts.Clear();
+
             await this._userRepository.SaveChangesAsync();
         }
 

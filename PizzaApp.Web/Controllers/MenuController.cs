@@ -1,5 +1,6 @@
 ﻿namespace PizzaApp.Web.Controllers
 {
+    using Humanizer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +13,10 @@
 
     public class MenuController : BaseController
     {
-        private static IEnumerable<string> CategoryNames = Enum.GetNames<MenuCategory>();
+        private readonly static Dictionary<MenuCategory, string> FormattedCategoryNames 
+            = Enum.GetValues<MenuCategory>()
+                  .ToDictionary(mc => mc, mc => mc.ToString()
+                                                  .Humanize(LetterCasing.Title));
 
         private readonly IMenuService _menuService;
         private readonly ICartService _cartService;
@@ -24,8 +28,6 @@
         }
 
         [HttpGet]
-        [Route("/Menu/Index")]
-        [Route("/Menu")]
         [AllowAnonymous]
         public IActionResult Index()
         {
@@ -49,14 +51,15 @@
                 MenuCategoryViewWrapper menuView = new()
                 {
                     Items = menuItems,
-                    AllCategories = CategoryNames
+                    AllCategories = FormattedCategoryNames,
+                    Category = categoryEnum.Value
                 };
 
                 return this.View(menuView);
             }
             catch (MenuCategoryNotImplementedException)
             {
-                return this.BadRequest(); //TODO: Log message
+                return this.NotFound(); //TODO: Log message
             }
             catch (Exception)
             {
@@ -74,11 +77,11 @@
 
                 return this.View("PizzaDetails", orderPizzaViewModel);
             }
-            catch (ItemNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return this.NotFound();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return this.BadRequest(); // TODO: Log
             }
@@ -93,7 +96,7 @@
                     = await this._menuService.GetDrinkDetailsById(id);
                 return this.View("ItemDetails", orderItem);
             }
-            catch (ItemNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return this.NotFound();
             }
@@ -112,7 +115,7 @@
                     = await this._menuService.GetDessertDetailsById(id);
                 return this.View("ItemDetails", orderItem);
             }
-            catch (ItemNotFoundException)
+            catch (EntityNotFoundException)
             {
                 return this.NotFound();
             }
@@ -128,11 +131,11 @@
             if (orderPizzaViewModel is null)
             {
                 // TODO: Handle better
-                return this.BadRequest("Invalid pizza details.");
+                return this.BadRequest();
             }
             if (!this.ModelState.IsValid)
             {
-                return this.BadRequest(); // TODO:
+                return this.BadRequest();
             }
 
             Guid? userId = this.GetUserId();
@@ -147,8 +150,8 @@
                 SelectedToppingsIds = input.SelectedToppingIds.ToArray(),
                 Quantity = input.Quantity
             };
-            bool addedToCart = await this._cartService
-                .AddPizzaToCartAsync(pizzaDto, userId!.Value);
+
+            await this._cartService.AddPizzaToCartAsync(pizzaDto, userId!.Value);
 
             return this.RedirectToAction(nameof(Index));
         }

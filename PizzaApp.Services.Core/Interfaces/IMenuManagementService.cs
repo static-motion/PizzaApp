@@ -12,7 +12,7 @@
         Task EditToppingCategoryAsync(EditToppingCategoryInputModel inputModel);
         public Task<AdminItemsOverviewViewWrapper> GetItemsFromCategory(ManagementCategory category, int page, int pageSize);
         Task<EditDoughInputModel> GetDoughDetailsByIdAsync(int id);
-        Task<EditAdminPizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id);
+        Task<EditBasePizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id);
         Task<EditSauceInputModel> GetSauceDetailsByIdAsync(int id);
         Task<EditToppingCategoryInputModel> GetToppingCategoryDetailsByIdAsync(int id);
         Task<EditToppingViewWrapper> GetToppingDetailsByIdAsync(int id);

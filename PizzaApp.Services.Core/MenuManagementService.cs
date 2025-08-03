@@ -158,7 +158,7 @@
             };
         }
 
-        public async Task<EditAdminPizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id)
+        public async Task<EditBasePizzaViewWrapper?> GetPizzaDetailsByIdAsync(int id)
         {
             BasePizzaInputModel? pizzaDetails = await this.GetPizzaDetailsViewModelByIdAsync(id);
 
@@ -174,7 +174,7 @@
                 = await this._pizzaIngredientsService.GetAllSaucesAsync(ignoreFiltering: true, disableTracking: true);
 
             // create the model
-            EditAdminPizzaViewWrapper managePizzaView = new()
+            EditBasePizzaViewWrapper managePizzaView = new()
             {
                 Pizza = pizzaDetails,
                 Ingredients = new PizzaIngredientsViewWrapper

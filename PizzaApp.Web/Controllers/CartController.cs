@@ -25,7 +25,7 @@
             CartViewWrapper shoppingCart =
                 await this._cartService.GetUserCart(userId!.Value);
 
-            return this.View("IndexAlt", shoppingCart);
+            return this.View(shoppingCart);
         }
 
         [HttpPost]

@@ -171,7 +171,7 @@
         [HttpGet]
         public async Task<IActionResult> EditPizza(int id)
         {
-            EditAdminPizzaViewWrapper? pizza = await this._menuManagementService.GetPizzaDetailsByIdAsync(id);
+            EditBasePizzaViewWrapper? pizza = await this._menuManagementService.GetPizzaDetailsByIdAsync(id);
 
             if (pizza is null)
             {
@@ -182,9 +182,12 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditPizza(EditAdminPizzaViewWrapper pizzaViewWrapper)
+        public async Task<IActionResult> EditPizza(EditBasePizzaViewWrapper pizzaViewWrapper)
         {
-            // TODO:
+            if (!this.ModelState.IsValid)
+            {
+                // TODO:
+            }
             BasePizzaInputModel pizza = pizzaViewWrapper.Pizza;
             await this._menuManagementService.EditPizzaAsync(pizza);
             return this.RedirectToAction(nameof(EditPizza), new { id =  pizza.Id });

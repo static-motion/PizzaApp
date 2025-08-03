@@ -111,7 +111,7 @@
         public async Task<PizzaDetailsViewWrapper> GetPizzaDetailsByIdAsync(int id)
         {
             CustomizePizzaInputModel pizzaDetails = await this.GetPizzaDetailsViewModelByIdAsync(id)
-                ?? throw new ItemNotFoundException(PizzaNotFoundMessage, id);
+                ?? throw new EntityNotFoundException(PizzaNotFoundMessage, id);
 
             IReadOnlyList<ToppingCategoryViewWrapper> allToppingsByCategories 
                 = await this._pizzaIngredientsService.GetAllCategoriesWithToppingsAsync();
@@ -165,7 +165,7 @@
         public async Task<MenuItemDetailsViewModel> GetDrinkDetailsById(int id)
         {
             Drink drink = await this._drinkRepository.GetByIdAsync(id) 
-                ?? throw new ItemNotFoundException(DrinkNotFoundMessage, id);
+                ?? throw new EntityNotFoundException(DrinkNotFoundMessage, id);
 
             return new MenuItemDetailsViewModel()
             {
@@ -181,7 +181,7 @@
         public async Task<MenuItemDetailsViewModel> GetDessertDetailsById(int id)
         {
             Dessert dessert = await this._dessertRepository.GetByIdAsync(id)
-                ?? throw new ItemNotFoundException(DessertNotFoundMessage, id);
+                ?? throw new EntityNotFoundException(DessertNotFoundMessage, id);
 
             return new MenuItemDetailsViewModel()
             {

@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\PizzaApp.Data.Models\PizzaApp.Data.Models.csproj" />
     <ProjectReference Include="..\PizzaApp.GCommon\PizzaApp.GCommon.csproj" />
     <ProjectReference Include="..\PizzaApp.Services.AutoMapping\PizzaApp.Services.AutoMapping.csproj" />
