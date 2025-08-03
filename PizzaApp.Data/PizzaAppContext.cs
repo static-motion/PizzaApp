@@ -4,6 +4,7 @@
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data.Models;
+    using PizzaApp.Data.Models.Interfaces;
     using PizzaApp.Data.Models.MappingEntities;
     using System.Reflection;
 
@@ -44,7 +45,7 @@
 
         public DbSet<ShoppingCartPizza> ShoppingCartsPizzas { get; set; }
 
-        public bool BypassToppingFilters { get; set; } = false;
+        public bool BypassIngredientsFilters { get; set; } = false;
 
         public PizzaAppContext(DbContextOptions<PizzaAppContext> options)
             : base(options)
@@ -57,12 +58,20 @@
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Topping>()
-                .HasQueryFilter(e => this.BypassToppingFilters ||
+                .HasQueryFilter(e => this.BypassIngredientsFilters ||
                     (e.IsDeleted == false && e.ToppingCategory.IsDeleted == false));
 
             modelBuilder.Entity<ToppingCategory>()
-                .HasQueryFilter(e => this.BypassToppingFilters ||
+                .HasQueryFilter(e => this.BypassIngredientsFilters ||
                     (e.IsDeleted == false));
+
+            modelBuilder.Entity<Dough>()
+                .HasQueryFilter(e => this.BypassIngredientsFilters || 
+                e.IsDeleted == false);
+
+            modelBuilder.Entity<Sauce>()
+                .HasQueryFilter(e => this.BypassIngredientsFilters ||
+                e.IsDeleted == false);
         }
     }
 }
