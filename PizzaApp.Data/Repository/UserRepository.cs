@@ -5,7 +5,7 @@
     using PizzaApp.Data.Repository.Interfaces;
     using System.Threading.Tasks;
 
-    public class UserRepository : BaseRepository<User, Guid, UserRepository>, IUserRepository
+    public class UserRepository : BaseRepository<User, Guid, IUserRepository>, IUserRepository
     {
         public UserRepository(PizzaAppContext dbContext) : base(dbContext)
         {

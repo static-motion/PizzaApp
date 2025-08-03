@@ -7,10 +7,11 @@
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    public interface IRepository<TEntity, TKey, TRepository> 
+    public interface IRepository<TEntity, TKey, out TRepository> 
         where TEntity : class, IEntity<TKey>, new()
         where TKey : notnull
-        where TRepository : BaseRepository<TEntity, TKey, TRepository>
+        where TRepository : IRepository<TEntity, TKey, TRepository>
+        //where TRepository : BaseRepository<TEntity, TKey, TRepository>
     {
         Task AddAsync(TEntity item);
 
@@ -39,7 +40,9 @@
         TRepository DisableTracking();
 
         TRepository IgnoreFiltering();
+
         Task<IEnumerable<TEntity>> TakeAsync(int take, int skip = 0);
+
         Task<int> TotalEntityCountAsync();
     }
 }

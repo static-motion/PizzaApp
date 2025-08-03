@@ -6,7 +6,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public class OrderRepository : BaseRepository<Order, Guid, OrderRepository>, IOrderRepository
+    public class OrderRepository : BaseRepository<Order, Guid, IOrderRepository>, IOrderRepository
     {
         public OrderRepository(PizzaAppContext dbContext) : base(dbContext)
         {

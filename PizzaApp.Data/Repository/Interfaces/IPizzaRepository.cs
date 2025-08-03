@@ -2,7 +2,7 @@
 {
     using PizzaApp.Data.Models;
 
-    public interface IPizzaRepository : IRepository<Pizza, int, PizzaRepository>
+    public interface IPizzaRepository : IRepository<Pizza, int, IPizzaRepository>
     {
         public Task<Pizza?> GetByIdWithIngredientsAsync(int id);
 

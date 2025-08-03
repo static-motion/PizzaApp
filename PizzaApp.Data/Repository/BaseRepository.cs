@@ -15,10 +15,10 @@
     /// <typeparam name="TEntity">The type of the entity managed by this repository. It must be a class, implement IEntity<TKey>, and have a parameterless constructor.</typeparam>
     /// <typeparam name="TKey">The type of the primary key for TEntity. It must be a non-nullable type.</typeparam>
     /// <typeparam name="TRepository">The concrete type of the repository inheriting from BaseRepository. This is used for fluent API chaining.</typeparam>
-    public abstract class BaseRepository<TEntity, TKey, TRepository>: IRepository<TEntity, TKey, TRepository> 
+    public abstract class BaseRepository<TEntity, TKey, TRepository> : IRepository<TEntity, TKey, TRepository> 
         where TEntity : class, IEntity<TKey>, new()
         where TKey : notnull
-        where TRepository : BaseRepository<TEntity, TKey, TRepository>
+        where TRepository : IRepository<TEntity, TKey, TRepository>
     {
         /// <summary>
         /// The Entity Framework Core database context instance used for database operations.
@@ -58,7 +58,7 @@
         public TRepository IgnoreFiltering()
         {
             ShouldIgnoreFilters = true;
-            return (TRepository)this;
+            return (TRepository)(object)this;
         }
         /// <summary>
         /// Configures the current repository instance to execute the next query operation without change tracking. 
@@ -69,7 +69,7 @@
         public TRepository DisableTracking()
         {
             ShouldNotTrack = true;
-            return (TRepository)this;
+            return (TRepository)(object)this;
         }
 
         /// <summary>
@@ -125,7 +125,7 @@
             query = this.ApplyConfiguration(query);
 
             TEntity? result = await query.FirstOrDefaultAsync(predicate);
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
 
             return result;
         }
@@ -140,7 +140,7 @@
         {
             if (typeof(TEntity) == typeof(Pizza) && !this.ShouldIgnoreFilters)
             {
-                this.DbContext.BypassToppingFilters = true;
+                this.DbContext.BypassIngredientsFilters = true;
             }
             if (this.ShouldNotTrack)
             {
@@ -167,7 +167,7 @@
 
             IEnumerable<TEntity> result = await query.ToListAsync();
 
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
 
             return result;
         }
@@ -178,7 +178,7 @@
             query = this.ApplyConfiguration(query);
 
             IEnumerable<TEntity> result = await query.ToListAsync();
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
 
             return result;
         }
@@ -189,7 +189,7 @@
             query = this.ApplyConfiguration(query);
 
             int result = await query.CountAsync();
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
 
             return result;
         }
@@ -204,7 +204,7 @@
             IQueryable<TEntity> query = this.DbSet.AsQueryable();
             query = this.ApplyConfiguration(query);
             TEntity? result = await query.FirstOrDefaultAsync(e => e.Id.Equals(id));
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
 
             return result;
         }
@@ -242,7 +242,7 @@
             query = this.ApplyConfiguration(query);
 
             TEntity? result = await query.SingleOrDefaultAsync(predicate);
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
 
             return result;
         }
@@ -272,7 +272,7 @@
             query = this.ApplyConfiguration(query);
 
             bool result = await query.AsNoTracking().AnyAsync(predicate);
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
 
             return result;
         }
@@ -295,7 +295,7 @@
             {
                 throw new InvalidOperationException("Not all entities were found for the provided IDs.");
             }
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
 
             return result;
         }

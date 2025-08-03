@@ -2,7 +2,7 @@
 {
     using PizzaApp.Data.Models;
 
-    public interface IDessertRepository : IRepository<Dessert, int, DessertRepository>
+    public interface IDessertRepository :  IRepository<Dessert, int, IDessertRepository>//, DessertRepository>
     {
     }
 }

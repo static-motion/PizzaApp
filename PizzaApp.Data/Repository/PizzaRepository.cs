@@ -6,7 +6,7 @@
     using PizzaApp.Data.Repository.Interfaces;
     using System.Collections.Generic;
 
-    public class PizzaRepository : BaseRepository<Pizza, int, PizzaRepository>, IPizzaRepository
+    public class PizzaRepository : BaseRepository<Pizza, int, IPizzaRepository>, IPizzaRepository
     {
         public PizzaRepository(PizzaAppContext dbContext) 
             : base(dbContext)
@@ -19,7 +19,7 @@
             query = this.ApplyConfiguration(query);
 
             ICollection<Pizza> result = await query.ToListAsync();
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
 
             return result;
         }
@@ -39,7 +39,7 @@
             query = this.ApplyConfiguration(query);
 
             ICollection<Pizza> result = await query.ToListAsync();
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
             return result;
         }
 
@@ -53,7 +53,7 @@
             query = this.ApplyConfiguration(query);
 
             Pizza? result = await query.FirstOrDefaultAsync(p => p.Id == id);
-            this.DbContext.BypassToppingFilters = false;
+            this.DbContext.BypassIngredientsFilters = false;
             return result;
         }
     }

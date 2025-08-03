@@ -3,7 +3,7 @@
     using PizzaApp.Data.Models;
     using System.Threading.Tasks;
 
-    public interface IUserRepository : IRepository<User, Guid, UserRepository>
+    public interface IUserRepository : IRepository<User, Guid, IUserRepository>
     {
         Task<User?> GetUserWithAddressesAsync(Guid userId);
         Task<User?> GetUserWithShoppingCartAsync(Guid userId);

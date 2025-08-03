@@ -3,7 +3,7 @@
     using PizzaApp.Data.Models;
     using PizzaApp.Data.Repository.Interfaces;
 
-    public class SauceRepository : BaseRepository<Sauce, int, SauceRepository>, ISauceRepository
+    public class SauceRepository : BaseRepository<Sauce, int, ISauceRepository>, ISauceRepository
     {
         public SauceRepository(PizzaAppContext dbContext) : base(dbContext)
         {

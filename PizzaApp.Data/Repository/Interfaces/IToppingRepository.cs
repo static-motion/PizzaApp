@@ -2,7 +2,7 @@
 {
     using PizzaApp.Data.Models;
 
-    public interface IToppingRepository : IRepository<Topping, int, ToppingRepository>
+    public interface IToppingRepository : IRepository<Topping, int, IToppingRepository>
     {
         Task<IEnumerable<Topping>> GetAllToppingsFromRangeAsync(IEnumerable<int> selectedToppingIds);
 

@@ -3,7 +3,7 @@
     using PizzaApp.Data.Models;
     using System.Collections.Generic;
 
-    public interface IToppingCategoryRepository : IRepository<ToppingCategory, int, ToppingCategoryRepository>
+    public interface IToppingCategoryRepository : IRepository<ToppingCategory, int, IToppingCategoryRepository>
     {
         
         public Task<IEnumerable<ToppingCategory>> GetAllWithToppingsAsync();

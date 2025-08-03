@@ -6,7 +6,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public class ToppingCategoryRepository : BaseRepository<ToppingCategory, int, ToppingCategoryRepository>, IToppingCategoryRepository
+    public class ToppingCategoryRepository : BaseRepository<ToppingCategory, int, IToppingCategoryRepository>, IToppingCategoryRepository
     {
         public ToppingCategoryRepository(PizzaAppContext dbContext) : base(dbContext)
         {
