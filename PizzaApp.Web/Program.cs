@@ -85,6 +85,8 @@ namespace PizzaApp.Web
 
             app.UseRouting();
 
+            app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
+
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllerRoute(
