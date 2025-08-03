@@ -6,26 +6,35 @@
 
 @if (Model.All(a => a.Category == MenuCategory.Pizzas))
 {
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title">Create a pizza.</h5>
-            <p class="card-text">Don't see anything you like? Try making your own!</p>
-            <div class="card-btn-container">
-                <a asp-controller="Pizzas" asp-action="Create" class="card-btn btn btn-danger"><i class ="fa-solid fa-plus fa-2xl"></i></a>
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <img class="card-img-top" src="~/img/pizza-blueprint.jpg" alt="Image of a pizza blueprint">
+            <div class="card-body">
+                <h5 class="card-title">Create a pizza.</h5>
+                <p class="card-text">Don't see anything you like? Try making your own!</p>
+                <div class="card-btn-container d-flex">
+                    <a asp-controller="Pizzas" asp-action="Create" class="card-btn btn btn-danger"><i class="fa-solid fa-plus fa-2xl"></i></a>
+                </div>
             </div>
         </div>
     </div>
+    
 }
 @foreach (MenuItemViewModel menuViewModel in Model)
 {
-    <div class="card" style="width: 18rem;">
-        <a class="add-to-favorites" href="#"><i class="fa-regular fa-heart favorites-icon"></i></a>
-        <img class="card-img-top" src=@menuViewModel.ImageUrl alt="Image of @menuViewModel.Name">
-        <div class="card-body">
-            <h5 class="card-title">@menuViewModel.Name</h5>
-            <p class="card-text">@menuViewModel.Description</p>
-            <div class="card-btn-container">
-                <a asp-controller="Menu" asp-action="@menuViewModel.Category" asp-route-id="@menuViewModel.Id" class="card-btn btn btn-danger"><i class="fa-solid fa-cart-plus"></i></a>
+    <div class="col-md-4 ">
+        <div class="card mb-3">
+            <a class="add-to-favorites" href="#"><i class="fa-regular fa-heart favorites-icon"></i></a>
+            @if (@menuViewModel.ImageUrl is not null) 
+            {
+                <img class="card-img-top" src=@menuViewModel.ImageUrl alt="Image of @menuViewModel.Name">
+            }
+            <div class="card-body">
+                <h5 class="card-title">@menuViewModel.Name</h5>
+                <p class="card-text">@menuViewModel.Description</p>
+                <div class="card-btn-container">
+                    <a asp-controller="Menu" asp-action="@menuViewModel.Category" asp-route-id="@menuViewModel.Id" class="card-btn btn btn-danger"><i class="fa-solid fa-cart-plus"></i></a>
+                </div>
             </div>
         </div>
     </div>

@@ -1,4 +1,4 @@
-﻿@model PizzaApp.Web.ViewModels.ShoppingCart.CartItemsViewWrapper
+﻿@model PizzaApp.Web.ViewModels.ShoppingCart.CartViewWrapper
 @{
     ViewData["Title"] = "Your Shopping Cart";
 }
@@ -6,7 +6,7 @@
 <div class="container mt-5">
     <h2 class="mb-4 text-center">@ViewData["Title"]</h2>
 
-    @if (!Model.Pizzas.Any() && !Model.Drinks.Any() && !Model.Desserts.Any())
+    @if (!Model.Items.Pizzas.Any() && !Model.Items.Drinks.Any() && !Model.Items.Desserts.Any())
     {
         <div class="text-center">
             <p>Your shopping cart is empty.</p>
@@ -15,19 +15,18 @@
     }
     else
     {
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="row">
-            <!-- Cart Items -->
             <div class="col-lg-8">
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
                         <h5 class="card-title">Cart Items</h5>
                         <hr />
 
-                        <!-- Pizza Items -->
-                        @if (Model.Pizzas.Any())
+                        @if (Model.Items.Pizzas.Any())
                         {
                             <h6 class="text-muted">Pizzas</h6>
-                            @foreach (var pizza in Model.Pizzas)
+                            @foreach (var pizza in Model.Items.Pizzas)
                             {
                                 <div class="row mb-3 align-items-center">
                                     <div class="col-6">
@@ -42,7 +41,7 @@
                                         }
                                     </div>
                                     <div class="col-2 text-center">@pizza.Quantity</div>
-                                    <div class="col-2 text-end fw-bold">$@(pizza.Price* pizza.Quantity)</div>
+                                    <div class="col-2 text-end fw-bold">$@(pizza.Price * pizza.Quantity)</div>
                                     <div class="col-2 text-end">
                                         <form asp-controller="Cart" asp-action="RemoveItem" method="post">
                                             <input type="hidden" name="itemId" value="@pizza.Id" />
@@ -54,11 +53,10 @@
                             }
                         }
 
-                        <!-- Drink Items -->
-                        @if (Model.Drinks.Any())
+                        @if (Model.Items.Drinks.Any())
                         {
                             <h6 class="text-muted mt-4">Drinks</h6>
-                            @foreach (var drink in Model.Drinks)
+                            @foreach (var drink in Model.Items.Drinks)
                             {
                                 <div class="row mb-3 align-items-center">
                                     <div class="col-6"><strong>@drink.Name</strong></div>
@@ -75,15 +73,15 @@
                             }
                         }
 
-                        <!-- Dessert Items -->
-                        @if (Model.Desserts.Any())
+                        @if (Model.Items.Desserts.Any())
                         {
                             <h6 class="text-muted mt-4">Desserts</h6>
-                            @foreach (var dessert in Model.Desserts)
+                            @foreach (var dessert in Model.Items.Desserts)
                             {
-                                <div class="row mb-3 align-items-center">                                    <div class="col-6"><strong>@dessert.Name</strong></div>
+                                <div class="row mb-3 align-items-center">
+                                    <div class="col-6"><strong>@dessert.Name</strong></div>
                                     <div class="col-2 text-center">@dessert.Quantity</div>
-                                    <div class="col-2 text-end fw-bold">$@(dessert.Price* dessert.Quantity)</div>
+                                    <div class="col-2 text-end fw-bold">$@(dessert.Price * dessert.Quantity)</div>
                                     <div class="col-2 text-end">
                                         <form asp-controller="Cart" asp-action="RemoveItem" method="post">
                                             <input type="hidden" name="itemId" value="@dessert.Id" />
@@ -97,28 +95,71 @@
                     </div>
                 </div>
             </div>
+            <form asp-controller="Cart" asp-action="PlaceOrder" method="post" class="col-lg-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Delivery Details</h5>
+                        <hr />
 
-            <!-- Order Summary -->
-            <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Select Address</strong></label>
+                            @if (Model.Addresses.Count() == 0)
+                            {
+                                <p>Looks like you haven't added any addresses to your account. <a asp-area="Identity" asp-page="/Account/Manage/Addresses">Click here</a> to fix that.</p>
+                            }
+                            else
+                            {
+                                @foreach (var address in Model.Addresses)
+                                {
+                                    <div class="form-check">
+                                        <input asp-for="OrderDetails.AddressId" type="radio" value="@address.Id" class="form-check-input" id="address-@address.Id" />
+                                        <label class="form-check-label" for="address-@address.Id">
+                                            @address.AddressLine1, @address.City
+                                            @if (!string.IsNullOrWhiteSpace(address.AddressLine2))
+                                            {
+                                                <br />
+
+                                                <small>@address.AddressLine2</small>
+                                            }
+                                        </label>
+                                    </div>
+                                }
+                            }
+                            <span asp-validation-for="OrderDetails.AddressId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="OrderDetails.PhoneNumber" class="form-label"><strong>Phone Number</strong></label>
+                            <input asp-for="OrderDetails.PhoneNumber" class="form-control" />
+                            <span asp-validation-for="OrderDetails.PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="OrderDetails.Comment" class="form-label"><strong>Order Comment (Optional)</strong></label>
+                            <textarea asp-for="OrderDetails.Comment" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">Order Summary</h5>
                         <hr />
                         <div class="d-flex justify-content-between mb-3">
                             <span>Subtotal</span>
-                            <span>$@Model.GrandTotal.ToString("F2")</span>
+                            <span>$@Model.Items.GrandTotal.ToString("F2")</span>
                         </div>
                         <div class="d-flex justify-content-between fw-bold fs-5">
                             <span>Total</span>
-                            <span>$@Model.GrandTotal.ToString("F2")</span>
+                            <span>$@Model.Items.GrandTotal.ToString("F2")</span>
                         </div>
                         <hr />
                         <div class="d-grid">
-                            <a asp-controller="Cart" asp-action="PlaceOrder" method="post" class="btn btn-primary">Finalize Order</a>
+                            <button type="submit" class="btn btn-primary">Finalize Order</button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     }
 </div>

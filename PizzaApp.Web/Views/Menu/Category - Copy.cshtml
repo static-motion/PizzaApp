@@ -1,0 +1,18 @@
+﻿@using PizzaApp.Web.ViewModels
+@using PizzaApp.Web.ViewModels.Menu
+@model MenuCategoryViewWrapper
+
+<div class="container menu-page">
+    <div class="container-fluid">
+        <partial name="_MenuSidebarPartial" model="@Model.AllCategories"/> 
+        <div class="row flex-wrap">
+            <div class="col py-3">
+                <partial name="_MenuItemsPartial" model="@Model.Items" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link href="~/css/Menu/menu-card.css" rel="stylesheet" type="text/css" />
+}

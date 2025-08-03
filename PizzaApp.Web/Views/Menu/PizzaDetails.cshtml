@@ -61,7 +61,7 @@
                                        name="Pizza.SelectedToppingIds"
                                        id="topping_@topping.Id"
                                        data-price="@topping.Price"
-                                       checked = "@(Model.Pizza.SelectedToppingIds.Contains(topping.Id) ? "checked" : "")" />
+                                       checked=@Model.Pizza.SelectedToppingIds.Contains(topping.Id) />
                                 <label class="form-check-label" for="topping_@topping.Id">
                                     @topping.Name (@topping.Price.ToString("C"))
                                 </label>

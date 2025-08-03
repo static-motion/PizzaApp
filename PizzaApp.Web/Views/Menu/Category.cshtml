@@ -1,18 +1,27 @@
 ﻿@using PizzaApp.Web.ViewModels
 @using PizzaApp.Web.ViewModels.Menu
+@using PizzaApp.GCommon.Enums
 @model MenuCategoryViewWrapper
 
-<div class="container menu-page">
-    <div class="container-fluid">
-        <partial name="_MenuSidebarPartial" model="@Model.AllCategories"/> 
-        <div class="row flex-wrap">
-            <div class="col py-3">
-                <partial name="_MenuItemsPartial" model="@Model.Items" />
-            </div>
+@{
+    ViewBag.Title = "Menu";
+}
+@section Styles {
+    <link href="~/css/Menu/menu-card.css" rel="stylesheet" type="text/css" />
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group">
+            @foreach (MenuCategory category in Model.AllCategories.Keys)
+            {
+                <a asp-action=@category class="list-group-item list-group-item-action @(Model.Category == category ? "active" : "")">@Model.AllCategories[category]</a>
+            }
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="row">
+            <partial name="_MenuItemsPartial" model="@Model.Items" />
         </div>
     </div>
 </div>
-
-@section Styles {
-    <link href="@Url.Content("~/css/Menu/menu-card.css")" rel="stylesheet" type="text/css" />
-}
