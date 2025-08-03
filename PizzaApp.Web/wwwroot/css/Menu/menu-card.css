@@ -2,6 +2,10 @@
     width: 100%;
 }
 
+.card-btn-container {
+    width: 100%;
+    align-self: end;
+}
 .add-to-favorites {
     position: absolute;
     color: red;
@@ -9,4 +13,21 @@
     height: 20px;
     top: 5px;
     right: 5px;
+}
+
+.card-img-top {
+    max-height: 170px;
+    object-fit: cover;
+}
+
+.card {
+    max-width: 18rem;
+    height: 22rem;
+    max-height: 25rem;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }

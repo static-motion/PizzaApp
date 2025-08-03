@@ -27,15 +27,12 @@ html {
   min-height: 100%;
 }
 
-body {
-  margin-bottom: 60px;
-}
-
 .container-main {
     padding: 3rem;
     max-width: 1320px;
     margin: auto;
     display: none;
+    margin-bottom: 60px;
 }
 
 .navbar-nav {
