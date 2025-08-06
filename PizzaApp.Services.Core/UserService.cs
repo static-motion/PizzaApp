@@ -1,6 +1,5 @@
 ﻿namespace PizzaApp.Services.Core
 {
-    using Microsoft.AspNetCore.Identity;
     using PizzaApp.Data.Models;
     using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.Services.Common.Exceptions;
@@ -12,18 +11,16 @@
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly UserManager<User> _userManager;
 
-        public UserService(IUserRepository userRepository, UserManager<User> userManager) 
+        public UserService(IUserRepository userRepository) 
         {
             this._userRepository = userRepository;
-            this._userManager = userManager;
         }
 
         public async Task AddAddressAsync(Guid userId, AddressInputModel input)
         {
             User? user = await this._userRepository.GetByIdAsync(userId) 
-                ?? throw new EntityNotFoundException(UserNotFoundMessage, userId);
+                ?? throw new EntityNotFoundException(EntityNotFoundMessage, nameof(User), userId);
 
             user.Addresses.Add(new Address
             {
@@ -38,10 +35,10 @@
         public async Task DeleteAddressAsync(Guid userId, int addressId)
         {
             User? user = await this._userRepository.GetUserWithAddressesAsync(userId)
-                ?? throw new EntityNotFoundException(UserNotFoundMessage, userId);
+                ?? throw new EntityNotFoundException(EntityNotFoundMessage, nameof(User), userId);
 
             Address? address = user.Addresses.FirstOrDefault(a => a.Id == addressId)
-                ?? throw new EntityNotFoundException(AddressNotFoundMessage, addressId);
+                ?? throw new EntityNotFoundException(EntityNotFoundMessage, nameof(Address), addressId);
 
             address.IsDeleted = true;
             await this._userRepository.SaveChangesAsync();
@@ -49,7 +46,9 @@
 
         public async Task<IEnumerable<AddressViewModel>> GetUserAddressesAsync(Guid userId)
         {
-            User? user = await this._userRepository.GetUserWithAddressesAsync(userId);
+            User? user = await this._userRepository
+                .DisableTracking()
+                .GetUserWithAddressesAsync(userId);
 
             if (user is null)
             {

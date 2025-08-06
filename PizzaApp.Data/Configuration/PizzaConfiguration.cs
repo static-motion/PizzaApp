@@ -48,7 +48,7 @@
 
             entity
                 .Property(e => e.PizzaType)
-                .HasDefaultValue(PizzaType.BasePizza)
+                .HasDefaultValue(PizzaType.AdminPizza)
                 .IsRequired();
 
             entity

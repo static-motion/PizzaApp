@@ -12,8 +12,8 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    using static PizzaApp.Services.Core.RepositoryHelper;
     using static PizzaApp.Services.Common.ExceptionMessages;
+    using PizzaApp.Services.Common.Exceptions;
 
     public class OrderService : IOrderService
     {
@@ -52,10 +52,17 @@
             IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
                 .IgnoreFiltering()
                 .DisableTracking()
-                .GetAllWithToppingsAsync();
+                .GetAllCategoriesWithToppingsAsync();
 
-            Dictionary<int, Dough> doughLookup = await GetEntityLookup(this._doughRepository, ignoreFiltering: true);
-            Dictionary<int, Sauce> sauceLookup = await GetEntityLookup(this._sauceRepository, ignoreFiltering: true);
+            Dictionary<int, Dough> doughLookup = await this._doughRepository
+                .DisableTracking()
+                .IgnoreFiltering()
+                .GetLookup();
+
+            Dictionary<int, Sauce> sauceLookup = await this._sauceRepository
+                .IgnoreFiltering()
+                .DisableTracking()
+                .GetLookup();
 
             foreach (Order order in orders)
             {
@@ -78,8 +85,10 @@
                     Name = op.BasePizza.Name,
                     Quantity = op.Quantity,
                     Price = op.PricePerItemAtPurchase,
-                    DoughName = doughLookup.TryGetValue(op.DoughId, out Dough? dough) ? dough.Type : "Unknown Dough",
-                    SauceName = op.SauceId.HasValue && sauceLookup.TryGetValue(op.SauceId.Value, out Sauce? sauce) ? sauce.Type : "No Sauce",
+                    DoughName = doughLookup.TryGetValue(op.DoughId, out Dough? dough) 
+                        ? dough.Type : throw new EntityNotFoundException("Dough not found"),
+                    SauceName = op.SauceId.HasValue && sauceLookup.TryGetValue(op.SauceId.Value, out Sauce? sauce) 
+                        ? sauce.Type : "No Sauce",
                     Toppings = allToppingCategories.SelectMany(t => t.Toppings) // what a mess
                                         .Where(t => order.OrderPizzas.Any(op => op.Toppings.Any(opt => opt.ToppingId == t.Id)))
                                         .GroupBy(t => t.ToppingCategory.Name)
@@ -104,8 +113,10 @@
         public async Task PlaceOrderAsync(OrderDetailsInputModel orderDetails, Guid userId)
         {
             User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId)
-                ?? throw new InvalidOperationException(UserNotFoundMessage); // TODO: Get user with addresses to validate
-                                                                             // that the user is trying to order to an address they own
+                ?? throw new EntityNotFoundException(EntityNotFoundMessage, nameof(User), userId.ToString()); 
+            
+            // TODO: Get user with addresses to validate                                                
+            // that the user is trying to order to an address they own
 
             if (user.ShoppingCartPizzas.Count == 0
                 && user.ShoppingCartDrinks.Count == 0
@@ -128,6 +139,7 @@
                     Quantity = d.Quantity,
                     PricePerItemAtPurchase = d.Drink.Price
                 });
+
             List<OrderPizza> orderPizzas = await this.CreateOrderPizzas(user);
 
             Order order = new()
@@ -169,19 +181,32 @@
             List<OrderPizza> orderPizzas = new();
             IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
                 .DisableTracking()
-                .GetAllWithToppingsAsync();
+                .GetAllCategoriesWithToppingsAsync();
 
-            Dictionary<int, Dough> doughsLookup = await GetEntityLookup(this._doughRepository);
-            Dictionary<int, Sauce> saucesLookup = await GetEntityLookup(this._sauceRepository);
+            Dictionary<int, Dough> doughsLookup = await this._doughRepository.DisableTracking().GetLookup();
+            Dictionary<int, Sauce> saucesLookup = await this._sauceRepository.DisableTracking().GetLookup();
 
             Dictionary<int, Topping> toppingsLookup = allToppingCategories
                 .SelectMany(tc => tc.Toppings)
                 .ToDictionary(t => t.Id);
 
+            List<ShoppingCartPizza> invalidPizzas = new();
+
             foreach (ShoppingCartPizza pizza in user.ShoppingCartPizzas)
             {
                 PizzaComponentsDto components = pizza.GetComponentsFromJson()
                     ?? throw new InvalidOperationException("Pizza components not found or invalid."); //TODO: Handle
+
+                bool isPizzaValid = doughsLookup.ContainsKey(components.DoughId)
+                    && components.SelectedToppings.All(toppingsLookup.ContainsKey)
+                    && (components.SauceId == null || saucesLookup.ContainsKey(components.SauceId.Value));
+
+                // TODO: the pizza in the cart gets removed for now. Should handle this situation better
+                if (!isPizzaValid)
+                {
+                    invalidPizzas.Add(pizza);
+                    continue;
+                }
 
                 OrderPizza orderPizza = new()
                 {
@@ -204,6 +229,12 @@
                 orderPizza.PricePerItemAtPurchase = priceTotal;
 
                 orderPizzas.Add(orderPizza);
+            }
+
+            if (invalidPizzas.Count > 0)
+            {
+                _ = invalidPizzas.Select(user.ShoppingCartPizzas.Remove);
+                await this._userRepository.SaveChangesAsync();
             }
 
             return orderPizzas;

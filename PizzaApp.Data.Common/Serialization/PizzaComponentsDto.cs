@@ -1,6 +1,7 @@
 ﻿namespace PizzaApp.Data.Common.Serialization
 {
     using System.Collections.Generic;
+    using System.Text.Json;
 
     // Customization model for serialization
     public class PizzaComponentsDto

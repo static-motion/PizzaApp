@@ -9,7 +9,7 @@
 
         [Phone]
         [Required(ErrorMessage = "Phone number is required.")]
-        public string? PhoneNumber { get; set; }
+        public required string PhoneNumber { get; set; }
 
         public string? Comment { get; set; }
     }

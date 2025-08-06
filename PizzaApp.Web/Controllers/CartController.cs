@@ -3,8 +3,9 @@
     using Microsoft.AspNetCore.Mvc;
     using PizzaApp.GCommon.Enums;
     using PizzaApp.GCommon.Extensions;
+    using PizzaApp.Services.Common.Exceptions;
     using PizzaApp.Services.Core.Interfaces;
-    using PizzaApp.Web.ViewModels.ShoppingCart;
+    using PizzaApp.Web.ViewModels.Cart;
 
     public class CartController :  BaseController
     {
@@ -20,24 +21,48 @@
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            Guid? userId = this.GetUserId();
+            try
+            {
+                Guid userId = this.GetUserId()!.Value;
 
-            CartViewWrapper shoppingCart =
-                await this._cartService.GetUserCart(userId!.Value);
+                CartViewWrapper shoppingCart =
+                    await this._cartService.GetUserCart(userId);
 
-            return this.View(shoppingCart);
+                return this.View(shoppingCart);
+            }
+            catch (Exception ex)
+            {
+                // TODO: Log message
+                return this.StatusCode(500);
+            }
+            
         }
 
         [HttpPost]
         public async Task<IActionResult> RemoveItem([FromForm] int itemId, [FromForm] string category)
         {
-            MenuCategory menuCategory = MenuCategoryExtensions.FromString(category)
+            try
+            {
+                MenuCategory menuCategory = MenuCategoryExtensions.FromString(category)
                 ?? throw new ArgumentException("Invalid category");
 
-            Guid? userId = this.GetUserId();
+                Guid? userId = this.GetUserId();
 
-            bool isRemoved = await this._cartService.RemoveItemFromCartAsync(itemId, userId!.Value, menuCategory);
-            return this.RedirectToAction(nameof(Index));
+                await this._cartService.RemoveItemFromCartAsync(itemId, userId!.Value, menuCategory);
+                return this.RedirectToAction(nameof(Index));
+            } 
+            catch (ArgumentException ex)
+            {
+                return this.BadRequest();
+            }
+            catch (EntityNotFoundException)
+            {
+                return this.BadRequest();
+            }
+            catch (Exception)
+            {
+                return this.StatusCode(500);
+            }
         }
 
         [HttpPost]

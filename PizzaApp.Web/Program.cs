@@ -59,15 +59,20 @@ namespace PizzaApp.Web
             });
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddCustomServices(typeof(MenuService).Assembly);
+            builder.Services.AddCustomServices(typeof(UserService).Assembly);
             builder.Services.AddRepositories(typeof(PizzaRepository).Assembly);
 
             WebApplication? app = builder.Build();
 
             using (IServiceScope scope = app.Services.CreateScope())
             {
-                IUserSeedingService userSeeding = scope.ServiceProvider.GetRequiredService<IUserSeedingService>();
+                IUserSeedingService userSeeding = scope.ServiceProvider
+                    .GetRequiredService<IUserSeedingService>();
                 await userSeeding.SeedUsersAndRolesAsync();
+
+                IPizzaSeedingService pizzaSeedingService = scope.ServiceProvider
+                    .GetRequiredService<IPizzaSeedingService>();
+                await pizzaSeedingService.SeedPizzas();
             }
             
             if (app.Environment.IsDevelopment())
@@ -91,7 +96,7 @@ namespace PizzaApp.Web
             app.UseAuthorization();
             app.MapControllerRoute(
                 name: "areas",
-                pattern: "{area:exists}/{controller=Manage}/{action=Index}/{id?}"
+                pattern: "{area:exists}/{controller=Overview}/{action=Index}/{id?}"
             );
             app.MapControllerRoute(
                 name: "default",

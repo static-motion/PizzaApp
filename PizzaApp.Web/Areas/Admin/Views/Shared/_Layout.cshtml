@@ -1,4 +1,5 @@
-﻿@{
+﻿@using static PizzaApp.GCommon.Constants;
+@{
     Layout = null;
 }
 
@@ -19,7 +20,7 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="Admin" asp-controller="Manage" asp-action="Index">Pizza Admin</a>
+                <a class="navbar-brand" asp-area="Admin" asp-controller="Overview" asp-action="Index">@AppName Admin Panel</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -32,11 +33,11 @@
                                 Items
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="itemsDropdown">
-                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Manage" asp-action="Pizzas">Pizzas</a></li>
-                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Manage" asp-action="Doughs">Doughs</a></li>
-                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Manage" asp-action="Sauces">Sauces</a></li>
-                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Manage" asp-action="Toppings">Toppings</a></li>
-                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Manage" asp-action="ToppingCategories">Topping Categories</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Overview" asp-action="Pizzas">Pizzas</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Overview" asp-action="Doughs">Doughs</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Overview" asp-action="Sauces">Sauces</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Overview" asp-action="Toppings">Toppings</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Overview" asp-action="ToppingCategories">Topping Categories</a></li>
                             </ul>
                         </li>
 
@@ -55,7 +56,7 @@
     </main>
 
     <footer class="text-center mt-5 mb-3 text-muted">
-        &copy; @DateTime.Now.Year - Pizza Admin Panel
+        &copy; @DateTime.Now.Year - @AppName Admin Panel
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

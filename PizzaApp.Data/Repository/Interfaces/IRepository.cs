@@ -44,5 +44,6 @@
         Task<IEnumerable<TEntity>> TakeAsync(int take, int skip = 0);
 
         Task<int> TotalEntityCountAsync();
+        Task<Dictionary<TKey, TEntity>> GetLookup();
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace PizzaApp.Services.Core
 {
-    using PizzaApp.Data.Common.Serialization;
     using PizzaApp.Data.Models;
     using PizzaApp.Data.Models.MappingEntities;
     using PizzaApp.Data.Repository.Interfaces;
@@ -8,97 +7,85 @@
     using PizzaApp.Services.Common.Dtos;
     using PizzaApp.Services.Common.Exceptions;
     using PizzaApp.Services.Core.Interfaces;
-    using PizzaApp.Web.ViewModels;
     using PizzaApp.Web.ViewModels.Address;
+    using PizzaApp.Web.ViewModels.Cart;
     using PizzaApp.Web.ViewModels.Menu;
     using PizzaApp.Web.ViewModels.ShoppingCart;
-    using System.Collections.Generic;
-
-    using static PizzaApp.Services.Common.ExceptionMessages;
-    using static PizzaApp.Services.Core.RepositoryHelper;
+    using System;
+    using System.Threading.Tasks;
 
     public class CartService : ICartService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IDoughRepository _doughRepository;
-        private readonly ISauceRepository _sauceRepository;
-        private readonly IToppingCategoryRepository _toppingCategoryRepository;
-        private readonly IPizzaRepository _pizzaRepository;
         private readonly IDrinkRepository _drinkRepository;
         private readonly IDessertRepository _dessertRepository;
+        private readonly IPizzaCartService _pizzaCartService;
 
-        public CartService(IUserRepository userRepository,
-            IDoughRepository doughRepository, 
-            ISauceRepository sauceRepository, 
-            IToppingCategoryRepository toppingCategoryRepository,
-            IPizzaRepository pizzaRepository,
+        public CartService(
+            IUserRepository userRepository,
+            IPizzaCartService pizzaCartService,
             IDrinkRepository drinkRepository,
             IDessertRepository dessertRepository)
         {
-            this._userRepository = userRepository;
-            this._doughRepository = doughRepository;
-            this._sauceRepository = sauceRepository;
-            this._toppingCategoryRepository = toppingCategoryRepository;
-            this._pizzaRepository = pizzaRepository;
-            this._drinkRepository = drinkRepository;
-            this._dessertRepository = dessertRepository;
+            _userRepository = userRepository;
+            _pizzaCartService = pizzaCartService;
+            _drinkRepository = drinkRepository;
+            _dessertRepository = dessertRepository;
         }
 
-        public static async Task RepoTest(IDessertRepository dessertRepository)
+        public async Task AddItemToCartAsync(MenuItemDetailsViewModel orderItem, Guid userId)
         {
-            var test = await dessertRepository.IgnoreFiltering().GetAllAsync();
-        }
-
-        public async Task<bool> AddItemToCartAsync(MenuItemDetailsViewModel orderItem, Guid userId)
-        {
-            User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId);
-
-            if (user is null)
+            try
             {
-                return false;
+                var user = await _userRepository.GetUserWithShoppingCartAsync(userId)
+                    ?? throw new EntityNotFoundException("Could not find user: " + userId);
+
+                switch (orderItem.Category)
+                {
+                    case MenuCategory.Drinks:
+                        await this.AddDrinkToCartAsync(orderItem, user);
+                        break;
+                    case MenuCategory.Desserts:
+                        await this.AddDessertToCartAsync(orderItem, user);
+                        break;
+                    default:
+                        throw new MenuCategoryNotImplementedException(orderItem.Category.ToString());
+                };
             }
-
-            bool result = orderItem.Category switch
+            catch (Exception)
             {
-                MenuCategory.Drinks => await this.AddDrinkToCartAsync(orderItem, user),
-                MenuCategory.Desserts => await this.AddDessertToCartAsync(orderItem, user),
-                _ => false
-            };
-
-            return result;
+                throw;
+            }
         }
-
-        private async Task<bool> AddDrinkToCartAsync(MenuItemDetailsViewModel item, User user)
+        private async Task AddDrinkToCartAsync(MenuItemDetailsViewModel item, User user)
         {
-            Drink? drink = await this._drinkRepository.GetByIdAsync(item.Id);
+            Drink? drink = await this._drinkRepository.GetByIdAsync(item.Id)
+                ?? throw new EntityNotFoundException(item.Id.ToString());
+            
+            ShoppingCartDrink? cartDrink = user.ShoppingCartDrinks
+                .FirstOrDefault(d => d.DrinkId == item.Id);
 
-            if (drink is null)
-                return false;
-
-            ShoppingCartDrink? cartDrink = user.ShoppingCartDrinks.FirstOrDefault(d => d.DrinkId == item.Id);
             if (cartDrink is not null)
             {
                 cartDrink.Quantity += item.Quantity;
-                return true;
+            } 
+            else
+            {
+                user.ShoppingCartDrinks.Add(new ShoppingCartDrink()
+                {
+                    DrinkId = item.Id,
+                    Quantity = item.Quantity,
+                    UserId = user.Id
+                });
             }
 
-            user.ShoppingCartDrinks.Add(new ShoppingCartDrink()
-            {
-                DrinkId = item.Id,
-                Quantity = item.Quantity,
-                UserId = user.Id
-            });
-
             await this._userRepository.SaveChangesAsync();
-            return true;
         }
 
-        private async Task<bool> AddDessertToCartAsync(MenuItemDetailsViewModel item, User user)
+        private async Task AddDessertToCartAsync(MenuItemDetailsViewModel item, User user)
         {
-            Dessert? dessert = await this._dessertRepository.IgnoreFiltering().GetByIdAsync(item.Id);
-
-            if (dessert is null)
-                return false;
+            Dessert? dessert = await this._dessertRepository.GetByIdAsync(item.Id)
+                ?? throw new EntityNotFoundException(item.Id.ToString());
 
             ShoppingCartDessert? cartDessert = user.ShoppingCartDesserts
                 .FirstOrDefault(d => d.DessertId == item.Id);
@@ -106,79 +93,62 @@
             if (cartDessert is not null)
             {
                 cartDessert.Quantity += item.Quantity;
-                return true;
+            }
+            else
+            {
+                user.ShoppingCartDesserts.Add(new ShoppingCartDessert()
+                {
+                    DessertId = item.Id,
+                    Quantity = item.Quantity,
+                    UserId = user.Id
+                });
             }
 
-            user.ShoppingCartDesserts.Add(new ShoppingCartDessert()
-            {
-                DessertId = item.Id,
-                Quantity = item.Quantity,
-                UserId = user.Id
-            });
-
             await this._userRepository.SaveChangesAsync();
-            return true;
         }
 
-        // TODO: refactor later
-        public async Task AddPizzaToCartAsync(PizzaCartDto pizzaDto, Guid userId)
+        public Task AddPizzaToCartAsync(PizzaCartDto pizzaDto, Guid userId)
         {
-            User user = await this._userRepository.GetUserWithShoppingCartAsync(userId)
-                ?? throw new EntityNotFoundException(UserNotFoundMessage, userId.ToString());
-
-            PizzaComponentsDto components = new()
-            {
-                DoughId = pizzaDto.DoughId,
-                SauceId = pizzaDto.SauceId,
-                SelectedToppings = pizzaDto.SelectedToppingsIds
-            };
-
-            ShoppingCartPizza pizza = new()
-            {
-                BasePizzaId = pizzaDto.PizzaId,
-                Quantity = pizzaDto.Quantity,
-                User = user,
-                UserId = user.Id,
-            };
-
-            // serialize components to JSON
-            pizza.SerializeComponentsToJson(components);
-
-            // check if pizza already in cart
-            ShoppingCartPizza? equalPizza = user.ShoppingCartPizzas.FirstOrDefault(p => 
-                (p.GetComponentsFromJson()?.Equals(components) ?? false) // check if components match
-                && pizza.BasePizzaId == p.BasePizzaId); // check if base pizza matches
-
-            // if pizza with same components exists, increase quantity
-            if (equalPizza is not null)
-            {
-                equalPizza.Quantity += pizzaDto.Quantity;
-            }
-            else // if not add new pizza to the cart
-            {
-                user.ShoppingCartPizzas.Add(pizza);
-            }
-
-            await this._userRepository.SaveChangesAsync();
+            return this._pizzaCartService.AddPizzaToCartAsync(pizzaDto, userId);
         }
 
-        //TODO: The current cart index view doesn't use all properties from the view models. Fix when possible.
-        public async Task<CartViewWrapper> GetUserCart(Guid userId)
+        public async Task ClearShoppingCart(Guid userId)
         {
             User? user = await this._userRepository.GetUserWithAddressesAndCartAsync(userId)
-                ?? throw new InvalidOperationException(UserNotFoundMessage);
+                ?? throw new EntityNotFoundException(nameof(User), userId.ToString());
 
-            IEnumerable<CartPizzaViewModel> pizzasInCart = await this.GetAllPizzasInCart(user);
-            IEnumerable<CartDrinkViewModel> drinksInCart = GetAllDrinksInCart(user);
-            IEnumerable<CartDessertViewModel> dessertsInCart = GetAllDessertsInCart(user);
+            user.ShoppingCartPizzas.Clear();
+            user.ShoppingCartDrinks.Clear();
+            user.ShoppingCartDesserts.Clear();
 
-            CartItemsViewWrapper cartItems = new()
+            await this._userRepository.SaveChangesAsync();
+        }
+
+        public async Task<CartViewWrapper> GetUserCart(Guid userId)
+        {
+            User? user = await _userRepository.GetUserWithAddressesAndCartAsync(userId)
+            ?? throw new EntityNotFoundException(userId.ToString());
+
+            return new CartViewWrapper
             {
-                Pizzas = pizzasInCart,
-                Drinks = drinksInCart,
-                Desserts = dessertsInCart
+                Items = new CartItemsViewWrapper
+                {
+                    Pizzas = await _pizzaCartService.GetPizzasInCart(user),
+                    Drinks = GetDrinksInCart(user),
+                    Desserts = GetDessertsInCart(user)
+                },
+                Addresses = GetUserAddresses(user),
+                OrderDetails = new OrderDetailsInputModel
+                {
+                    PhoneNumber = user.PhoneNumber ?? "",
+                    AddressId = user.Addresses.FirstOrDefault()?.Id
+                }
             };
-            IEnumerable<AddressViewModel> addresses = user.Addresses
+        }
+
+        private static IEnumerable<AddressViewModel> GetUserAddresses(User user)
+        {
+            return user.Addresses
                 .Select(a => new AddressViewModel
                 {
                     Id = a.Id,
@@ -186,22 +156,9 @@
                     AddressLine1 = a.AddressLine1,
                     AddressLine2 = a.AddressLine2,
                 });
-
-            CartViewWrapper shoppingCart = new()
-            {
-                Items = cartItems,
-                Addresses = addresses,
-                OrderDetails = new OrderDetailsInputModel()
-                {
-                    PhoneNumber = user.PhoneNumber,
-                    AddressId = addresses.FirstOrDefault()?.Id ?? null,
-                }
-            };
-
-            return shoppingCart;
         }
 
-        private static List<CartDessertViewModel> GetAllDessertsInCart(User user)
+        private static List<CartDessertViewModel> GetDessertsInCart(User user)
         {
             return user.ShoppingCartDesserts
                 .Select(d => new CartDessertViewModel
@@ -214,7 +171,7 @@
                 }).ToList();
         }
 
-        private static List<CartDrinkViewModel> GetAllDrinksInCart(User user)
+        private static List<CartDrinkViewModel> GetDrinksInCart(User user)
         {
             return user.ShoppingCartDrinks
                 .Select(d => new CartDrinkViewModel
@@ -227,149 +184,34 @@
                 }).ToList();
         }
 
-        private async Task<IEnumerable<CartPizzaViewModel>> GetAllPizzasInCart(User user)
+        public async Task RemoveItemFromCartAsync(int itemId, Guid userId, MenuCategory menuCategory)
         {
-            IEnumerable<ToppingCategory> allToppingCategories = await this._toppingCategoryRepository
-                .DisableTracking()
-                .GetAllWithToppingsAsync();
-
-            Dictionary<int, Dough> doughsLookup = await GetEntityLookup(this._doughRepository);
-            Dictionary<int, Sauce> saucesLookup = await GetEntityLookup(this._sauceRepository, ignoreFiltering: true);
-
-            List<CartPizzaViewModel> pizzasInCart = new();
-
-            foreach (ShoppingCartPizza pizza in user.ShoppingCartPizzas)
-            {
-                // load base pizza
-                Pizza basePizza = await this._pizzaRepository
-                    .DisableTracking()
-                    .IgnoreFiltering()
-                    .GetByIdAsync(pizza.BasePizzaId)
-                    ?? throw new EntityNotFoundException(PizzaNotFoundMessage, pizza.BasePizzaId);
-
-                PizzaComponentsDto components = pizza.GetComponentsFromJson()
-                    ?? throw new InvalidOperationException("Pizza components not found or invalid."); //TODO: handle more gracefully
-                
-
-                // load dough and sauce
-                if (!doughsLookup.TryGetValue(components.DoughId, out Dough? dough))
-                {
-                    continue;
-                }
-
-                Sauce? sauce = null;
-                // this is done because selecting a sauce for the pizza is not mandatory.
-                // we need to differenciate between when a user has not picked a sauce and
-                // when the sauce has been disabled (IsDeleted = true)
-                // if SauceId doesn't have a value we can conclude that the user has not picked a sauce.
-                if (components.SauceId.HasValue) // if the SauceId has value
-                {                                // we try to get it from the lookup dictionary
-                    if (!saucesLookup.TryGetValue(components.SauceId.Value, out sauce)) 
-                    {
-                        continue;// if we end up here this means
-                                 // that the sauce has been filtered out by the query filter
-                                 // due to IsDeleted = true. We skip building the cart pizza
-                                 // with the inactive sauce
-                    }
-                }
-
-                try
-                {
-                    CartPizzaViewModel pizzaViewModel = new()
-                    {
-                        Id = pizza.Id,
-                        Name = basePizza.Name,
-                        DoughName = dough.Type,
-                        SauceName = sauce?.Type ?? "No", 
-                        Quantity = pizza.Quantity
-                    };
-
-                    foreach (int toppingId in components.SelectedToppings)
-                    {
-                        Topping? topping = allToppingCategories.SelectMany(tc => tc.Toppings)
-                            .FirstOrDefault(t => t.Id == toppingId)                     
-                        ?? throw new DeletedOrInactiveToppingException(DeletedOrInactiveToppingMessage, toppingId); //skip pizza because one or more
-                                                                                                                    //of the toppings is inactive
-
-                        string categoryName = topping.ToppingCategory.Name;
-
-                        if (!pizzaViewModel.Toppings.TryGetValue(categoryName, out List<ToppingViewModel>? categoryItems))
-                        {
-                            categoryItems = new List<ToppingViewModel>();
-                            pizzaViewModel.Toppings.Add(categoryName, categoryItems);
-                        }
-
-                        categoryItems.Add(new ToppingViewModel()
-                        {
-                            Id = topping.Id,
-                            Name = topping.Name,
-                            Price = topping.Price
-                        });
-                    }
-
-                    decimal toppingsTotalPrice = pizzaViewModel.Toppings.Values
-                        .SelectMany(t => t)
-                        .Sum(t => t.Price);
-                    pizzaViewModel.Price = toppingsTotalPrice + dough.Price + (sauce?.Price ?? 0);
-
-                    pizzasInCart.Add(pizzaViewModel);
-                }
-                catch (DeletedOrInactiveToppingException)
-                {
-                    continue;
-                }
-
-            }
-            return pizzasInCart;
-        }
-
-        public async Task<bool> RemoveItemFromCartAsync(int itemId, Guid userId, MenuCategory menuCategory)
-        {
-            User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId);
-
-            if (user is null)
-                return false; // TODO: throw exception instead for better error handling
-
+            User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId)
+                ?? throw new EntityNotFoundException(userId.ToString());
+            
             switch (menuCategory)
             {
                 case MenuCategory.Pizzas:
-                    ShoppingCartPizza? pizzaToRemove = user.ShoppingCartPizzas.FirstOrDefault(p => p.Id == itemId);
-                    if (pizzaToRemove is null)
-                        return false;
+                    ShoppingCartPizza? pizzaToRemove = user.ShoppingCartPizzas.FirstOrDefault(p => p.Id == itemId) 
+                        ?? throw new EntityNotFoundException(itemId.ToString());
                     user.ShoppingCartPizzas.Remove(pizzaToRemove);
                     break;
                 case MenuCategory.Drinks:
-                    ShoppingCartDrink? drinkToRemove = user.ShoppingCartDrinks.FirstOrDefault(d => d.DrinkId == itemId);
-                    if (drinkToRemove is null)
-                        return false;
+                    ShoppingCartDrink? drinkToRemove = user.ShoppingCartDrinks.FirstOrDefault(d => d.DrinkId == itemId)
+                        ?? throw new EntityNotFoundException(itemId.ToString());
                     user.ShoppingCartDrinks.Remove(drinkToRemove);
                     break;
                 case MenuCategory.Desserts:
-                    ShoppingCartDessert? dessertToRemove = user.ShoppingCartDesserts.FirstOrDefault(d => d.DessertId == itemId);
-                    if (dessertToRemove is null)
-                        return false;
+                    ShoppingCartDessert? dessertToRemove = user.ShoppingCartDesserts.FirstOrDefault(d => d.DessertId == itemId)
+                        ?? throw new EntityNotFoundException(itemId.ToString());
                     user.ShoppingCartDesserts.Remove(dessertToRemove);
                     break;
                 default:
                     throw new MenuCategoryNotImplementedException
-                        (MenuCategoryNotImplementedMessage, menuCategory.ToString());
+                        (menuCategory.ToString());
             }
 
             await this._userRepository.SaveChangesAsync();
-            return true; // Successfully removed the item from the cart
         }
-
-        public async Task ClearShoppingCart(Guid userId)
-        {
-            User? user = await this._userRepository.GetUserWithAddressesAndCartAsync(userId)
-                ?? throw new EntityNotFoundException(UserNotFoundMessage, userId.ToString());
-
-            user.ShoppingCartPizzas.Clear();
-            user.ShoppingCartDrinks.Clear();
-            user.ShoppingCartDesserts.Clear();
-
-            await this._userRepository.SaveChangesAsync();
-        }
-
     }
 }

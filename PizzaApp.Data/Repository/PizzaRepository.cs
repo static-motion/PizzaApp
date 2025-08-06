@@ -4,6 +4,7 @@
     using Microsoft.EntityFrameworkCore;
     using PizzaApp.Data.Models;
     using PizzaApp.Data.Repository.Interfaces;
+    using System;
     using System.Collections.Generic;
 
     public class PizzaRepository : BaseRepository<Pizza, int, IPizzaRepository>, IPizzaRepository
@@ -15,7 +16,7 @@
 
         public async Task<ICollection<Pizza>> GetAllBasePizzasAsync()
         {
-            IQueryable<Pizza> query = this.DbSet.Where(p => p.PizzaType == PizzaType.BasePizza);
+            IQueryable<Pizza> query = this.DbSet.Where(p => p.PizzaType == PizzaType.AdminPizza);
             query = this.ApplyConfiguration(query);
 
             ICollection<Pizza> result = await query.ToListAsync();
@@ -24,10 +25,10 @@
             return result;
         }
 
-        public async Task<ICollection<Pizza>> TakeBasePizzasWithIngredientsAsync(int take, int skip = 0)
+        public async Task<IEnumerable<Pizza>> TakeBasePizzasWithIngredientsAsync(int take, int skip = 0)
         {
             IQueryable<Pizza> query = this.DbSet
-                .Where(p => p.PizzaType == PizzaType.BasePizza)
+                .Where(p => p.PizzaType == PizzaType.AdminPizza)
                 .Include(p => p.Dough)
                 .Include(p => p.Sauce)
                 .Include(p => p.Toppings)
@@ -54,6 +55,19 @@
 
             Pizza? result = await query.FirstOrDefaultAsync(p => p.Id == id);
             this.DbContext.BypassIngredientsFilters = false;
+            return result;
+        }
+
+        public async Task<ICollection<Pizza>> GetAllUserPizzasAsync(Guid userId)
+        {
+            IQueryable<Pizza> query = this.DbSet.Where(p => 
+                                                    p.PizzaType == PizzaType.CustomerPizza 
+                                                    && p.CreatorUserId == userId);
+            query = this.ApplyConfiguration(query);
+
+            ICollection<Pizza> result = await query.ToListAsync();
+            this.DbContext.BypassIngredientsFilters = false;
+
             return result;
         }
     }

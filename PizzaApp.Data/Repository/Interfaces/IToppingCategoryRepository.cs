@@ -6,6 +6,6 @@
     public interface IToppingCategoryRepository : IRepository<ToppingCategory, int, IToppingCategoryRepository>
     {
         
-        public Task<IEnumerable<ToppingCategory>> GetAllWithToppingsAsync();
+        public Task<IEnumerable<ToppingCategory>> GetAllCategoriesWithToppingsAsync();
     }
 }

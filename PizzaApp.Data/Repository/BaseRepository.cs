@@ -2,6 +2,7 @@
 {
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
+    using PizzaApp.Data.Common.Exceptions;
     using PizzaApp.Data.Models;
     using PizzaApp.Data.Models.Interfaces;
     using PizzaApp.Data.Repository.Interfaces;
@@ -277,25 +278,31 @@
             return result;
         }
 
-        /// <summary>
-        /// Asynchronously retrieves a collection of entities based on a list of their primary keys. 
-        /// Applies any configured query options (e.g., AsNoTracking, IgnoreFilters). 
-        /// Throws an InvalidOperationException if not all entities for the provided IDs are found.
-        /// </summary>
-        /// <param name="ids">An enumerable collection of primary keys.</param>
-        /// <returns>A Task that represents the asynchronous operation. 
-        /// The task result contains an enumerable collection of entities corresponding to the provided IDs.</returns>
-        /// <exception cref="InvalidOperationException">InvalidOperationException if the count of retrieved entities does not match the count of provided IDs.</exception>
-        public async Task<IEnumerable<TEntity>> GetRangeByIdsAsync(IEnumerable<TKey> ids)
+        public async Task<Dictionary<TKey, TEntity>> GetLookup()
         {
             IQueryable<TEntity> query = this.DbSet.AsQueryable();
             query = this.ApplyConfiguration(query);
-            IEnumerable<TEntity> result = await query.Where(e => ids.Contains(e.Id)).ToListAsync();
-            if (result.Count() != ids.Count())
-            {
-                throw new InvalidOperationException("Not all entities were found for the provided IDs.");
-            }
+            IEnumerable<TEntity> allEntities = await this.GetAllAsync();
+
             this.DbContext.BypassIngredientsFilters = false;
+
+            return allEntities.ToDictionary(e => e.Id, e => e);
+        }
+
+        public async Task<IEnumerable<TEntity>> GetRangeByIdsAsync(IEnumerable<TKey> ids)
+        {
+            if (!ids.Any())
+                return Enumerable.Empty<TEntity>();
+
+            IQueryable<TEntity> query = this.DbSet.AsQueryable();
+            query = this.ApplyConfiguration(query);
+            IEnumerable<TEntity> result = await query.Where(e => ids.Contains(e.Id)).ToListAsync();
+            
+            this.DbContext.BypassIngredientsFilters = false;
+
+            if (result.Count() != ids.Count())
+                throw new EntityRangeCountMismatchException("msg");
+
 
             return result;
         }

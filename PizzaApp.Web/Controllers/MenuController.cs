@@ -3,9 +3,8 @@
     using Humanizer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-
+    using PizzaApp.Data.Common.Exceptions;
     using PizzaApp.GCommon.Enums;
-    using PizzaApp.GCommon.Extensions;
     using PizzaApp.Services.Common.Dtos;
     using PizzaApp.Services.Common.Exceptions;
     using PizzaApp.Services.Core.Interfaces;
@@ -18,62 +17,59 @@
                   .ToDictionary(mc => mc, mc => mc.ToString()
                                                   .Humanize(LetterCasing.Title));
 
-        private readonly IMenuService _menuService;
         private readonly ICartService _cartService;
+        private readonly IPizzaMenuService _pizzaMenuService;
+        private readonly IDessertMenuService _dessertMenuService;
+        private readonly IDrinkMenuService _drinkMenuService;
 
-        public MenuController(IMenuService menuService, ICartService cartService)
+        public MenuController(IPizzaMenuService pizzaMenuService, 
+            ICartService cartService,
+            IDrinkMenuService drinkMenuService,
+            IDessertMenuService dessertMenuService)
         {
-            this._menuService = menuService;
             this._cartService = cartService;
+            this._pizzaMenuService = pizzaMenuService;
+            this._dessertMenuService = dessertMenuService;
+            this._drinkMenuService = drinkMenuService;
         }
 
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Index()
         {
-            return this.RedirectToAction(nameof(Category), new { category = MenuCategory.Pizzas });
+            return this.RedirectToAction(nameof(Pizzas));
         }
 
-        [HttpGet("/Menu/{category}")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Category(string category)
+        [HttpGet]
+        public async Task<IActionResult> Pizzas()
         {
             try
             {
-                MenuCategory? categoryEnum = MenuCategoryExtensions.FromString(category);
-
-                if (categoryEnum is null)
-                    return this.NotFound();
-
                 IEnumerable<MenuItemViewModel> menuItems
-                    = await this._menuService.GetAllMenuItemsForCategoryAsync(categoryEnum.Value);
+                    = await this._pizzaMenuService.GetAllBaseItemsAsync();
 
                 MenuCategoryViewWrapper menuView = new()
                 {
                     Items = menuItems,
                     AllCategories = FormattedCategoryNames,
-                    Category = categoryEnum.Value
+                    Category = MenuCategory.Pizzas
                 };
 
-                return this.View(menuView);
-            }
-            catch (MenuCategoryNotImplementedException)
-            {
-                return this.NotFound(); //TODO: Log message
+                return this.View("Category", menuView);
             }
             catch (Exception)
             {
-                return this.BadRequest();
+                return this.BadRequest(); // TODO: Log
             }
         }
 
-        [HttpGet]
+        [HttpGet("/Menu/Pizzas/{id}")]
         public async Task<IActionResult> Pizzas(int id)
         {
             try
             {
                 PizzaDetailsViewWrapper orderPizzaViewModel
-                    = await this._menuService.GetPizzaDetailsByIdAsync(id);
+                    = await this._pizzaMenuService.GetPizzaDetailsByIdAsync(id);
 
                 return this.View("PizzaDetails", orderPizzaViewModel);
             }
@@ -88,12 +84,79 @@
         }
 
         [HttpGet]
+        public async Task<IActionResult> MyPizzas()
+        {
+            try
+            {
+                Guid? userId = this.GetUserId();
+                IEnumerable<MenuItemViewModel> menuItems
+                    = await this._pizzaMenuService.GetAllUserPizzasAsync(userId!.Value);
+
+                MenuCategoryViewWrapper menuView = new()
+                {
+                    Items = menuItems,
+                    AllCategories = FormattedCategoryNames,
+                    Category = MenuCategory.MyPizzas
+                };
+
+                return this.View("Category", menuView);
+            }
+            catch (Exception)
+            {
+                return this.BadRequest(); // TODO: Log
+            }
+        }
+
+        [HttpGet("/Menu/MyPizzas/{id}")]
+        public async Task<IActionResult> MyPizzas(int id)
+        {
+            try
+            {
+                PizzaDetailsViewWrapper orderPizzaViewModel
+                    = await this._pizzaMenuService.GetPizzaDetailsByIdAsync(id);
+
+                return this.View("PizzaDetails", orderPizzaViewModel);
+            }
+            catch (EntityNotFoundException)
+            {
+                return this.NotFound();
+            }
+            catch (Exception)
+            {
+                return this.BadRequest(); // TODO: Log
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Drinks()
+        {
+            try
+            {
+                IEnumerable<MenuItemViewModel> menuItems
+                    = await this._drinkMenuService.GetAllBaseItemsAsync();
+
+                MenuCategoryViewWrapper menuView = new()
+                {
+                    Items = menuItems,
+                    AllCategories = FormattedCategoryNames,
+                    Category = MenuCategory.Drinks
+                };
+
+                return this.View("Category", menuView);
+            }
+            catch (Exception)
+            {
+                return this.BadRequest(); // TODO: Log
+            }
+        }
+
+        [HttpGet("/Menu/Drinks/{id}")]
         public async Task<IActionResult> Drinks(int id)
         {
             try
             {
                 MenuItemDetailsViewModel orderItem
-                    = await this._menuService.GetDrinkDetailsById(id);
+                    = await this._drinkMenuService.GetDetailsById(id);
                 return this.View("ItemDetails", orderItem);
             }
             catch (EntityNotFoundException)
@@ -107,12 +170,35 @@
         }
 
         [HttpGet]
+        public async Task<IActionResult> Desserts()
+        {
+            try
+            {
+                IEnumerable<MenuItemViewModel> menuItems
+                    = await this._dessertMenuService.GetAllBaseItemsAsync();
+
+                MenuCategoryViewWrapper menuView = new()
+                {
+                    Items = menuItems,
+                    AllCategories = FormattedCategoryNames,
+                    Category = MenuCategory.Desserts
+                };
+
+                return this.View("Category", menuView);
+            }
+            catch (Exception)
+            {
+                return this.BadRequest(); // TODO: Log
+            }
+        }
+
+        [HttpGet("/Menu/Desserts/{id}")]
         public async Task<IActionResult> Desserts(int id)
         {
             try
             {
                 MenuItemDetailsViewModel orderItem
-                    = await this._menuService.GetDessertDetailsById(id);
+                    = await this._dessertMenuService.GetDetailsById(id);
                 return this.View("ItemDetails", orderItem);
             }
             catch (EntityNotFoundException)
@@ -150,31 +236,56 @@
                 SelectedToppingsIds = input.SelectedToppingIds.ToArray(),
                 Quantity = input.Quantity
             };
+            try
+            {
+                await this._cartService.AddPizzaToCartAsync(pizzaDto, userId!.Value);
 
-            await this._cartService.AddPizzaToCartAsync(pizzaDto, userId!.Value);
-
-            return this.RedirectToAction(nameof(Index));
+                return this.RedirectToAction(nameof(Index));
+            } 
+            catch (EntityNotFoundException)
+            {
+                return this.BadRequest();
+            }
+            catch (EntityRangeCountMismatchException)
+            {
+                return this.BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return this.StatusCode(500);
+            }
+            
         }
 
         [HttpPost]
         public async Task<IActionResult> AddItemToCart(MenuItemDetailsViewModel? orderItem)
         {
-            if (orderItem is null)
+            if (orderItem is null || !this.ModelState.IsValid)
             {
                 // TODO: Handle better
                 return this.BadRequest("Invalid menu item.");
             }
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest();
-                // TODO: Handle
-            }
+
             Guid? userId = this.GetUserId(); // TODO: handle null userId
 
-            bool addedToCart = await this._cartService
-                .AddItemToCartAsync(orderItem, userId!.Value);
+            try
+            {
+                await this._cartService.AddItemToCartAsync(orderItem, userId!.Value);
 
-            return this.RedirectToAction(nameof(Index));
+                return this.RedirectToAction(nameof(Index));
+            }
+            catch (EntityNotFoundException)
+            {
+                return this.BadRequest();
+            }
+            catch (EntityRangeCountMismatchException)
+            {
+                return this.BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return this.StatusCode(500);
+            }
         }
     }
 }

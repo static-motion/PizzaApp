@@ -4,10 +4,12 @@
 
     public interface IPizzaRepository : IRepository<Pizza, int, IPizzaRepository>
     {
+        public Task<ICollection<Pizza>> GetAllBasePizzasAsync();
+
+        public Task<ICollection<Pizza>> GetAllUserPizzasAsync(Guid userId);
+
         public Task<Pizza?> GetByIdWithIngredientsAsync(int id);
 
-        public Task<ICollection<Pizza>> GetAllBasePizzasAsync();
-        
-        Task<ICollection<Pizza>> TakeBasePizzasWithIngredientsAsync(int take, int skip = 0);
+        Task<IEnumerable<Pizza>> TakeBasePizzasWithIngredientsAsync(int take, int skip = 0);
     }
 }

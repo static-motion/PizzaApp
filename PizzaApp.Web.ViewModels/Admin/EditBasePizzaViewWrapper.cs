@@ -6,6 +6,6 @@
     {
         [ValidateNever]
         public PizzaIngredientsViewWrapper Ingredients { get; set; } = null!;
-        public BasePizzaInputModel Pizza { get; set; } = null!;
+        public EditBasePizzaInputModel Pizza { get; set; } = null!;
     }
 }

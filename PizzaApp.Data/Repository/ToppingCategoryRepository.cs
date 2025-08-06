@@ -12,7 +12,7 @@
         {
         }
 
-        public async Task<IEnumerable<ToppingCategory>> GetAllWithToppingsAsync()
+        public async Task<IEnumerable<ToppingCategory>> GetAllCategoriesWithToppingsAsync()
         {
             IQueryable<ToppingCategory> query = this.DbSet.Include(tc => tc.Toppings);
 

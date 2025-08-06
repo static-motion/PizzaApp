@@ -9,26 +9,26 @@
     public class ShoppingCartPizza : IEntity<int>
     {
         [Comment("Primary Key unique identifier")]
-        public int Id { get; set; }
+        public virtual int Id { get; set; }
 
         [Comment("Foreign Key to base Pizza")]
-        public int BasePizzaId { get; set; }
+        public virtual int BasePizzaId { get; set; }
 
         public Pizza BasePizza { get; set; } = null!;
 
         [Comment("Foreign Key to User. Indicates whose shopping cart this pizza is in.")]
-        public Guid UserId { get; set; }
+        public virtual Guid UserId { get; set; }
 
         public User User { get; set; } = null!;
 
         [Comment("Quantity of this item in cart")]
-        public int Quantity { get; set; }
+        public virtual int Quantity { get; set; }
 
         [Comment("JSON serialized pizza data")]
-        public string? PizzaComponentsJson { get; set; }
+        public virtual string? PizzaComponentsJson { get; set; }
 
         // Helper methods to work with components data
-        public PizzaComponentsDto? GetComponentsFromJson()
+        public virtual PizzaComponentsDto? GetComponentsFromJson()
         {
             if (string.IsNullOrEmpty(this.PizzaComponentsJson))
                 return null;
@@ -36,7 +36,7 @@
             return JsonSerializer.Deserialize<PizzaComponentsDto>(this.PizzaComponentsJson);
         }
 
-        public void SerializeComponentsToJson(PizzaComponentsDto? data)
+        public virtual void SerializeComponentsToJson(PizzaComponentsDto? data)
         {
             if (data == null)
             {

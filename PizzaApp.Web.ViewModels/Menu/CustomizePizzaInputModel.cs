@@ -13,11 +13,13 @@
         public required string Name { get; set; }
 
         [Range(1, 20)]
+        [Required]
         public int Quantity { get; set; }
 
         public string? Description { get; set; }
 
         [Range(1, double.MaxValue)]
+        [Required]
         public int DoughId { get; set; }
 
         [Range(1, double.MaxValue)]

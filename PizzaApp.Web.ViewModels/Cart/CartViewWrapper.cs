@@ -1,10 +1,13 @@
-﻿namespace PizzaApp.Web.ViewModels.ShoppingCart
+﻿namespace PizzaApp.Web.ViewModels.Cart
 {
+    using PizzaApp.Web.ViewModels.ShoppingCart;
+    using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
     using PizzaApp.Web.ViewModels.Address;
 
     public class CartViewWrapper
     {
-        public CartItemsViewWrapper? Items { get; set; }
+        [ValidateNever]
+        public CartItemsViewWrapper Items { get; set; } = null!;
 
         public OrderDetailsInputModel OrderDetails { get; set; } = null!;
         
