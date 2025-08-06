@@ -61,6 +61,7 @@ nav.navbar > div.container-fluid {
 }
 
 .account-dropdown-menu {
+    z-index: 10;
     list-style-type: none;
     position: absolute;
     top: 50px;
