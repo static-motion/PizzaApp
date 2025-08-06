@@ -60,7 +60,7 @@
             try
             {
                 await this._pizzaCreationService.CreatePizzaAsync(pizzaInput, userId!.Value);
-                return this.RedirectToAction(nameof(Create));
+                return this.RedirectToAction("MyPizzas", "Menu");
             }
             catch (EntityNotFoundException)
             {

@@ -4,11 +4,11 @@
     using PizzaApp.Services.Core.Interfaces;
     using PizzaApp.Web.ViewModels.Admin;
 
-    public class MyPizzasController : BaseAdminController
+    public class PizzasController : BaseAdminController
     {
         private readonly IPizzaManagementService _pizzaManagementService;
         private readonly IIngredientsService _ingredientsService;
-        public MyPizzasController(IPizzaManagementService pizzaManagementService,               
+        public PizzasController(IPizzaManagementService pizzaManagementService,               
             IIngredientsService ingredientsService)
         {
             this._pizzaManagementService = pizzaManagementService;

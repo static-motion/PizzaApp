@@ -70,7 +70,7 @@
         {
             if (!this.ModelState.IsValid) // TODO: handle better lol
             {
-                return this.BadRequest(this.ModelState);
+                return this.BadRequest();
             }
 
             Guid? userId = this.GetUserId();
