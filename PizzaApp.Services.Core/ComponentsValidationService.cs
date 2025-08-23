@@ -1,6 +1,7 @@
 ﻿namespace PizzaApp.Services.Core
 {
     using PizzaApp.Data.Common.Exceptions;
+    using PizzaApp.Data.Models;
     using PizzaApp.Data.Repository.Interfaces;
     using PizzaApp.Services.Common.Exceptions;
     using PizzaApp.Services.Core.Interfaces;
@@ -29,7 +30,7 @@
                 this._doughRepository.IgnoreFiltering();
             }
             bool doughExists = await this._doughRepository.ExistsAsync(d => d.Id == doughId);
-            if (!doughExists) throw new EntityNotFoundException("");
+            if (!doughExists) throw new EntityNotFoundException(nameof(Dough), doughId.ToString());
 
             if (sauceId.HasValue)
             {
@@ -38,7 +39,7 @@
                     this._sauceRepository.IgnoreFiltering();
                 }
                 var sauceExists = await this._sauceRepository.ExistsAsync(s => sauceId.Value == s.Id);
-                if (!sauceExists) throw new EntityNotFoundException("");
+                if (!sauceExists) throw new EntityNotFoundException(nameof(Sauce), sauceId.Value.ToString());
             }
 
             try

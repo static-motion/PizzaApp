@@ -213,7 +213,7 @@
             var userId = Guid.NewGuid();
 
             _pizzaCreationServiceMock.Setup(x => x.CreatePizzaAsync(inputModel, userId))
-                .ThrowsAsync(new EntityNotFoundException(""));
+                .ThrowsAsync(new EntityNotFoundException("test", "test"));
 
             // Act & Assert
             Assert.ThrowsAsync<EntityNotFoundException>(() =>

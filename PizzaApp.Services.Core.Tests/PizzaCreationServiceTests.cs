@@ -197,7 +197,7 @@
 
             _componentsValidationServiceMock.Setup(x => x.ValidateComponentsExistAsync(
                 inputModel.DoughId, inputModel.SauceId, inputModel.SelectedToppingIds, false))
-                .ThrowsAsync(new EntityNotFoundException("test"));
+                .ThrowsAsync(new EntityNotFoundException("test", "test"));
 
             // Act & Assert
             Assert.ThrowsAsync<EntityNotFoundException>(() =>

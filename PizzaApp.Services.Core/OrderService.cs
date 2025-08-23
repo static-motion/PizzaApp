@@ -55,8 +55,8 @@
                 .GetAllCategoriesWithToppingsAsync();
 
             Dictionary<int, Dough> doughLookup = await this._doughRepository
-                .DisableTracking()
                 .IgnoreFiltering()
+                .DisableTracking()
                 .GetLookup();
 
             Dictionary<int, Sauce> sauceLookup = await this._sauceRepository
@@ -86,7 +86,7 @@
                     Quantity = op.Quantity,
                     Price = op.PricePerItemAtPurchase,
                     DoughName = doughLookup.TryGetValue(op.DoughId, out Dough? dough) 
-                        ? dough.Type : throw new EntityNotFoundException("Dough not found"),
+                        ? dough.Type : throw new EntityNotFoundException(nameof(Dough), op.DoughId.ToString()),
                     SauceName = op.SauceId.HasValue && sauceLookup.TryGetValue(op.SauceId.Value, out Sauce? sauce) 
                         ? sauce.Type : "No Sauce",
                     Toppings = allToppingCategories.SelectMany(t => t.Toppings) // what a mess
@@ -113,7 +113,7 @@
         public async Task PlaceOrderAsync(OrderDetailsInputModel orderDetails, Guid userId)
         {
             User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId)
-                ?? throw new EntityNotFoundException(EntityNotFoundMessage, nameof(User), userId.ToString()); 
+                ?? throw new EntityNotFoundException(nameof(User), userId.ToString()); 
             
             // TODO: Get user with addresses to validate                                                
             // that the user is trying to order to an address they own

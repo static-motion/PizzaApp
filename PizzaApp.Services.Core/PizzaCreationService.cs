@@ -30,7 +30,7 @@
         public async Task CreatePizzaAsync(ICreatePizzaInputModel inputPizza, Guid userId)
         {
             User? user = await this._userManager.FindByIdAsync(userId.ToString())
-                ?? throw new EntityNotFoundException(userId.ToString());
+                ?? throw new EntityNotFoundException(nameof(User), userId.ToString());
 
             bool isAdmin = await this._userManager.IsInRoleAsync(user, "Admin");
 

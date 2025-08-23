@@ -38,7 +38,7 @@
             try
             {
                 var user = await _userRepository.GetUserWithShoppingCartAsync(userId)
-                    ?? throw new EntityNotFoundException("Could not find user: " + userId);
+                    ?? throw new EntityNotFoundException(nameof(User), userId.ToString());
 
                 switch (orderItem.Category)
                 {
@@ -60,7 +60,7 @@
         private async Task AddDrinkToCartAsync(MenuItemDetailsViewModel item, User user)
         {
             Drink? drink = await this._drinkRepository.GetByIdAsync(item.Id)
-                ?? throw new EntityNotFoundException(item.Id.ToString());
+                ?? throw new EntityNotFoundException(nameof(Drink), item.Id.ToString());
             
             ShoppingCartDrink? cartDrink = user.ShoppingCartDrinks
                 .FirstOrDefault(d => d.DrinkId == item.Id);
@@ -85,7 +85,7 @@
         private async Task AddDessertToCartAsync(MenuItemDetailsViewModel item, User user)
         {
             Dessert? dessert = await this._dessertRepository.GetByIdAsync(item.Id)
-                ?? throw new EntityNotFoundException(item.Id.ToString());
+                ?? throw new EntityNotFoundException(nameof(Dessert), item.Id.ToString());
 
             ShoppingCartDessert? cartDessert = user.ShoppingCartDesserts
                 .FirstOrDefault(d => d.DessertId == item.Id);
@@ -127,7 +127,7 @@
         public async Task<CartViewWrapper> GetUserCart(Guid userId)
         {
             User? user = await _userRepository.GetUserWithAddressesAndCartAsync(userId)
-            ?? throw new EntityNotFoundException(userId.ToString());
+            ?? throw new EntityNotFoundException(nameof(User), userId.ToString());
 
             return new CartViewWrapper
             {
@@ -187,23 +187,23 @@
         public async Task RemoveItemFromCartAsync(int itemId, Guid userId, MenuCategory menuCategory)
         {
             User? user = await this._userRepository.GetUserWithShoppingCartAsync(userId)
-                ?? throw new EntityNotFoundException(userId.ToString());
+                ?? throw new EntityNotFoundException(nameof(User), userId.ToString());
             
             switch (menuCategory)
             {
                 case MenuCategory.Pizzas:
                     ShoppingCartPizza? pizzaToRemove = user.ShoppingCartPizzas.FirstOrDefault(p => p.Id == itemId) 
-                        ?? throw new EntityNotFoundException(itemId.ToString());
+                        ?? throw new EntityNotFoundException(nameof(ShoppingCartPizza), itemId.ToString());
                     user.ShoppingCartPizzas.Remove(pizzaToRemove);
                     break;
                 case MenuCategory.Drinks:
                     ShoppingCartDrink? drinkToRemove = user.ShoppingCartDrinks.FirstOrDefault(d => d.DrinkId == itemId)
-                        ?? throw new EntityNotFoundException(itemId.ToString());
+                        ?? throw new EntityNotFoundException(nameof(ShoppingCartDrink), itemId.ToString());
                     user.ShoppingCartDrinks.Remove(drinkToRemove);
                     break;
                 case MenuCategory.Desserts:
                     ShoppingCartDessert? dessertToRemove = user.ShoppingCartDesserts.FirstOrDefault(d => d.DessertId == itemId)
-                        ?? throw new EntityNotFoundException(itemId.ToString());
+                        ?? throw new EntityNotFoundException(nameof(ShoppingCartDessert), itemId.ToString());
                     user.ShoppingCartDesserts.Remove(dessertToRemove);
                     break;
                 default:

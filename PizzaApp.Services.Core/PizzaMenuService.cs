@@ -56,7 +56,7 @@
         public async Task<PizzaDetailsViewWrapper> GetPizzaDetailsByIdAsync(int id)
         {
             CustomizePizzaInputModel pizzaDetails = await this.GetPizzaDetailsViewModelByIdAsync(id)
-                ?? throw new EntityNotFoundException(EntityNotFoundMessage, nameof(Pizza), id);
+                ?? throw new EntityNotFoundException(nameof(Pizza), id.ToString());
 
             PizzaDetailsViewWrapper orderPizzaView = new()
             {

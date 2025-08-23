@@ -10,8 +10,6 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    using static PizzaApp.Services.Common.ExceptionMessages;
-
     public class DessertMenuService : IDessertMenuService
     {
         private readonly IDessertRepository _dessertRepository;
@@ -39,7 +37,7 @@
         public async Task<MenuItemDetailsViewModel> GetDetailsById(int id)
         {
             Dessert dessert = await this._dessertRepository.GetByIdAsync(id)
-                ?? throw new EntityNotFoundException(EntityNotFoundMessage, nameof(Dessert), id);
+                ?? throw new EntityNotFoundException(nameof(Dessert), id.ToString());
 
             return new MenuItemDetailsViewModel()
             {

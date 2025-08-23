@@ -32,7 +32,7 @@
         public async Task EditPizzaAsync(IEditPizzaInputModel inputPizza, Guid userId)
         {
             User? user = await this._userManager.FindByIdAsync(userId.ToString())
-                ?? throw new EntityNotFoundException(userId.ToString());
+                ?? throw new EntityNotFoundException(nameof(User), userId.ToString());
 
             bool isAdmin = await this._userManager.IsInRoleAsync(user, "Admin");
             bool ignoreOwnership = false;
@@ -49,7 +49,7 @@
 
 
             Pizza? pizzaToEdit = await this._pizzaRepository.GetByIdWithIngredientsAsync(inputPizza.Id)
-                ?? throw new EntityNotFoundException(EntityNotFoundMessage);
+                ?? throw new EntityNotFoundException(nameof(Pizza), inputPizza.Id.ToString());
 
             // if ignoreownership is true this means the user is an admin and
             // is trying to edit a base pizza. this is allowed.
@@ -95,10 +95,10 @@
             Pizza? pizzaToEdit = await this._pizzaRepository
                 .DisableTracking()
                 .GetByIdWithIngredientsAsync(id)
-                ?? throw new EntityNotFoundException(EntityNotFoundMessage);
+                ?? throw new EntityNotFoundException(nameof(Pizza), id.ToString());
 
             if (pizzaToEdit.PizzaType != PizzaType.CustomerPizza)
-                throw new EntityNotFoundException($"No customer pizza with ID: {id} was found.");
+                throw new EntityNotFoundException(nameof(Pizza), id.ToString());
 
             if (pizzaToEdit.CreatorUserId != userId)
                 throw new UserNotOwnerException();
@@ -120,7 +120,7 @@
         public async Task<EditBasePizzaInputModel> GetBasePizzaToEdit(int id, Guid userId)
         {
             User? user = await this._userManager.FindByIdAsync(userId.ToString())
-                ?? throw new EntityNotFoundException(userId.ToString());
+                ?? throw new EntityNotFoundException(nameof(User), userId.ToString());
 
             bool isAdmin = await this._userManager.IsInRoleAsync(user, "Admin");
 
@@ -131,7 +131,7 @@
                 .DisableTracking()
                 .IgnoreFiltering()
                 .GetByIdWithIngredientsAsync(id)
-            ?? throw new EntityNotFoundException(id.ToString());
+            ?? throw new EntityNotFoundException(nameof(Pizza), id.ToString());
 
             if (pizza.PizzaType != PizzaType.AdminPizza)
                 throw new InvalidOperationException($"No base pizza with ID: {id} was found.");

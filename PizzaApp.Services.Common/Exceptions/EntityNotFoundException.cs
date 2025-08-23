@@ -1,9 +1,10 @@
 ﻿namespace PizzaApp.Services.Common.Exceptions
 {
-    using PizzaApp.GCommon.Exceptions;
-    public class EntityNotFoundException : CustomExceptionBase
+    using static PizzaApp.Services.Common.ExceptionMessages;
+    public class EntityNotFoundException : Exception
     {
-        public EntityNotFoundException(string? message, params object[] parameters) : base(message, parameters)
+        public EntityNotFoundException(string type, string id) 
+            : base(string.Format(EntityNotFoundMessage, type, id))
         {
         }
     }

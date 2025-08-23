@@ -188,23 +188,6 @@
                     //ImageUrl = "https://images.unsplash.com/photo-1458642849426-cfb724f15ef7?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     IsDeleted = false
                 },
-                /*new Pizza
-                {
-                    Id = 10,
-                    Name = "Philly Cheese Dream",
-                    Description = "Indulgent Philadelphia cheese with pesto sauce.",
-                    DoughId = 3,
-                    SauceId = 4,
-                    CreatorUserId = userId,
-                    PizzaType = PizzaType.AdminPizza,
-                    Toppings = new List<PizzaTopping>
-                    {
-                        new PizzaTopping { ToppingId = 7 },
-                        new PizzaTopping { ToppingId = 4 }
-                    },
-                    ImageUrl = "https://example.com/images/philly_cheese.jpg",
-                    IsDeleted = false
-                }*/
             };
 
             return pizzas;

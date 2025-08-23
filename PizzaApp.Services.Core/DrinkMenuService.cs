@@ -40,7 +40,7 @@
         public async Task<MenuItemDetailsViewModel> GetDetailsById(int id)
         {
             Drink drink = await this._drinkRepository.GetByIdAsync(id)
-                ?? throw new EntityNotFoundException(EntityNotFoundMessage, nameof(Drink), id);
+                ?? throw new EntityNotFoundException(nameof(Drink), id.ToString());
 
             return new MenuItemDetailsViewModel()
             {

@@ -125,7 +125,7 @@
 
             _mockComponentsValidationService.Setup(x => x.ValidateComponentsExistAsync(
                 It.IsAny<int>(), It.IsAny<int?>(), It.IsAny<IEnumerable<int>>(), false))
-                .ThrowsAsync(new EntityNotFoundException("Invalid component"));
+                .ThrowsAsync(new EntityNotFoundException("test", "test"));
 
             // Act & Assert
             Assert.ThrowsAsync<EntityNotFoundException>(

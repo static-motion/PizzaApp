@@ -37,7 +37,7 @@
             Dough? dough = await _doughRepository
                 .IgnoreFiltering()
                 .GetByIdAsync(id)
-            ?? throw new EntityNotFoundException("Dough not found.");
+            ?? throw new EntityNotFoundException(nameof(Dough), id.ToString());
 
             return new EditDoughInputModel
             {
@@ -54,7 +54,7 @@
             Dough? dough = await _doughRepository
                 .IgnoreFiltering()
                 .GetByIdAsync(model.Id)
-            ?? throw new EntityNotFoundException("Dough not found.");
+            ?? throw new EntityNotFoundException(nameof(Dough), model.Id.ToString());
 
             dough.Type = model.Type;
             dough.Price = model.Price;

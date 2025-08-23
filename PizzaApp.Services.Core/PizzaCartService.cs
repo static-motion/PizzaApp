@@ -38,7 +38,7 @@ public class PizzaCartService : IPizzaCartService
     public async Task AddPizzaToCartAsync(PizzaCartDto pizzaDto, Guid userId)
     {
         User? user = await _userRepository.GetUserWithShoppingCartAsync(userId)
-            ?? throw new EntityNotFoundException("");
+            ?? throw new EntityNotFoundException(nameof(User), userId.ToString());
 
         PizzaComponentsDto components = new()
         {
@@ -132,13 +132,13 @@ public class PizzaCartService : IPizzaCartService
         try
         {
             if (!basePizzaDict.TryGetValue(pizza.BasePizzaId, out var basePizza) || basePizza.IsDeleted)
-                throw new EntityNotFoundException("Could not find pizza: " + pizza.BasePizzaId);
+                throw new EntityNotFoundException(nameof(Pizza), pizza.BasePizzaId.ToString());
 
             PizzaComponentsDto? components = pizza.GetComponentsFromJson()
                 ?? throw new InvalidOperationException();
 
             if (!doughDict.TryGetValue(components.DoughId, out var dough) || dough.IsDeleted)
-                throw new EntityNotFoundException("Could not find dough:", components.DoughId);
+                throw new EntityNotFoundException(nameof(Dough), components.DoughId.ToString());
 
             Sauce? sauce = null;
             // this is done because selecting a sauce for the pizza is not mandatory.
@@ -149,7 +149,7 @@ public class PizzaCartService : IPizzaCartService
             {                                // we try to get it from the lookup dictionary
                 if (!sauceDict.TryGetValue(components.SauceId.Value, out sauce))
                 {
-                    throw new EntityNotFoundException(components.SauceId.Value.ToString());// if we end up here this means
+                    throw new EntityNotFoundException(nameof(Sauce), components.SauceId.Value.ToString());// if we end up here this means
                              // that the sauce has been filtered out by the query filter
                              // due to IsDeleted = true. We skip building the cart pizza
                              // with the inactive sauce
@@ -170,7 +170,7 @@ public class PizzaCartService : IPizzaCartService
             foreach (var toppingId in components.SelectedToppings)
             {
                 if (!toppingDict.TryGetValue(toppingId, out var topping))
-                    throw new EntityNotFoundException("Could not find topping:", toppingId);
+                    throw new EntityNotFoundException(nameof(Topping), toppingId.ToString());
 
                 var categoryName = topping.ToppingCategory.Name;
 
